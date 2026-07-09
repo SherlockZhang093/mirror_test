@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="600" viewBox="0 0 1280 600">
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 34px "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #172033; }
+      .lane { fill: #ffffff; stroke: #d6deea; stroke-width: 2; rx: 20; }
+      .mirror { fill: #edf8ff; stroke: #66a6d9; stroke-width: 2.5; rx: 16; }
+      .bossA { fill: #fff0f0; stroke: #d76161; stroke-width: 2.5; rx: 16; }
+      .bossB { fill: #f3f0ff; stroke: #7a6fd8; stroke-width: 2.5; rx: 16; }
+      .bossC { fill: #fff8e6; stroke: #cda13a; stroke-width: 2.5; rx: 16; }
+      .label { font: 700 23px "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #172033; }
+      .text { font: 17px "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #566477; }
+      .arrow { stroke: #607086; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+      .dash { stroke: #8a97a8; stroke-width: 3; stroke-dasharray: 8 8; fill: none; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#607086"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1280" height="600"/>
+  <text class="title" x="60" y="70">关卡结构：现实层与镜像层交替推进</text>
+
+  <rect class="lane" x="70" y="130" width="1140" height="160"/>
+  <text class="label" x="100" y="180">现实层</text>
+  <text class="text" x="100" y="215">承担推进、教学、敌人组合和能力验证</text>
+
+  <rect class="lane" x="70" y="355" width="1140" height="160"/>
+  <text class="label" x="100" y="405">镜像层</text>
+  <text class="text" x="100" y="440">承担 Boss 战、能力夺回和主题化演出</text>
+
+  <rect class="mirror" x="270" y="160" width="170" height="88"/>
+  <text class="label" x="315" y="195">镜子门</text>
+  <text class="text" x="306" y="224">第一次阻断</text>
+
+  <rect class="bossA" x="270" y="385" width="170" height="88"/>
+  <text class="label" x="315" y="420">刃镜</text>
+  <text class="text" x="300" y="449">镜刃主题</text>
+
+  <rect class="mirror" x="555" y="160" width="170" height="88"/>
+  <text class="label" x="600" y="195">镜子门</text>
+  <text class="text" x="590" y="224">第二次阻断</text>
+
+  <rect class="bossB" x="555" y="385" width="170" height="88"/>
+  <text class="label" x="600" y="420">回声</text>
+  <text class="text" x="590" y="449">冲刺与残影</text>
+
+  <rect class="mirror" x="840" y="160" width="170" height="88"/>
+  <text class="label" x="900" y="195">尾声</text>
+  <text class="text" x="870" y="224">进入最终试炼</text>
+
+  <rect class="bossC" x="840" y="385" width="220" height="88"/>
+  <text class="label" x="900" y="420">镜域之主</text>
+  <text class="text" x="875" y="449">前两种能力的综合考验</text>
+
+  <path class="arrow" d="M170 205 H255"/>
+  <path class="dash" d="M355 250 V372"/>
+  <path class="arrow" d="M445 205 H540"/>
+  <path class="dash" d="M640 250 V372"/>
+  <path class="arrow" d="M730 205 H825"/>
+  <path class="dash" d="M925 250 V372"/>
+  <path class="arrow" d="M440 430 H540"/>
+  <path class="arrow" d="M725 430 H825"/>
+</svg>

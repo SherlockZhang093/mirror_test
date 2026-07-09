@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="560" viewBox="0 0 1280 560">
+  <defs>
+    <style>
+      .bg { fill: #f7f8fb; }
+      .title { font: 700 34px "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #172033; }
+      .center { fill: #ffffff; stroke: #95a3b8; stroke-width: 3; rx: 22; }
+      .boss { fill: #fff1f1; stroke: #d46a6a; stroke-width: 2.5; rx: 18; }
+      .player { fill: #eef8ff; stroke: #5d9fd2; stroke-width: 2.5; rx: 18; }
+      .enemy { fill: #f2fff5; stroke: #65b97a; stroke-width: 2.5; rx: 18; }
+      .feedback { fill: #fff8e7; stroke: #cda146; stroke-width: 2.5; rx: 18; }
+      .label { font: 700 24px "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #172033; }
+      .text { font: 18px "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #566477; }
+      .arrow { stroke: #617086; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#617086"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1280" height="560"/>
+  <text class="title" x="60" y="70">能力复用思路：同一个能力，不同使用者版本</text>
+
+  <rect class="center" x="455" y="185" width="370" height="160"/>
+  <text class="label" x="555" y="235">AbilityConfig</text>
+  <text class="text" x="510" y="272">描述一个能力的共同逻辑</text>
+  <text class="text" x="500" y="302">例如：镜刃 / 回声冲刺</text>
+
+  <rect class="boss" x="90" y="155" width="270" height="130"/>
+  <text class="label" x="170" y="205">Boss 版</text>
+  <text class="text" x="125" y="240">前摇清楚，可读可躲</text>
+  <text class="text" x="125" y="268">用于“教学”和压迫</text>
+
+  <rect class="player" x="920" y="155" width="270" height="130"/>
+  <text class="label" x="990" y="205">玩家版</text>
+  <text class="text" x="955" y="240">响应更快，反馈更强</text>
+  <text class="text" x="955" y="268">用于“夺回后的成长”</text>
+
+  <rect class="enemy" x="90" y="355" width="270" height="120"/>
+  <text class="label" x="165" y="405">敌人版</text>
+  <text class="text" x="125" y="440">简单、稳定、低成本</text>
+
+  <rect class="feedback" x="920" y="355" width="270" height="120"/>
+  <text class="label" x="990" y="405">反馈配置</text>
+  <text class="text" x="955" y="440">动画、特效、音效、顿帧</text>
+
+  <path class="arrow" d="M455 245 H375"/>
+  <path class="arrow" d="M825 245 H905"/>
+  <path class="arrow" d="M455 310 C380 350 360 375 375 405"/>
+  <path class="arrow" d="M825 310 C900 350 920 375 905 405"/>
+</svg>

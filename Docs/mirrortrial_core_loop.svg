@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="520" viewBox="0 0 1280 520">
+  <defs>
+    <style>
+      .bg { fill: #f7f8fb; }
+      .title { font: 700 34px "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #172033; }
+      .node-title { font: 700 24px "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #172033; }
+      .node-text { font: 18px "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #526071; }
+      .small { font: 16px "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #6b7788; }
+      .arrow { stroke: #5c6f89; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+      .card { fill: #ffffff; stroke: #ccd5e2; stroke-width: 2; rx: 18; }
+      .mirror { fill: #edf8ff; stroke: #64a6d8; stroke-width: 3; rx: 18; }
+      .boss { fill: #fff2f2; stroke: #d96969; stroke-width: 3; rx: 18; }
+      .gain { fill: #f2fff7; stroke: #61b77c; stroke-width: 3; rx: 18; }
+      .final { fill: #fff8e8; stroke: #d3a332; stroke-width: 3; rx: 18; }
+    </style>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#5c6f89"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1280" height="520"/>
+  <text class="title" x="60" y="70">核心体验循环：镜子阻断 → 镜像试炼 → 夺回能力</text>
+
+  <rect class="card" x="70" y="150" width="190" height="140"/>
+  <text class="node-title" x="105" y="200">现实层推进</text>
+  <text class="node-text" x="105" y="235">横版前进</text>
+  <text class="node-text" x="105" y="263">遭遇敌人</text>
+
+  <path class="arrow" d="M270 220 H345"/>
+
+  <rect class="mirror" x="360" y="150" width="190" height="140"/>
+  <text class="node-title" x="415" y="200">镜子门</text>
+  <text class="node-text" x="395" y="235">阻挡前路</text>
+  <text class="node-text" x="395" y="263">进入镜中</text>
+
+  <path class="arrow" d="M560 220 H635"/>
+
+  <rect class="boss" x="650" y="150" width="190" height="140"/>
+  <text class="node-title" x="690" y="200">镜像 Boss</text>
+  <text class="node-text" x="685" y="235">展示能力</text>
+  <text class="node-text" x="685" y="263">逼迫学习</text>
+
+  <path class="arrow" d="M850 220 H925"/>
+
+  <rect class="gain" x="940" y="150" width="190" height="140"/>
+  <text class="node-title" x="990" y="200">夺回能力</text>
+  <text class="node-text" x="970" y="235">能力解锁</text>
+  <text class="node-text" x="970" y="263">战斗方式变化</text>
+
+  <path class="arrow" d="M1035 300 C1035 390 165 390 165 310"/>
+  <text class="small" x="465" y="410">带着新能力回到现实层，解决之前更难处理的威胁</text>
+
+  <rect class="final" x="480" y="315" width="320" height="95"/>
+  <text class="node-title" x="555" y="355">最终综合考验</text>
+  <text class="node-text" x="515" y="385">用夺回的能力对抗完整镜像自我</text>
+</svg>
