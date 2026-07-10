@@ -14,13 +14,13 @@ namespace MirrorTrial.Player
         public class MovementTuning
         {
             public float moveSpeed = 5f;
-            public float acceleration = 50f;
-            public float deceleration = 60f;
+            public float acceleration = 30f;
+            public float deceleration = 20f;
             public float airAcceleration = 30f;
             public float jumpSpeed = 7.5f;
             public float baseGravityModifier = 1f;
-            public float fallGravityMultiplier = 1.4f;
-            [Range(0f, 1f)] public float jumpCutMultiplier = 0.5f;
+            public float fallGravityMultiplier = 1.15f;
+            [Range(0f, 1f)] public float jumpCutMultiplier = 0.55f;
             public float coyoteTime = 0.08f;
             public float jumpBufferTime = 0.10f;
         }

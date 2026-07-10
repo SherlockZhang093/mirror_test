@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 128469109}
   - component: {fileID: 128469108}
   - component: {fileID: 128469107}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Platform_Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -263,7 +263,7 @@ GameObject:
   - component: {fileID: 436791918}
   - component: {fileID: 436791917}
   - component: {fileID: 436791916}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Platform_Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -393,7 +393,7 @@ GameObject:
   - component: {fileID: 1146825943}
   - component: {fileID: 1146825942}
   - component: {fileID: 1146825941}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Wall_Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -615,7 +615,7 @@ GameObject:
   - component: {fileID: 1305894468}
   - component: {fileID: 1305894467}
   - component: {fileID: 1305894466}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Ground_Main
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -745,7 +745,7 @@ GameObject:
   - component: {fileID: 1378026215}
   - component: {fileID: 1378026214}
   - component: {fileID: 1378026213}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Wall_Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -872,6 +872,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 903989754809041374, guid: 0eb9dd5878ab6d849b4720b03e304987,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 1.3145105
+      objectReference: {fileID: 0}
+    - target: {fileID: 903989754809041374, guid: 0eb9dd5878ab6d849b4720b03e304987,
+        type: 3}
+      propertyPath: m_Offset.y
+      value: 0.6389099
+      objectReference: {fileID: 0}
     - target: {fileID: 4756217149488517540, guid: 0eb9dd5878ab6d849b4720b03e304987,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -880,7 +890,7 @@ PrefabInstance:
     - target: {fileID: 4756217149488517540, guid: 0eb9dd5878ab6d849b4720b03e304987,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.95
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4756217149488517540, guid: 0eb9dd5878ab6d849b4720b03e304987,
         type: 3}
@@ -1355,7 +1365,7 @@ GameObject:
   - component: {fileID: 1884165624}
   - component: {fileID: 1884165623}
   - component: {fileID: 1884165622}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Platform_High
   m_TagString: Untagged
   m_Icon: {fileID: 0}

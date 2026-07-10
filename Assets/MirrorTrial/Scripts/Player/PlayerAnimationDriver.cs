@@ -2,15 +2,12 @@ using UnityEngine;
 
 namespace MirrorTrial.Player
 {
-    /// <summary>
-    /// 纯展示层：只读 PlayerStateMachine.CurrentState，映射到 Animator 播放。
-    /// 不再自己判断 locomotion，也不再持有 forcedState —— 唯一真相在状态机。
-    ///
-    /// ForceState / ClearForcedState 保留为兼容 API，转发给状态机的 RequestAction / ReleaseAction。
-    /// </summary>
-    [RequireComponent(typeof(Animator), typeof(PlayerMotor), typeof(PlayerStateMachine))]
+    [RequireComponent(typeof(PlayerMotor), typeof(PlayerStateMachine))]
     public class PlayerAnimationDriver : MonoBehaviour
     {
+        [Header("References")]
+        [SerializeField] Animator animator;
+
         [Header("Blend")]
         [SerializeField] float fadeDuration = 0.08f;
 
@@ -26,33 +23,45 @@ namespace MirrorTrial.Player
         [SerializeField] string hurtState = "HitDamage";
         [SerializeField] string deadState = "Die";
 
-        Animator animator;
         PlayerStateMachine stateMachine;
         PlayerActionState playingState = PlayerActionState.None;
 
         void Awake()
         {
-            animator = GetComponent<Animator>();
+            if (!animator)
+                animator = GetComponentInChildren<Animator>(true);
+
+            if (animator)
+                animator.applyRootMotion = false;
+
             stateMachine = GetComponent<PlayerStateMachine>();
         }
 
         void Update()
         {
-            if (stateMachine == null) return;
-            // 状态机已在本帧更早（DefaultExecutionOrder -100）解算好 CurrentState
+            if (!animator || stateMachine == null)
+                return;
+
             Play(stateMachine.CurrentState);
         }
 
-        // ── 兼容旧调用：转发给状态机 ──
-        public void ForceState(PlayerActionState state) { if (stateMachine != null) stateMachine.RequestAction(state); }
-        public void ClearForcedState(PlayerActionState state) { if (stateMachine != null) stateMachine.ReleaseAction(state); }
+        public void ForceState(PlayerActionState state)
+        {
+            if (stateMachine != null)
+                stateMachine.RequestAction(state);
+        }
+
+        public void ClearForcedState(PlayerActionState state)
+        {
+            if (stateMachine != null)
+                stateMachine.ReleaseAction(state);
+        }
 
         void Play(PlayerActionState state)
         {
             if (state == playingState)
                 return;
 
-            // Land 态若没有对应动画名，回退成 Idle，避免卡在无效 state
             var stateName = GetAnimationStateName(state);
             if (string.IsNullOrEmpty(stateName))
             {

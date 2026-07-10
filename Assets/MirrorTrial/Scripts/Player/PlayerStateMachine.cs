@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace MirrorTrial.Player
 {
@@ -15,7 +15,7 @@ namespace MirrorTrial.Player
     {
         [Header("Land buffer")]
         [Tooltip("落地后维持 Land 态的时间（秒），播放着地动画/缓冲。0 = 不用 Land 态")]
-        [SerializeField] float landStateDuration = 0.08f;
+        [SerializeField] float landStateDuration = 0.05f;
 
         [Header("Debug")]
         [SerializeField] bool logStateChanges = true;
@@ -66,8 +66,8 @@ namespace MirrorTrial.Player
         void Tick()
         {
             // 1) 落地事件检测：空中 → 地面 的那一帧，进入 Land 缓冲
-            // 用 Motor 的稳定落地标志（经过吸附稳定化），而非基类每帧横跳的 IsGrounded
-            bool grounded = motor.StableGrounded;
+            // PlayerMotor owns the single authoritative grounded result.
+            bool grounded = motor.IsGrounded;
             if (grounded && !wasGroundedLastFrame)
                 landTimer = landStateDuration;
             else if (landTimer > 0f)

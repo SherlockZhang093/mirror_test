@@ -2,31 +2,29 @@ using UnityEngine;
 
 namespace MirrorTrial.Player
 {
-    /// <summary>
-    /// Temporary debug overlay. Shows input state + motor state on screen.
-    /// Attach to the Player or any object in the scene.
-    /// Delete this script once debugging is done.
-    /// </summary>
     public class PlayerDebugOverlay : MonoBehaviour
     {
         PlayerInputReader input;
         PlayerMotor motor;
+        PlayerStateMachine stateMachine;
 
         void Awake()
         {
-            // Try to find on self first, then search scene
             input = GetComponent<PlayerInputReader>();
             motor = GetComponent<PlayerMotor>();
+            stateMachine = GetComponent<PlayerStateMachine>();
 
             if (input == null)
                 input = FindObjectOfType<PlayerInputReader>();
             if (motor == null)
                 motor = FindObjectOfType<PlayerMotor>();
+            if (stateMachine == null)
+                stateMachine = FindObjectOfType<PlayerStateMachine>();
         }
 
         void OnGUI()
         {
-            GUILayout.BeginArea(new Rect(10, 10, 300, 400));
+            GUILayout.BeginArea(new Rect(10, 10, 320, 420));
             GUILayout.Label("<size=14><b>== Player Debug ==</b></size>");
 
             if (input == null)
@@ -52,10 +50,12 @@ namespace MirrorTrial.Player
             else
             {
                 GUILayout.Label($"IsGrounded: {motor.IsGrounded}");
+                GUILayout.Label($"State: {(stateMachine ? stateMachine.CurrentState.ToString() : "NOT FOUND")}");
                 GUILayout.Label($"Velocity: {motor.Velocity}");
                 GUILayout.Label($"MoveX (motor): {motor.MoveX:F2}");
                 GUILayout.Label($"MovementLocked: {motor.MovementLocked}");
                 GUILayout.Label($"Position: {motor.transform.position}");
+                GUILayout.Label($"TimeScale: {Time.timeScale:F2}");
             }
 
             GUILayout.EndArea();

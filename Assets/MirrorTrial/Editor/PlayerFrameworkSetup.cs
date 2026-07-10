@@ -1,4 +1,4 @@
-﻿using MirrorTrial.Abilities;
+using MirrorTrial.Abilities;
 using MirrorTrial.Combat;
 using MirrorTrial.Player;
 using Platformer.Mechanics;
@@ -64,23 +64,27 @@ namespace MirrorTrial.Editor
             var player = new GameObject("Player_MirrorTrial");
             ApplyTagAndLayer(player);
 
-            var spriteRenderer = player.AddComponent<SpriteRenderer>();
+            var visual = new GameObject("Visual");
+            visual.transform.SetParent(player.transform, false);
+
+            var spriteRenderer = visual.AddComponent<SpriteRenderer>();
             spriteRenderer.sortingOrder = 5;
             spriteRenderer.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(IdleSpritePath);
 
-            var animator = player.AddComponent<Animator>();
+            var animator = visual.AddComponent<Animator>();
             animator.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(AnimatorPath);
+            animator.applyRootMotion = false;
 
             var body = player.AddComponent<Rigidbody2D>();
-            body.bodyType = RigidbodyType2D.Kinematic;
-            body.useFullKinematicContacts = false;
-            body.interpolation = RigidbodyInterpolation2D.None;
-            body.collisionDetectionMode = CollisionDetectionMode2D.Discrete;
+            body.bodyType = RigidbodyType2D.Dynamic;
+            body.gravityScale = 0f;
+            body.interpolation = RigidbodyInterpolation2D.Interpolate;
+            body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
             body.freezeRotation = true;
 
             var collider = player.AddComponent<BoxCollider2D>();
-            collider.offset = new Vector2(0f, -0.10f);
-            collider.size = new Vector2(0.45f, 0.90f);
+            collider.offset = new Vector2(0f, 0.65f);
+            collider.size = new Vector2(0.45f, 1.30f);
 
             var health = player.AddComponent<Health>();
             health.maxHP = 100;
