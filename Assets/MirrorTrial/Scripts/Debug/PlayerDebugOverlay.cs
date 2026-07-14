@@ -7,12 +7,16 @@ namespace MirrorTrial.Player
         PlayerInputReader input;
         PlayerMotor motor;
         PlayerStateMachine stateMachine;
+        PlayerWeaponController weapons;
+        PlayerBowCombat bowCombat;
 
         void Awake()
         {
             input = GetComponent<PlayerInputReader>();
             motor = GetComponent<PlayerMotor>();
             stateMachine = GetComponent<PlayerStateMachine>();
+            weapons = GetComponent<PlayerWeaponController>();
+            bowCombat = GetComponent<PlayerBowCombat>();
 
             if (input == null)
                 input = FindObjectOfType<PlayerInputReader>();
@@ -20,6 +24,10 @@ namespace MirrorTrial.Player
                 motor = FindObjectOfType<PlayerMotor>();
             if (stateMachine == null)
                 stateMachine = FindObjectOfType<PlayerStateMachine>();
+            if (weapons == null)
+                weapons = FindObjectOfType<PlayerWeaponController>();
+            if (bowCombat == null)
+                bowCombat = FindObjectOfType<PlayerBowCombat>();
         }
 
         void OnGUI()
@@ -38,7 +46,11 @@ namespace MirrorTrial.Player
                 GUILayout.Label($"JumpPressed: {input.JumpPressed}");
                 GUILayout.Label($"AttackPressed: {input.AttackPressed}");
                 GUILayout.Label($"MirrorBlade: {input.MirrorBladePressed}");
-                GUILayout.Label($"EchoDash: {input.EchoDashPressed}");
+                GUILayout.Label($"WeaponSkill: {input.WeaponSkillPressed}");
+                GUILayout.Label($"MobilitySkill: {input.MobilitySkillPressed}");
+                GUILayout.Label($"CurrentWeapon: {(weapons ? weapons.CurrentWeapon.ToString() : "NOT FOUND")}");
+                GUILayout.Label($"WeaponSlot: {(weapons ? weapons.ActiveSlotIndex + 1 : 0)}");
+                GUILayout.Label($"BowBusy: {(bowCombat && bowCombat.IsBusy)}");
             }
 
             GUILayout.Space(10);

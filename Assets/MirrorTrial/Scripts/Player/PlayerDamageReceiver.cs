@@ -13,6 +13,7 @@ namespace MirrorTrial.Player
         PlayerMotor motor;
         PlayerAnimationDriver animationDriver;
         Health health;
+        PlayerCombat combat;
 
         bool invincible;
         Coroutine hurtRoutine;
@@ -24,6 +25,7 @@ namespace MirrorTrial.Player
             motor = GetComponent<PlayerMotor>();
             animationDriver = GetComponent<PlayerAnimationDriver>();
             health = GetComponent<Health>();
+            combat = GetComponent<PlayerCombat>();
         }
 
         public void SetExternalInvincible(float duration)
@@ -41,6 +43,8 @@ namespace MirrorTrial.Player
         void OnDamagePayloadReceived(DamagePayload payload)
         {
             if (invincible)
+                return;
+            if (combat && combat.TryBlockIncomingHit())
                 return;
 
             if (health)

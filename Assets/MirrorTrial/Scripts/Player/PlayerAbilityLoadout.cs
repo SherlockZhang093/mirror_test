@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using MirrorTrial.Abilities;
 using MirrorTrial.Combat;
 using UnityEngine;
@@ -9,16 +9,18 @@ namespace MirrorTrial.Player
     [RequireComponent(typeof(PlayerAnimationDriver))]
     public class PlayerAbilityLoadout : MonoBehaviour
     {
+        [SerializeField] AnimationClip mirrorBladeClip;
         [SerializeField] MirrorBladeProjectile mirrorBladeProjectilePrefab;
         [SerializeField] Transform projectileSpawnPoint;
         [SerializeField] float projectileSpawnForwardOffset = 0.65f;
-        [SerializeField] float projectileSpawnUpOffset = 0.10f;
+        [SerializeField] float projectileSpawnUpOffset = 1.10f;
 
         PlayerInputReader input;
         PlayerTuning tuning;
         PlayerMotor motor;
         PlayerAnimationDriver animationDriver;
         PlayerDamageReceiver damageReceiver;
+        PlayerWeaponController weapons;
 
         float mirrorBladeReadyTime;
         float echoDashReadyTime;
@@ -34,16 +36,17 @@ namespace MirrorTrial.Player
             motor = GetComponent<PlayerMotor>();
             animationDriver = GetComponent<PlayerAnimationDriver>();
             damageReceiver = GetComponent<PlayerDamageReceiver>();
+            weapons = GetComponent<PlayerWeaponController>();
         }
 
         void Update()
         {
             var abilities = tuning.abilities;
 
-            if (abilities.mirrorBladeUnlocked && input.MirrorBladePressed && mirrorBladeRoutine == null && Time.time >= mirrorBladeReadyTime)
+            if (abilities.mirrorBladeUnlocked && weapons && weapons.CurrentWeapon == PlayerWeaponType.Sword && input.WasPressed(PlayerInputCommand.WeaponSkill) && mirrorBladeRoutine == null && Time.time >= mirrorBladeReadyTime)
                 mirrorBladeRoutine = StartCoroutine(MirrorBladeRoutine());
 
-            if (abilities.echoDashUnlocked && input.EchoDashPressed && echoDashRoutine == null && Time.time >= echoDashReadyTime)
+            if (abilities.echoDashUnlocked && input.WasPressed(PlayerInputCommand.MobilitySkill) && echoDashRoutine == null && Time.time >= echoDashReadyTime)
                 echoDashRoutine = StartCoroutine(EchoDashRoutine());
         }
 
@@ -52,7 +55,9 @@ namespace MirrorTrial.Player
             var ability = tuning.abilities;
             mirrorBladeReadyTime = Time.time + ability.mirrorBladeCooldown;
             motor.MovementLocked = true;
-            animationDriver.ForceState(PlayerActionState.Cast);
+            animationDriver.ForceState(PlayerActionState.Attack);
+            if (mirrorBladeClip) animationDriver.PlayActionClip(mirrorBladeClip, ability.mirrorBladeStartup + ability.mirrorBladeRecovery);
+            else animationDriver.ForceState(PlayerActionState.Cast);
 
             yield return new WaitForSeconds(ability.mirrorBladeStartup);
 
@@ -61,6 +66,8 @@ namespace MirrorTrial.Player
             yield return new WaitForSeconds(ability.mirrorBladeRecovery);
 
             motor.MovementLocked = false;
+            animationDriver.StopActionClip();
+            animationDriver.ClearForcedState(PlayerActionState.Attack);
             animationDriver.ClearForcedState(PlayerActionState.Cast);
             mirrorBladeRoutine = null;
         }

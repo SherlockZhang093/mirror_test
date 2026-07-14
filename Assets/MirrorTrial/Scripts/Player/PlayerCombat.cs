@@ -1,23 +1,132 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using MirrorTrial.Combat;
 using UnityEngine;
 
 namespace MirrorTrial.Player
 {
+    public enum PlayerMoveCategory
+    {
+        Basic,
+        Sword,
+        Punch,
+        Kick,
+        Bow,
+        Skill
+    }
+
+    public enum PlayerComboCategory
+    {
+        Opener,
+        Chain,
+        Finisher,
+        Launcher,
+        Guard,
+        Special
+    }
+
+    public enum AttackHitboxInterpolation
+    {
+        Step,
+        Linear
+    }
+
+    [Serializable]
+    public sealed class PlayerAttackHitboxKey
+    {
+        public int frame;
+        public bool enabled = true;
+        public Vector2 offset = new Vector2(0.65f, 0f);
+        public Vector2 size = new Vector2(1f, 0.8f);
+        public AttackHitboxInterpolation interpolation = AttackHitboxInterpolation.Step;
+    }
+
+    [Serializable]
+    public sealed class PlayerComboStep
+    {
+        public string name = "Attack";
+        public PlayerMoveCategory moveCategory = PlayerMoveCategory.Basic;
+        public PlayerComboCategory comboCategory = PlayerComboCategory.Chain;
+        public PlayerInputCommand input = PlayerInputCommand.PrimaryAttack;
+        public AnimationClip animationClip;
+        [HideInInspector] public PlayerActionState animationState = PlayerActionState.Attack;
+        public int animationFrameRate = 12;
+        public int animationFrameCount = 8;
+        public bool mirrorHitboxByFacing = true;
+        public List<PlayerAttackHitboxKey> hitboxKeys = new List<PlayerAttackHitboxKey>();
+        public float startup = 0.08f;
+        public float activeTime = 0.08f;
+        public float recovery = 0.16f;
+        public float comboWindowStart = 0.10f;
+        public float comboWindowEnd = 0.28f;
+        public float damageMultiplier = 1f;
+        public float knockbackMultiplier = 1f;
+        public bool lockMovement = true;
+    }
+
+    [Serializable]
+    public sealed class PlayerComboSet
+    {
+        public string name = "Default Combo";
+        public PlayerWeaponType weaponType = PlayerWeaponType.Sword;
+        public List<PlayerComboStep> steps = new List<PlayerComboStep>();
+    }
+
     [RequireComponent(typeof(PlayerInputReader), typeof(PlayerTuning), typeof(PlayerMotor))]
     [RequireComponent(typeof(PlayerAnimationDriver))]
     public class PlayerCombat : MonoBehaviour
     {
         [SerializeField] Hitbox attackHitbox;
+        [SerializeField] List<PlayerComboSet> comboSets = new List<PlayerComboSet>();
+        [SerializeField] int activeComboSetIndex;
+        [SerializeField, HideInInspector] bool punchComboCreated;
+        [SerializeField, HideInInspector] List<PlayerComboStep> combo = CreateDefaultCombo();
+        [SerializeField] AnimationClip swordGuardClip;
+        [SerializeField] AnimationClip swordGuardImpactClip;
+        [SerializeField] PlayerComboStep swordRunAttack = CreateSwordRunAttack();
+        [SerializeField] PlayerComboStep swordCrouchAttack = CreateSwordCrouchAttack();
 
         PlayerInputReader input;
         PlayerTuning tuning;
         PlayerMotor motor;
         PlayerAnimationDriver animationDriver;
+        PlayerWeaponController weapons;
 
         Coroutine attackRoutine;
+        Hitbox activeHitbox;
+        bool queuedNextComboStep;
+        bool guarding;
+        Coroutine guardImpactRoutine;
 
-        public bool IsAttacking => attackRoutine != null;
+        public bool IsAttacking { get { return attackRoutine != null || guarding; } }
+        public bool IsGuarding { get { return guarding; } }
+        public int ActiveComboSetIndex { get { return activeComboSetIndex; } set { activeComboSetIndex = Mathf.Clamp(value, 0, Mathf.Max(0, comboSets.Count - 1)); } }
+        public IList<PlayerComboSet> ComboSets { get { return comboSets; } }
+        public IList<PlayerComboStep> Combo { get { return ActiveCombo; } }
+        List<PlayerComboStep> ActiveCombo
+        {
+            get
+            {
+                EnsureCombo();
+                if (!weapons) weapons = GetComponent<PlayerWeaponController>();
+                var weapon = weapons ? weapons.CurrentWeapon : PlayerWeaponType.Unarmed;
+                for (var i = 0; i < comboSets.Count; i++)
+                    if (comboSets[i] != null && comboSets[i].weaponType == weapon)
+                        return comboSets[i].steps;
+                return comboSets[Mathf.Clamp(activeComboSetIndex, 0, comboSets.Count - 1)].steps;
+            }
+        }
+
+        void OnValidate()
+        {
+            EnsureCombo();
+        }
+
+        public void EnsureComboData()
+        {
+            EnsureCombo();
+        }
 
         void Awake()
         {
@@ -25,6 +134,8 @@ namespace MirrorTrial.Player
             tuning = GetComponent<PlayerTuning>();
             motor = GetComponent<PlayerMotor>();
             animationDriver = GetComponent<PlayerAnimationDriver>();
+            weapons = GetComponent<PlayerWeaponController>();
+            EnsureCombo();
 
             if (attackHitbox)
                 attackHitbox.SetActive(false);
@@ -32,48 +143,415 @@ namespace MirrorTrial.Player
 
         void Update()
         {
-            if (input.AttackPressed && attackRoutine == null)
-                attackRoutine = StartCoroutine(AttackRoutine());
-        }
+            if (!weapons) weapons = GetComponent<PlayerWeaponController>();
+            var weapon = weapons ? weapons.CurrentWeapon : PlayerWeaponType.Unarmed;
+            if (weapon == PlayerWeaponType.Bow || weapon == PlayerWeaponType.Reserved)
+                return;
 
-        IEnumerator AttackRoutine()
-        {
-            var combat = tuning.combat;
-            animationDriver.ForceState(PlayerActionState.Attack);
-            motor.MovementLocked = true;
-
-            yield return new WaitForSeconds(combat.attackStartup);
-
-            if (attackHitbox)
+            if (weapon == PlayerWeaponType.Sword)
             {
-                var direction = motor.FacingRight ? Vector2.right : Vector2.left;
-                var hitboxTransform = attackHitbox.transform;
-                var localPosition = hitboxTransform.localPosition;
-                localPosition.x = Mathf.Abs(localPosition.x) * direction.x;
-                hitboxTransform.localPosition = localPosition;
-
-                attackHitbox.Configure(new DamagePayload(gameObject, combat.attackDamage, combat.attackKnockback, direction, combat.hitStop));
-                attackHitbox.SetActive(true);
+                if (!guarding && attackRoutine == null && input.IsHeld(PlayerInputCommand.SecondaryAttack))
+                    BeginGuard();
+                else if (guarding && !input.IsHeld(PlayerInputCommand.SecondaryAttack))
+                    EndGuard();
+                if (guarding)
+                    return;
             }
 
-            yield return new WaitForSeconds(combat.attackActiveTime);
+            var activeCombo = ActiveCombo;
+            if (activeCombo.Count == 0)
+                return;
+            if (weapon == PlayerWeaponType.Sword && input.WasPressed(PlayerInputCommand.PrimaryAttack) && attackRoutine == null)
+            {
+                if (input.MoveY < -0.5f)
+                    attackRoutine = StartCoroutine(SingleStepRoutine(swordCrouchAttack));
+                else if (Mathf.Abs(input.MoveX) > 0.1f)
+                    attackRoutine = StartCoroutine(SingleStepRoutine(swordRunAttack));
+                else
+                    attackRoutine = StartCoroutine(ComboRoutine());
+                return;
+            }
+            if (weapon == PlayerWeaponType.Unarmed && input.WasPressed(PlayerInputCommand.SecondaryAttack) && attackRoutine == null)
+            {
+                attackRoutine = StartCoroutine(SingleStepRoutine(activeCombo[activeCombo.Count - 1]));
+                return;
+            }
+            if (input.WasPressed(activeCombo[0].input) && attackRoutine == null)
+                attackRoutine = StartCoroutine(ComboRoutine());
+        }
 
+        void BeginGuard()
+        {
+            guarding = true;
+            motor.MovementLocked = true;
+            animationDriver.ForceState(PlayerActionState.Attack);
+            if (swordGuardClip) animationDriver.PlayActionClip(swordGuardClip, swordGuardClip.length);
+            else animationDriver.ForceState(PlayerActionState.SwordGuard);
+        }
+
+        void EndGuard()
+        {
+            guarding = false;
+            motor.MovementLocked = false;
+            animationDriver.StopActionClip();
+            animationDriver.ClearForcedState(PlayerActionState.Attack);
+            animationDriver.ClearForcedState(PlayerActionState.SwordGuard);
+            animationDriver.ClearForcedState(PlayerActionState.SwordGuardImpact);
+        }
+
+        public bool TryBlockIncomingHit()
+        {
+            if (!guarding)
+                return false;
+            if (guardImpactRoutine != null)
+                StopCoroutine(guardImpactRoutine);
+            guardImpactRoutine = StartCoroutine(GuardImpactRoutine());
+            return true;
+        }
+
+        IEnumerator GuardImpactRoutine()
+        {
+            if (swordGuardImpactClip) animationDriver.PlayActionClip(swordGuardImpactClip, 0.12f);
+            else animationDriver.ForceState(PlayerActionState.SwordGuardImpact);
+            yield return new WaitForSeconds(0.12f);
+            animationDriver.StopActionClip();
+            animationDriver.ClearForcedState(PlayerActionState.SwordGuardImpact);
+            if (guarding)
+            {
+                if (swordGuardClip) animationDriver.PlayActionClip(swordGuardClip, swordGuardClip.length);
+                else animationDriver.ForceState(PlayerActionState.SwordGuard);
+            }
+            guardImpactRoutine = null;
+        }
+
+        IEnumerator SingleStepRoutine(PlayerComboStep step)
+        {
+            yield return StartCoroutine(ComboStepRoutine(step, step.input));
+            DeactivateActiveHitbox();
+            motor.MovementLocked = false;
+            attackRoutine = null;
+        }
+
+        IEnumerator ComboRoutine()
+        {
+            var activeCombo = ActiveCombo;
+            var stepIndex = 0;
+            while (stepIndex < activeCombo.Count)
+            {
+                queuedNextComboStep = false;
+                var nextInput = stepIndex < activeCombo.Count - 1 ? activeCombo[stepIndex + 1].input : activeCombo[stepIndex].input;
+                yield return StartCoroutine(ComboStepRoutine(activeCombo[stepIndex], nextInput));
+
+                if (!queuedNextComboStep || stepIndex >= activeCombo.Count - 1)
+                    break;
+
+                stepIndex++;
+            }
+
+            DeactivateActiveHitbox();
+            motor.MovementLocked = false;
+            attackRoutine = null;
+        }
+
+        IEnumerator ComboStepRoutine(PlayerComboStep step, PlayerInputCommand nextInput)
+        {
+            var combat = tuning.combat;
+            var elapsed = 0f;
+            var totalDuration = Mathf.Max(0f, step.startup) + Mathf.Max(0f, step.activeTime) + Mathf.Max(0f, step.recovery);
+
+            if (step.lockMovement)
+                motor.MovementLocked = true;
+            animationDriver.ForceState(PlayerActionState.Attack);
+            if (step.animationClip)
+                animationDriver.PlayActionClip(step.animationClip, totalDuration);
+            else
+                animationDriver.ForceState(step.animationState);
+
+            while (elapsed < totalDuration)
+            {
+                ApplyHitboxFrame(step, combat, elapsed);
+
+                if (elapsed >= step.comboWindowStart && elapsed <= step.comboWindowEnd && input.WasPressed(nextInput))
+                    queuedNextComboStep = true;
+
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            DeactivateActiveHitbox();
+            if (step.animationClip)
+            {
+                animationDriver.StopActionClip();
+                animationDriver.ClearForcedState(PlayerActionState.Attack);
+            }
+            else
+                animationDriver.ClearForcedState(step.animationState);
+        }
+
+        void ApplyHitboxFrame(PlayerComboStep step, PlayerTuning.CombatTuning combat, float elapsed)
+        {
+            if (!attackHitbox)
+                return;
+
+            PlayerAttackHitboxKey key;
+            var frame = Mathf.FloorToInt(Mathf.Max(0f, elapsed) * Mathf.Max(1, step.animationFrameRate));
+            if (!TryEvaluateHitboxKey(step, frame, out key) || !key.enabled)
+            {
+                DeactivateActiveHitbox();
+                return;
+            }
+
+            var direction = motor.FacingRight ? Vector2.right : Vector2.left;
+            ApplyHitboxShape(attackHitbox, key.offset, key.size, step.mirrorHitboxByFacing, direction);
+
+            var damage = Mathf.RoundToInt(combat.attackDamage * Mathf.Max(0f, step.damageMultiplier));
+            var knockback = combat.attackKnockback * Mathf.Max(0f, step.knockbackMultiplier);
+            attackHitbox.Configure(new DamagePayload(gameObject, damage, knockback, direction, combat.hitStop));
+            activeHitbox = attackHitbox;
+            activeHitbox.SetActive(true);
+        }
+
+        static bool TryEvaluateHitboxKey(PlayerComboStep step, int frame, out PlayerAttackHitboxKey result)
+        {
+            result = null;
+            if (step.hitboxKeys == null || step.hitboxKeys.Count == 0)
+                return false;
+
+            PlayerAttackHitboxKey previous = null;
+            PlayerAttackHitboxKey next = null;
+            for (var i = 0; i < step.hitboxKeys.Count; i++)
+            {
+                var key = step.hitboxKeys[i];
+                if (key == null)
+                    continue;
+                if (key.frame <= frame && (previous == null || key.frame >= previous.frame))
+                    previous = key;
+                if (key.frame > frame && (next == null || key.frame < next.frame))
+                    next = key;
+            }
+
+            if (previous == null)
+                return false;
+
+            result = previous;
+            if (next == null || previous.interpolation != AttackHitboxInterpolation.Linear || !previous.enabled || !next.enabled || next.frame <= previous.frame)
+                return true;
+
+            var t = Mathf.InverseLerp(previous.frame, next.frame, frame);
+            result = new PlayerAttackHitboxKey
+            {
+                frame = frame,
+                enabled = true,
+                offset = Vector2.Lerp(previous.offset, next.offset, t),
+                size = Vector2.Lerp(previous.size, next.size, t),
+                interpolation = previous.interpolation
+            };
+            return true;
+        }
+
+        void ApplyHitboxShape(Hitbox hitbox, Vector2 offset, Vector2 size, bool mirrorByFacing, Vector2 direction)
+        {
+            var hitboxTransform = hitbox.transform;
+            var localPosition = (Vector3)offset;
+            if (mirrorByFacing)
+                localPosition.x = Mathf.Abs(localPosition.x) * direction.x;
+            hitboxTransform.localPosition = localPosition;
+
+            size = new Vector2(Mathf.Max(0.01f, size.x), Mathf.Max(0.01f, size.y));
+            var box = hitbox.GetComponent<BoxCollider2D>();
+            if (box)
+            {
+                box.size = size;
+                box.offset = Vector2.zero;
+                return;
+            }
+
+            var capsule = hitbox.GetComponent<CapsuleCollider2D>();
+            if (capsule)
+            {
+                capsule.size = size;
+                capsule.offset = Vector2.zero;
+                return;
+            }
+
+            var circle = hitbox.GetComponent<CircleCollider2D>();
+            if (circle)
+            {
+                circle.radius = Mathf.Max(size.x, size.y) * 0.5f;
+                circle.offset = Vector2.zero;
+            }
+        }
+
+        void DeactivateActiveHitbox()
+        {
+            if (activeHitbox)
+                activeHitbox.SetActive(false);
+            activeHitbox = null;
             if (attackHitbox)
                 attackHitbox.SetActive(false);
+        }
 
-            var remainingLock = Mathf.Max(0f, combat.attackMoveLock - combat.attackStartup - combat.attackActiveTime);
-            if (remainingLock > 0f)
-                yield return new WaitForSeconds(remainingLock);
 
-            motor.MovementLocked = false;
+        void EnsureCombo()
+        {
+            if (comboSets == null)
+                comboSets = new List<PlayerComboSet>();
+            if (comboSets.Count == 0)
+            {
+                var migratedSteps = combo != null && combo.Count > 0 ? combo : CreateDefaultCombo();
+                comboSets.Add(new PlayerComboSet { name = "\u5251\u672f\u56db\u8fde", weaponType = PlayerWeaponType.Sword, steps = migratedSteps });
+                combo = new List<PlayerComboStep>();
+            }
+            if (!punchComboCreated)
+            {
+                comboSets.Add(CreatePunchComboSet());
+                punchComboCreated = true;
+            }
+            activeComboSetIndex = Mathf.Clamp(activeComboSetIndex, 0, comboSets.Count - 1);
+            if (swordRunAttack == null) swordRunAttack = CreateSwordRunAttack();
+            if (swordCrouchAttack == null) swordCrouchAttack = CreateSwordCrouchAttack();
+            EnsureHitboxKeys(swordRunAttack);
+            EnsureHitboxKeys(swordCrouchAttack);
+            for (var setIndex = 0; setIndex < comboSets.Count; setIndex++)
+            {
+                var set = comboSets[setIndex];
+                if (set == null)
+                {
+                    set = new PlayerComboSet { name = "Combo " + (setIndex + 1) };
+                    comboSets[setIndex] = set;
+                }
+                if (set.steps == null)
+                    set.steps = new List<PlayerComboStep>();
+                for (var i = 0; i < set.steps.Count; i++)
+                    EnsureHitboxKeys(set.steps[i]);
+            }
+        }
 
-            var remainingRecovery = Mathf.Max(0f, combat.attackRecovery - remainingLock);
-            if (remainingRecovery > 0f)
-                yield return new WaitForSeconds(remainingRecovery);
+        static void EnsureHitboxKeys(PlayerComboStep step)
+        {
+            if (step.hitboxKeys == null)
+                step.hitboxKeys = new List<PlayerAttackHitboxKey>();
+            if (step.hitboxKeys.Count == 0)
+            {
+                step.hitboxKeys.Add(new PlayerAttackHitboxKey { frame = 0, enabled = false });
+                step.hitboxKeys.Add(new PlayerAttackHitboxKey { frame = Mathf.Max(1, Mathf.RoundToInt(step.startup * Mathf.Max(1, step.animationFrameRate))), enabled = true });
+                step.hitboxKeys.Add(new PlayerAttackHitboxKey { frame = Mathf.Max(2, Mathf.RoundToInt((step.startup + step.activeTime) * Mathf.Max(1, step.animationFrameRate))), enabled = false });
+            }
+            step.hitboxKeys.Sort((a, b) => a.frame.CompareTo(b.frame));
+        }
 
-            animationDriver.ClearForcedState(PlayerActionState.Attack);
-            attackRoutine = null;
+        static PlayerComboStep CreateSwordRunAttack()
+        {
+            return new PlayerComboStep
+            {
+                name = "\u5954\u8dd1\u65a9",
+                moveCategory = PlayerMoveCategory.Sword,
+                comboCategory = PlayerComboCategory.Special,
+                input = PlayerInputCommand.PrimaryAttack,
+                animationState = PlayerActionState.SwordRunSlash,
+                startup = 0.06f, activeTime = 0.1f, recovery = 0.19f,
+                damageMultiplier = 1.2f, knockbackMultiplier = 1.15f,
+                hitboxKeys = new List<PlayerAttackHitboxKey>
+                {
+                    new PlayerAttackHitboxKey { frame = 0, enabled = false },
+                    new PlayerAttackHitboxKey { frame = 2, enabled = true, offset = new Vector2(0.8f, 0.05f), size = new Vector2(1.25f, 0.85f), interpolation = AttackHitboxInterpolation.Linear },
+                    new PlayerAttackHitboxKey { frame = 5, enabled = false }
+                }
+            };
+        }
+
+        static PlayerComboStep CreateSwordCrouchAttack()
+        {
+            return new PlayerComboStep
+            {
+                name = "\u4e0b\u8e72\u65a9",
+                moveCategory = PlayerMoveCategory.Sword,
+                comboCategory = PlayerComboCategory.Special,
+                input = PlayerInputCommand.PrimaryAttack,
+                animationState = PlayerActionState.CrouchSlash,
+                startup = 0.07f, activeTime = 0.1f, recovery = 0.18f,
+                damageMultiplier = 1.1f, knockbackMultiplier = 1f,
+                hitboxKeys = new List<PlayerAttackHitboxKey>
+                {
+                    new PlayerAttackHitboxKey { frame = 0, enabled = false },
+                    new PlayerAttackHitboxKey { frame = 2, enabled = true, offset = new Vector2(0.72f, -0.2f), size = new Vector2(1.15f, 0.62f), interpolation = AttackHitboxInterpolation.Linear },
+                    new PlayerAttackHitboxKey { frame = 5, enabled = false }
+                }
+            };
+        }
+
+        static PlayerComboSet CreatePunchComboSet()
+        {
+            return new PlayerComboSet
+            {
+                name = "\u62f3\u51fb\u4e09\u8fde",
+                weaponType = PlayerWeaponType.Unarmed,
+                steps = new List<PlayerComboStep>
+                {
+                    new PlayerComboStep
+                    {
+                        name = "\u76f4\u62f3\u8d77\u624b",
+                        moveCategory = PlayerMoveCategory.Punch,
+                        comboCategory = PlayerComboCategory.Opener,
+                        input = PlayerInputCommand.PrimaryAttack,
+                        animationState = PlayerActionState.PunchA,
+                        startup = 0.05f, activeTime = 0.08f, recovery = 0.12f,
+                        comboWindowStart = 0.10f, comboWindowEnd = 0.22f,
+                        damageMultiplier = 0.9f, knockbackMultiplier = 0.75f,
+                        hitboxKeys = new List<PlayerAttackHitboxKey>
+                        {
+                            new PlayerAttackHitboxKey { frame = 0, enabled = false },
+                            new PlayerAttackHitboxKey { frame = 1, enabled = true, offset = new Vector2(0.52f, 0.08f), size = new Vector2(0.72f, 0.52f), interpolation = AttackHitboxInterpolation.Linear },
+                            new PlayerAttackHitboxKey { frame = 3, enabled = false }
+                        }
+                    },
+                    new PlayerComboStep
+                    {
+                        name = "\u6446\u62f3\u8854\u63a5",
+                        moveCategory = PlayerMoveCategory.Punch,
+                        comboCategory = PlayerComboCategory.Chain,
+                        input = PlayerInputCommand.PrimaryAttack,
+                        animationState = PlayerActionState.PunchB,
+                        startup = 0.06f, activeTime = 0.08f, recovery = 0.11f,
+                        comboWindowStart = 0.10f, comboWindowEnd = 0.22f,
+                        damageMultiplier = 1f, knockbackMultiplier = 0.9f,
+                        hitboxKeys = new List<PlayerAttackHitboxKey>
+                        {
+                            new PlayerAttackHitboxKey { frame = 0, enabled = false },
+                            new PlayerAttackHitboxKey { frame = 1, enabled = true, offset = new Vector2(0.58f, 0.1f), size = new Vector2(0.82f, 0.58f), interpolation = AttackHitboxInterpolation.Linear },
+                            new PlayerAttackHitboxKey { frame = 3, enabled = false }
+                        }
+                    },
+                    new PlayerComboStep
+                    {
+                        name = "\u91cd\u62f3\u7ec8\u7ed3",
+                        moveCategory = PlayerMoveCategory.Punch,
+                        comboCategory = PlayerComboCategory.Finisher,
+                        input = PlayerInputCommand.PrimaryAttack,
+                        animationState = PlayerActionState.PunchC,
+                        startup = 0.08f, activeTime = 0.1f, recovery = 0.18f,
+                        comboWindowStart = 0.12f, comboWindowEnd = 0.24f,
+                        damageMultiplier = 1.3f, knockbackMultiplier = 1.35f,
+                        hitboxKeys = new List<PlayerAttackHitboxKey>
+                        {
+                            new PlayerAttackHitboxKey { frame = 0, enabled = false },
+                            new PlayerAttackHitboxKey { frame = 2, enabled = true, offset = new Vector2(0.64f, 0.06f), size = new Vector2(0.95f, 0.64f), interpolation = AttackHitboxInterpolation.Linear },
+                            new PlayerAttackHitboxKey { frame = 4, enabled = false }
+                        }
+                    }
+                }
+            };
+        }
+
+        static List<PlayerComboStep> CreateDefaultCombo()
+        {
+            return new List<PlayerComboStep>
+            {
+                new PlayerComboStep { name = "Combo A", moveCategory = PlayerMoveCategory.Sword, comboCategory = PlayerComboCategory.Opener, animationState = PlayerActionState.ComboAttackA, hitboxKeys = new List<PlayerAttackHitboxKey> { new PlayerAttackHitboxKey { frame = 0, enabled = false }, new PlayerAttackHitboxKey { frame = 1, enabled = true, offset = new Vector2(0.65f, 0f), size = new Vector2(1f, 0.8f), interpolation = AttackHitboxInterpolation.Linear }, new PlayerAttackHitboxKey { frame = 4, enabled = false } } },
+                new PlayerComboStep { name = "Combo B", moveCategory = PlayerMoveCategory.Sword, comboCategory = PlayerComboCategory.Chain, animationState = PlayerActionState.ComboAttackB, hitboxKeys = new List<PlayerAttackHitboxKey> { new PlayerAttackHitboxKey { frame = 0, enabled = false }, new PlayerAttackHitboxKey { frame = 1, enabled = true, offset = new Vector2(0.72f, 0f), size = new Vector2(1.1f, 0.85f), interpolation = AttackHitboxInterpolation.Linear }, new PlayerAttackHitboxKey { frame = 4, enabled = false } }, damageMultiplier = 1.1f },
+                new PlayerComboStep { name = "Combo C", moveCategory = PlayerMoveCategory.Sword, comboCategory = PlayerComboCategory.Chain, animationState = PlayerActionState.ComboAttackC, hitboxKeys = new List<PlayerAttackHitboxKey> { new PlayerAttackHitboxKey { frame = 0, enabled = false }, new PlayerAttackHitboxKey { frame = 1, enabled = true, offset = new Vector2(0.78f, 0.04f), size = new Vector2(1.15f, 0.9f), interpolation = AttackHitboxInterpolation.Linear }, new PlayerAttackHitboxKey { frame = 4, enabled = false } }, damageMultiplier = 1.2f },
+                new PlayerComboStep { name = "Combo D", moveCategory = PlayerMoveCategory.Sword, comboCategory = PlayerComboCategory.Finisher, animationState = PlayerActionState.ComboAttackD, hitboxKeys = new List<PlayerAttackHitboxKey> { new PlayerAttackHitboxKey { frame = 0, enabled = false }, new PlayerAttackHitboxKey { frame = 1, enabled = true, offset = new Vector2(0.86f, 0.06f), size = new Vector2(1.25f, 0.95f), interpolation = AttackHitboxInterpolation.Linear }, new PlayerAttackHitboxKey { frame = 4, enabled = false } }, damageMultiplier = 1.35f }
+            };
         }
     }
 }
-

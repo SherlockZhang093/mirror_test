@@ -15,7 +15,7 @@ namespace MirrorTrial.Player
     {
         [Header("Land buffer")]
         [Tooltip("落地后维持 Land 态的时间（秒），播放着地动画/缓冲。0 = 不用 Land 态")]
-        [SerializeField] float landStateDuration = 0.05f;
+        [SerializeField] float landStateDuration = 0.1667f;
 
         [Header("Debug")]
         [SerializeField] bool logStateChanges = true;

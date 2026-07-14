@@ -1,30 +1,97 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations;
+using UnityEngine.Playables;
 
 namespace MirrorTrial.Player
 {
-    [RequireComponent(typeof(PlayerMotor), typeof(PlayerStateMachine))]
+    public enum PlayerAnimationTimingSource
+    {
+        ClipDuration,
+        AttackWindow,
+        CastWindow,
+        DashDuration,
+        HurtLock
+    }
+
+    [Serializable]
+    public sealed class PlayerAnimationBinding
+    {
+        [SerializeField] PlayerActionState action;
+        [SerializeField] string animatorState;
+        [SerializeField] float sourceClipDuration;
+        [SerializeField] PlayerAnimationTimingSource timingSource;
+
+        public PlayerActionState Action => action;
+        public string AnimatorState => animatorState;
+        public float SourceClipDuration => sourceClipDuration;
+        public PlayerAnimationTimingSource TimingSource => timingSource;
+
+        public PlayerAnimationBinding()
+        {
+        }
+
+        public PlayerAnimationBinding(PlayerActionState action, string animatorState, float sourceClipDuration, PlayerAnimationTimingSource timingSource)
+        {
+            this.action = action;
+            this.animatorState = animatorState;
+            this.sourceClipDuration = sourceClipDuration;
+            this.timingSource = timingSource;
+        }
+
+        public float GetPlaybackSpeed(PlayerTuning tuning)
+        {
+            if (sourceClipDuration <= 0f)
+                return 1f;
+
+            var targetDuration = GetTargetDuration(tuning);
+            return sourceClipDuration / Mathf.Max(0.01f, targetDuration);
+        }
+
+        public float GetTargetDuration(PlayerTuning tuning)
+        {
+            if (!tuning)
+                return sourceClipDuration;
+
+            switch (timingSource)
+            {
+                case PlayerAnimationTimingSource.AttackWindow:
+                    return tuning.combat.attackStartup + tuning.combat.attackActiveTime + tuning.combat.attackRecovery;
+                case PlayerAnimationTimingSource.CastWindow:
+                    return tuning.abilities.mirrorBladeStartup + tuning.abilities.mirrorBladeRecovery;
+                case PlayerAnimationTimingSource.DashDuration:
+                    return tuning.abilities.echoDashDuration;
+                case PlayerAnimationTimingSource.HurtLock:
+                    return tuning.hurt.hurtLockTime;
+                default:
+                    return sourceClipDuration;
+            }
+        }
+    }
+
+    [RequireComponent(typeof(PlayerMotor), typeof(PlayerStateMachine), typeof(PlayerTuning))]
     public class PlayerAnimationDriver : MonoBehaviour
     {
         [Header("References")]
         [SerializeField] Animator animator;
 
         [Header("Blend")]
-        [SerializeField] float fadeDuration = 0.08f;
+        [SerializeField] float fadeDuration = 0.04f;
 
-        [Header("Animation States")]
-        [SerializeField] string idleState = "Idle";
-        [SerializeField] string runState = "Run";
-        [SerializeField] string jumpRiseState = "JumpRise";
-        [SerializeField] string jumpFallState = "JumpFall";
-        [SerializeField] string landState = "Land";
-        [SerializeField] string attackState = "SwordAttack";
-        [SerializeField] string castState = "AirSlash";
-        [SerializeField] string dashState = "Dash";
-        [SerializeField] string hurtState = "HitDamage";
-        [SerializeField] string deadState = "Die";
+        [Header("Animation Table")]
+        [SerializeField] List<PlayerAnimationBinding> animations = CreateDefaultBindings();
 
         PlayerStateMachine stateMachine;
+        PlayerTuning tuning;
+        PlayerWeaponController weapons;
         PlayerActionState playingState = PlayerActionState.None;
+        PlayableGraph actionGraph;
+        bool actionClipPlaying;
+
+        public Animator Animator => animator;
+        public float FadeDuration => fadeDuration;
+        public IList<PlayerAnimationBinding> Animations { get { return animations; } }
 
         void Awake()
         {
@@ -35,14 +102,57 @@ namespace MirrorTrial.Player
                 animator.applyRootMotion = false;
 
             stateMachine = GetComponent<PlayerStateMachine>();
+            tuning = GetComponent<PlayerTuning>();
+            weapons = GetComponent<PlayerWeaponController>();
+            if (weapons) weapons.WeaponChanged += OnWeaponChanged;
+            EnsureAnimationBindings();
+        }
+
+        void OnValidate()
+        {
+            EnsureAnimationBindings();
+        }
+
+        void OnDestroy()
+        {
+            if (weapons) weapons.WeaponChanged -= OnWeaponChanged;
+            StopActionClip();
+        }
+
+        void OnWeaponChanged(PlayerWeaponType weapon)
+        {
+            playingState = PlayerActionState.None;
         }
 
         void Update()
         {
-            if (!animator || stateMachine == null)
+            if (!animator || stateMachine == null || actionClipPlaying)
                 return;
 
             Play(stateMachine.CurrentState);
+        }
+
+        public void PlayActionClip(AnimationClip clip, float targetDuration)
+        {
+            if (!animator || !clip)
+                return;
+            StopActionClip();
+            actionGraph = PlayableGraph.Create("Player Direct Action Clip");
+            var output = AnimationPlayableOutput.Create(actionGraph, "Action", animator);
+            var playable = AnimationClipPlayable.Create(actionGraph, clip);
+            playable.SetApplyFootIK(false);
+            playable.SetSpeed(targetDuration > 0f ? clip.length / targetDuration : 1f);
+            output.SetSourcePlayable(playable);
+            actionGraph.Play();
+            actionClipPlaying = true;
+        }
+
+        public void StopActionClip()
+        {
+            if (actionGraph.IsValid())
+                actionGraph.Destroy();
+            actionClipPlaying = false;
+            playingState = PlayerActionState.None;
         }
 
         public void ForceState(PlayerActionState state)
@@ -62,35 +172,108 @@ namespace MirrorTrial.Player
             if (state == playingState)
                 return;
 
-            var stateName = GetAnimationStateName(state);
-            if (string.IsNullOrEmpty(stateName))
+            var binding = FindBinding(state);
+            if (binding == null || string.IsNullOrEmpty(binding.AnimatorState))
+                return;
+
+            var animatorState = ResolveAnimatorState(state, binding.AnimatorState);
+            var stateHash = Animator.StringToHash("Base Layer." + animatorState);
+            if (!animator.HasState(0, stateHash))
             {
-                if (state == PlayerActionState.Land)
-                    stateName = idleState;
-                if (string.IsNullOrEmpty(stateName))
-                    return;
+                Debug.LogError("Player Animator is missing state: " + animatorState, animator);
+                return;
             }
 
-            animator.CrossFade(stateName, fadeDuration);
+            animator.speed = binding.GetPlaybackSpeed(tuning);
+            animator.CrossFade(stateHash, fadeDuration, 0, 0f);
             playingState = state;
         }
 
-        string GetAnimationStateName(PlayerActionState state)
+        string ResolveAnimatorState(PlayerActionState state, string fallback)
         {
+            if (!weapons || weapons.CurrentWeapon != PlayerWeaponType.Sword)
+                return fallback;
             switch (state)
             {
-                case PlayerActionState.Idle: return idleState;
-                case PlayerActionState.Run: return runState;
-                case PlayerActionState.JumpRise: return jumpRiseState;
-                case PlayerActionState.JumpFall: return jumpFallState;
-                case PlayerActionState.Land: return landState;
-                case PlayerActionState.Attack: return attackState;
-                case PlayerActionState.Cast: return castState;
-                case PlayerActionState.Dash: return dashState;
-                case PlayerActionState.Hurt: return hurtState;
-                case PlayerActionState.Dead: return deadState;
-                default: return string.Empty;
+                case PlayerActionState.Idle: return "SwordIdle";
+                case PlayerActionState.Run: return "SwordRun";
+                case PlayerActionState.JumpRise: return "SwordJumpRise";
+                case PlayerActionState.JumpFall: return "SwordJumpFall";
+                default: return fallback;
             }
+        }
+
+        PlayerAnimationBinding FindBinding(PlayerActionState state)
+        {
+            for (var i = 0; i < animations.Count; i++)
+                if (animations[i] != null && animations[i].Action == state)
+                    return animations[i];
+            return null;
+        }
+
+        void EnsureAnimationBindings()
+        {
+            if (animations == null)
+                animations = new List<PlayerAnimationBinding>();
+
+            var defaults = CreateDefaultBindings();
+            for (var i = 0; i < defaults.Count; i++)
+            {
+                var exists = false;
+                for (var j = 0; j < animations.Count; j++)
+                {
+                    if (animations[j] != null && animations[j].Action == defaults[i].Action)
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists)
+                    animations.Add(defaults[i]);
+            }
+        }
+
+        static List<PlayerAnimationBinding> CreateDefaultBindings()
+        {
+            return new List<PlayerAnimationBinding>
+            {
+                B(PlayerActionState.Idle, "Idle"),
+                B(PlayerActionState.Run, "Run"),
+                B(PlayerActionState.JumpRise, "JumpRise"),
+                B(PlayerActionState.JumpFall, "JumpFall"),
+                B(PlayerActionState.Land, "Land", 0.1667f),
+                B(PlayerActionState.Attack, "SwordAttack", 0.5f, PlayerAnimationTimingSource.AttackWindow),
+                B(PlayerActionState.Cast, "AirSlash", 0.2857f, PlayerAnimationTimingSource.CastWindow),
+                B(PlayerActionState.Dash, "Dash", 0.75f, PlayerAnimationTimingSource.DashDuration),
+                B(PlayerActionState.Hurt, "HitDamage", 0.2143f, PlayerAnimationTimingSource.HurtLock),
+                B(PlayerActionState.Dead, "Die"),
+                B(PlayerActionState.BowDraw, "BowDraw", 0.25f),
+                B(PlayerActionState.BowAim, "BowAim"),
+                B(PlayerActionState.BowFull, "BowFull"),
+                B(PlayerActionState.BowFire, "BowFire", 0.25f),
+                B(PlayerActionState.ComboAttackA, "ComboAttackA", 0.25f),
+                B(PlayerActionState.ComboAttackB, "ComboAttackB", 0.25f),
+                B(PlayerActionState.ComboAttackC, "ComboAttackC", 0.25f),
+                B(PlayerActionState.ComboAttackD, "ComboAttackD", 0.25f),
+                B(PlayerActionState.PunchA, "PunchA", 0.25f),
+                B(PlayerActionState.PunchB, "PunchB", 0.25f),
+                B(PlayerActionState.PunchC, "PunchC", 0.25f),
+                B(PlayerActionState.KickA, "KickA", 0.25f),
+                B(PlayerActionState.KickB, "KickB", 0.25f),
+                B(PlayerActionState.KickC, "KickC", 0.25f),
+                B(PlayerActionState.SwordStandingSlash, "SwordStandingSlash", 0.35f),
+                B(PlayerActionState.SwordRunSlash, "SwordRunSlash", 0.35f),
+                B(PlayerActionState.SwordGuard, "SwordGuard"),
+                B(PlayerActionState.SwordGuardImpact, "SwordGuardImpact", 0.2f),
+                B(PlayerActionState.SwordSprintSlash, "SwordSprintSlash", 0.35f),
+                B(PlayerActionState.CrouchSlash, "CrouchSlash", 0.35f)
+            };
+        }
+
+        static PlayerAnimationBinding B(PlayerActionState action, string animatorState, float sourceClipDuration = 0f, PlayerAnimationTimingSource timingSource = PlayerAnimationTimingSource.ClipDuration)
+        {
+            return new PlayerAnimationBinding(action, animatorState, sourceClipDuration, timingSource);
         }
     }
 }

@@ -91,52 +91,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitboxCollider: {fileID: 0}
---- !u!1 &7253538297837963826
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4756217149488517540}
-  - component: {fileID: 1376214869525727879}
-  - component: {fileID: 903989754809041374}
-  - component: {fileID: 3340953237809312058}
-  - component: {fileID: 1649567303454630154}
-  - component: {fileID: 5044512537473418742}
-  - component: {fileID: 3517131352704987190}
-  - component: {fileID: 7043580121085824825}
-  - component: {fileID: 8265540847525026043}
-  - component: {fileID: 3603827661786735700}
-  - component: {fileID: 5090720824673183153}
-  - component: {fileID: 7858448471584779278}
-  - component: {fileID: 3077298778465174437}
-  - component: {fileID: 6901234567890123456}
-  m_Layer: 0
-  m_Name: Player_MirrorTrial
-  m_TagString: Player
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4756217149488517540
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7253538297837963826}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 3931810769508925516}
-  - {fileID: 7000000000000000002}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7000000000000000001
 GameObject:
   m_ObjectHideFlags: 0
@@ -232,7 +186,7 @@ Animator:
   m_GameObject: {fileID: 7000000000000000001}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: c794c61eb96248f4fbcd054821a369cd, type: 2}
+  m_Controller: {fileID: 9100000, guid: 7cec9a3c96e4cd843836375a49afd6e8, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -243,6 +197,54 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &7253538297837963826
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4756217149488517540}
+  - component: {fileID: 1376214869525727879}
+  - component: {fileID: 903989754809041374}
+  - component: {fileID: 3340953237809312058}
+  - component: {fileID: 1649567303454630154}
+  - component: {fileID: 5044512537473418742}
+  - component: {fileID: 3517131352704987190}
+  - component: {fileID: 7043580121085824825}
+  - component: {fileID: 8265540847525026043}
+  - component: {fileID: 3603827661786735700}
+  - component: {fileID: 5090720824673183153}
+  - component: {fileID: 7858448471584779278}
+  - component: {fileID: 3077298778465174437}
+  - component: {fileID: 6901234567890123456}
+  - component: {fileID: 5873674232144329648}
+  - component: {fileID: 246818073585722775}
+  m_Layer: 0
+  m_Name: Player_MirrorTrial
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4756217149488517540
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7253538297837963826}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3931810769508925516}
+  - {fileID: 7000000000000000002}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &1376214869525727879
 Rigidbody2D:
   serializedVersion: 4
@@ -256,8 +258,8 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_LinearDrag: 2
+  m_AngularDrag: 1
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -302,7 +304,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.1}
+  m_Offset: {x: 0, y: 0.6389099}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
@@ -313,7 +315,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.45, y: 0.9}
+  m_Size: {x: 0.45, y: 1.3145105}
   m_EdgeRadius: 0
 --- !u!114 &3340953237809312058
 MonoBehaviour:
@@ -437,10 +439,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   horizontalAxis: Horizontal
+  verticalAxis: Vertical
   jumpButton: Jump
-  attackButton: Fire1
-  mirrorBladeButton: Fire2
-  echoDashButton: Fire3
+  bindings:
+  - command: 0
+    buttonName: Fire1
+    key: 106
+  - command: 1
+    buttonName: Fire2
+    key: 107
+  - command: 2
+    buttonName: Fire3
+    key: 108
+  - command: 3
+    buttonName: 
+    key: 304
+  - command: 4
+    buttonName: 
+    key: 49
+  - command: 5
+    buttonName: 
+    key: 50
+  - command: 6
+    buttonName: 
+    key: 51
+  - command: 7
+    buttonName: 
+    key: 52
+  bindingSchemaVersion: 2
 --- !u!114 &3517131352704987190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -492,6 +518,16 @@ MonoBehaviour:
     echoDashDuration: 0.18
     echoDashInvincibleTime: 0.15
     echoDashCooldown: 3
+    bowMinChargeTime: 0.12
+    bowMaxChargeTime: 0.8
+    bowRecovery: 0.18
+    bowMinDamage: 6
+    bowMaxDamage: 18
+    bowMinSpeed: 10
+    bowMaxSpeed: 20
+    bowRange: 12
+    bowKnockback: {x: 2.5, y: 0.5}
+    bowHitStop: 0.04
 --- !u!114 &7043580121085824825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -506,7 +542,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 128
   groundCheckDistance: 0.04
   minGroundNormalY: 0.9
 --- !u!114 &8265540847525026043
@@ -521,17 +557,129 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5453ea582ff23234d9b524e743482709, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeDuration: 0.08
-  idleState: Idle
-  runState: Run
-  jumpRiseState: JumpRise
-  jumpFallState: JumpFall
-  landState: Land
-  attackState: SwordAttack
-  castState: AirSlash
-  dashState: Dash
-  hurtState: HitDamage
-  deadState: Die
+  animator: {fileID: 0}
+  fadeDuration: 0.04
+  animations:
+  - action: 1
+    animatorState: Idle
+    sourceClipDuration: 0.70000005
+    timingSource: 0
+  - action: 2
+    animatorState: Run
+    sourceClipDuration: 0.6666666
+    timingSource: 0
+  - action: 3
+    animatorState: JumpRise
+    sourceClipDuration: 0.083333336
+    timingSource: 0
+  - action: 4
+    animatorState: JumpFall
+    sourceClipDuration: 0.083333336
+    timingSource: 0
+  - action: 5
+    animatorState: Land
+    sourceClipDuration: 0.1667
+    timingSource: 0
+  - action: 6
+    animatorState: SwordAttack
+    sourceClipDuration: 0.5
+    timingSource: 1
+  - action: 7
+    animatorState: AirSlash
+    sourceClipDuration: 0.2857
+    timingSource: 2
+  - action: 8
+    animatorState: Dash
+    sourceClipDuration: 0.75
+    timingSource: 3
+  - action: 9
+    animatorState: HitDamage
+    sourceClipDuration: 0.2143
+    timingSource: 4
+  - action: 10
+    animatorState: Die
+    sourceClipDuration: 1.25
+    timingSource: 0
+  - action: 11
+    animatorState: BowDraw
+    sourceClipDuration: 0.25
+    timingSource: 0
+  - action: 12
+    animatorState: BowAim
+    sourceClipDuration: 0.25
+    timingSource: 0
+  - action: 13
+    animatorState: BowFull
+    sourceClipDuration: 1
+    timingSource: 0
+  - action: 14
+    animatorState: BowFire
+    sourceClipDuration: 0.25
+    timingSource: 0
+  - action: 15
+    animatorState: ComboAttackA
+    sourceClipDuration: 0.25
+    timingSource: 0
+  - action: 16
+    animatorState: ComboAttackB
+    sourceClipDuration: 0.25
+    timingSource: 0
+  - action: 17
+    animatorState: ComboAttackC
+    sourceClipDuration: 0.25
+    timingSource: 0
+  - action: 18
+    animatorState: ComboAttackD
+    sourceClipDuration: 0.25
+    timingSource: 0
+  - action: 19
+    animatorState: PunchA
+    sourceClipDuration: 0.25
+    timingSource: 0
+  - action: 20
+    animatorState: PunchB
+    sourceClipDuration: 0.25
+    timingSource: 0
+  - action: 21
+    animatorState: PunchC
+    sourceClipDuration: 0.25
+    timingSource: 0
+  - action: 22
+    animatorState: KickA
+    sourceClipDuration: 0.25
+    timingSource: 0
+  - action: 23
+    animatorState: KickB
+    sourceClipDuration: 0.25
+    timingSource: 0
+  - action: 24
+    animatorState: KickC
+    sourceClipDuration: 0.25
+    timingSource: 0
+  - action: 25
+    animatorState: SwordStandingSlash
+    sourceClipDuration: 0.35
+    timingSource: 0
+  - action: 26
+    animatorState: SwordRunSlash
+    sourceClipDuration: 0.35
+    timingSource: 0
+  - action: 27
+    animatorState: SwordGuard
+    sourceClipDuration: 0.0625
+    timingSource: 0
+  - action: 28
+    animatorState: SwordGuardImpact
+    sourceClipDuration: 0.2
+    timingSource: 0
+  - action: 29
+    animatorState: SwordSprintSlash
+    sourceClipDuration: 0.35
+    timingSource: 0
+  - action: 30
+    animatorState: CrouchSlash
+    sourceClipDuration: 0.35
+    timingSource: 0
 --- !u!114 &3603827661786735700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -545,6 +693,318 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackHitbox: {fileID: 4388561565866199630}
+  comboSets:
+  - name: "\u5251\u672F\u56DB\u8FDE"
+    weaponType: 1
+    steps:
+    - name: Combo A
+      moveCategory: 1
+      comboCategory: 0
+      input: 0
+      animationClip: {fileID: 7400000, guid: d014983ce728ef54db394042da6f09c0, type: 2}
+      animationState: 15
+      animationFrameRate: 12
+      animationFrameCount: 8
+      mirrorHitboxByFacing: 1
+      hitboxKeys:
+      - frame: 0
+        enabled: 0
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 0
+      - frame: 1
+        enabled: 1
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 1
+      - frame: 4
+        enabled: 0
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 0
+      startup: 0.08
+      activeTime: 0.08
+      recovery: 0.16
+      comboWindowStart: 0.1
+      comboWindowEnd: 0.28
+      damageMultiplier: 1
+      knockbackMultiplier: 1
+      lockMovement: 1
+    - name: Combo B
+      moveCategory: 1
+      comboCategory: 1
+      input: 0
+      animationClip: {fileID: 7400000, guid: 047d935fe1f929b44bee471667c8e228, type: 2}
+      animationState: 16
+      animationFrameRate: 12
+      animationFrameCount: 8
+      mirrorHitboxByFacing: 1
+      hitboxKeys:
+      - frame: 0
+        enabled: 0
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 0
+      - frame: 1
+        enabled: 1
+        offset: {x: 0.72, y: 0}
+        size: {x: 1.1, y: 0.85}
+        interpolation: 1
+      - frame: 4
+        enabled: 0
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 0
+      startup: 0.08
+      activeTime: 0.08
+      recovery: 0.16
+      comboWindowStart: 0.1
+      comboWindowEnd: 0.28
+      damageMultiplier: 1.1
+      knockbackMultiplier: 1
+      lockMovement: 1
+    - name: Combo C
+      moveCategory: 1
+      comboCategory: 1
+      input: 0
+      animationClip: {fileID: 7400000, guid: 05db0a10e588a1941af9be8d74518c2b, type: 2}
+      animationState: 17
+      animationFrameRate: 12
+      animationFrameCount: 8
+      mirrorHitboxByFacing: 1
+      hitboxKeys:
+      - frame: 0
+        enabled: 0
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 0
+      - frame: 1
+        enabled: 1
+        offset: {x: 0.78, y: 0.04}
+        size: {x: 1.15, y: 0.9}
+        interpolation: 1
+      - frame: 4
+        enabled: 0
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 0
+      startup: 0.08
+      activeTime: 0.08
+      recovery: 0.16
+      comboWindowStart: 0.1
+      comboWindowEnd: 0.28
+      damageMultiplier: 1.2
+      knockbackMultiplier: 1
+      lockMovement: 1
+    - name: Combo D
+      moveCategory: 1
+      comboCategory: 2
+      input: 0
+      animationClip: {fileID: 7400000, guid: fbe4f8e8a1ea96343a9bcded7cdd48f3, type: 2}
+      animationState: 18
+      animationFrameRate: 12
+      animationFrameCount: 8
+      mirrorHitboxByFacing: 1
+      hitboxKeys:
+      - frame: 0
+        enabled: 0
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 0
+      - frame: 1
+        enabled: 1
+        offset: {x: 0.86, y: 0.06}
+        size: {x: 1.25, y: 0.95}
+        interpolation: 1
+      - frame: 4
+        enabled: 0
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 0
+      startup: 0.08
+      activeTime: 0.08
+      recovery: 0.16
+      comboWindowStart: 0.1
+      comboWindowEnd: 0.28
+      damageMultiplier: 1.35
+      knockbackMultiplier: 1
+      lockMovement: 1
+  - name: "\u62F3\u51FB\u4E09\u8FDE"
+    weaponType: 0
+    steps:
+    - name: "\u76F4\u62F3\u8D77\u624B"
+      moveCategory: 2
+      comboCategory: 0
+      input: 0
+      animationClip: {fileID: 7400000, guid: b7bc9fd93b409664f9de91ab9e4f8257, type: 2}
+      animationState: 19
+      animationFrameRate: 12
+      animationFrameCount: 8
+      mirrorHitboxByFacing: 1
+      hitboxKeys:
+      - frame: 0
+        enabled: 0
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 0
+      - frame: 1
+        enabled: 1
+        offset: {x: 0.52, y: 0.08}
+        size: {x: 0.72, y: 0.52}
+        interpolation: 1
+      - frame: 3
+        enabled: 0
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 0
+      startup: 0.05
+      activeTime: 0.08
+      recovery: 0.12
+      comboWindowStart: 0.1
+      comboWindowEnd: 0.22
+      damageMultiplier: 0.9
+      knockbackMultiplier: 0.75
+      lockMovement: 1
+    - name: "\u6446\u62F3\u8854\u63A5"
+      moveCategory: 2
+      comboCategory: 1
+      input: 0
+      animationClip: {fileID: 7400000, guid: 85670856356c2e04a8c0a4a52c546fc3, type: 2}
+      animationState: 20
+      animationFrameRate: 12
+      animationFrameCount: 8
+      mirrorHitboxByFacing: 1
+      hitboxKeys:
+      - frame: 0
+        enabled: 0
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 0
+      - frame: 1
+        enabled: 1
+        offset: {x: 0.58, y: 0.1}
+        size: {x: 0.82, y: 0.58}
+        interpolation: 1
+      - frame: 3
+        enabled: 0
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 0
+      startup: 0.06
+      activeTime: 0.08
+      recovery: 0.11
+      comboWindowStart: 0.1
+      comboWindowEnd: 0.22
+      damageMultiplier: 1
+      knockbackMultiplier: 0.9
+      lockMovement: 1
+    - name: "\u91CD\u62F3\u7EC8\u7ED3"
+      moveCategory: 2
+      comboCategory: 2
+      input: 0
+      animationClip: {fileID: 7400000, guid: c597c06a9e9196347857e43072f14058, type: 2}
+      animationState: 21
+      animationFrameRate: 12
+      animationFrameCount: 8
+      mirrorHitboxByFacing: 1
+      hitboxKeys:
+      - frame: 0
+        enabled: 0
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 0
+      - frame: 2
+        enabled: 1
+        offset: {x: 0.64, y: 0.06}
+        size: {x: 0.95, y: 0.64}
+        interpolation: 1
+      - frame: 4
+        enabled: 0
+        offset: {x: 0.65, y: 0}
+        size: {x: 1, y: 0.8}
+        interpolation: 0
+      startup: 0.08
+      activeTime: 0.1
+      recovery: 0.18
+      comboWindowStart: 0.12
+      comboWindowEnd: 0.24
+      damageMultiplier: 1.3
+      knockbackMultiplier: 1.35
+      lockMovement: 1
+  activeComboSetIndex: 0
+  punchComboCreated: 1
+  combo: []
+  swordGuardClip: {fileID: 7400000, guid: 2460091f9596b4241972a347066392b9, type: 2}
+  swordGuardImpactClip: {fileID: 7400000, guid: 59ec72e765455be439cfe9a5bcf40d2c,
+    type: 2}
+  swordRunAttack:
+    name: "\u5954\u8DD1\u65A9"
+    moveCategory: 1
+    comboCategory: 5
+    input: 0
+    animationClip: {fileID: 7400000, guid: c6a0af29f0f619842809c25774b3b3fc, type: 2}
+    animationState: 26
+    animationFrameRate: 12
+    animationFrameCount: 8
+    mirrorHitboxByFacing: 1
+    hitboxKeys:
+    - frame: 0
+      enabled: 0
+      offset: {x: 0.65, y: 0}
+      size: {x: 1, y: 0.8}
+      interpolation: 0
+    - frame: 2
+      enabled: 1
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.25, y: 0.85}
+      interpolation: 1
+    - frame: 5
+      enabled: 0
+      offset: {x: 0.65, y: 0}
+      size: {x: 1, y: 0.8}
+      interpolation: 0
+    startup: 0.06
+    activeTime: 0.1
+    recovery: 0.19
+    comboWindowStart: 0.1
+    comboWindowEnd: 0.28
+    damageMultiplier: 1.2
+    knockbackMultiplier: 1.15
+    lockMovement: 1
+  swordCrouchAttack:
+    name: "\u4E0B\u8E72\u65A9"
+    moveCategory: 1
+    comboCategory: 5
+    input: 0
+    animationClip: {fileID: 7400000, guid: 64bd0da4e98c2914d863ac4901c63156, type: 2}
+    animationState: 30
+    animationFrameRate: 12
+    animationFrameCount: 8
+    mirrorHitboxByFacing: 1
+    hitboxKeys:
+    - frame: 0
+      enabled: 0
+      offset: {x: 0.65, y: 0}
+      size: {x: 1, y: 0.8}
+      interpolation: 0
+    - frame: 2
+      enabled: 1
+      offset: {x: 0.72, y: -0.2}
+      size: {x: 1.15, y: 0.62}
+      interpolation: 1
+    - frame: 5
+      enabled: 0
+      offset: {x: 0.65, y: 0}
+      size: {x: 1, y: 0.8}
+      interpolation: 0
+    startup: 0.07
+    activeTime: 0.1
+    recovery: 0.18
+    comboWindowStart: 0.1
+    comboWindowEnd: 0.28
+    damageMultiplier: 1.1
+    knockbackMultiplier: 1
+    lockMovement: 1
 --- !u!114 &5090720824673183153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -557,6 +1017,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07f5e61d05a34a04e8005508ab8d2efe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mirrorBladeClip: {fileID: 7400000, guid: 4b8e4772b1a5ae1418a1bfcc176d156c, type: 2}
   mirrorBladeProjectilePrefab: {fileID: 5775481720314507263, guid: 05ed8c06ce550484e8ff45467324009b,
     type: 3}
   projectileSpawnPoint: {fileID: 0}
@@ -589,7 +1050,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08c82141d97af1b468b27f107692be86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-
 --- !u!114 &6901234567890123456
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -601,4 +1061,49 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 80005c0856662fe4f89b97acf395d474, type: 3}
   m_Name: 
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
+  landStateDuration: 0.1667
+  logStateChanges: 1
+--- !u!114 &5873674232144329648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7253538297837963826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4ad2e37a4bbfbd4eba5c42adafd18c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slots:
+  - name: "\u7A7A\u624B"
+    weaponType: 0
+    available: 1
+  - name: "\u5251"
+    weaponType: 1
+    available: 1
+  - name: "\u5F13"
+    weaponType: 2
+    available: 1
+  - name: "\u9884\u7559"
+    weaponType: 3
+    available: 1
+  activeSlotIndex: 0
+--- !u!114 &246818073585722775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7253538297837963826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 849e85433cffb33428d232466879da7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  drawClip: {fileID: 7400000, guid: 2e20e1f593d7d064c9b7172d2fd116b1, type: 2}
+  fullDrawClip: {fileID: 7400000, guid: 5b6240e8c875df34cb058909e1cdbe06, type: 2}
+  fireClip: {fileID: 7400000, guid: 1ef75b23fa20025478aa122e114ee448, type: 2}
+  arrowSpawnPoint: {fileID: 0}
+  fallbackSpawnOffset: {x: 0.65, y: 0.9}

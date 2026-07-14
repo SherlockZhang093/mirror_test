@@ -49,7 +49,7 @@ namespace MirrorTrial.Player
         [Serializable]
         public class AbilityTuning
         {
-            public bool mirrorBladeUnlocked;
+            public bool mirrorBladeUnlocked = true;
             public int mirrorBladeDamage = 15;
             public float mirrorBladeStartup = 0.15f;
             public float mirrorBladeRecovery = 0.20f;
@@ -59,11 +59,22 @@ namespace MirrorTrial.Player
             public Vector2 mirrorBladeKnockback = new Vector2(2.5f, 0.5f);
             public float mirrorBladeHitStop = 0.04f;
 
-            public bool echoDashUnlocked;
+            public bool echoDashUnlocked = true;
             public float echoDashDistance = 5f;
             public float echoDashDuration = 0.18f;
             public float echoDashInvincibleTime = 0.15f;
             public float echoDashCooldown = 3f;
+
+            public float bowMinChargeTime = 0.12f;
+            public float bowMaxChargeTime = 0.8f;
+            public float bowRecovery = 0.18f;
+            public int bowMinDamage = 6;
+            public int bowMaxDamage = 18;
+            public float bowMinSpeed = 10f;
+            public float bowMaxSpeed = 20f;
+            public float bowRange = 12f;
+            public Vector2 bowKnockback = new Vector2(2.5f, 0.5f);
+            public float bowHitStop = 0.04f;
         }
     }
 }
