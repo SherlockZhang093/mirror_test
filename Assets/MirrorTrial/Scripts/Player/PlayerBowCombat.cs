@@ -6,7 +6,7 @@ using UnityEngine;
 namespace MirrorTrial.Player
 {
     [RequireComponent(typeof(PlayerInputReader), typeof(PlayerWeaponController), typeof(PlayerAnimationDriver))]
-    public sealed class PlayerBowCombat : MonoBehaviour
+    public sealed class PlayerBowCombat : MonoBehaviour, IInterruptiblePlayerAction
     {
         [SerializeField] AnimationClip drawClip;
         [SerializeField] AnimationClip fullDrawClip;
@@ -79,6 +79,23 @@ namespace MirrorTrial.Player
             animationDriver.ClearForcedState(PlayerActionState.Attack);
             animationDriver.ClearForcedState(PlayerActionState.BowDraw);
             animationDriver.ClearForcedState(PlayerActionState.BowFull);
+        }
+
+        public void CancelCurrentAction(PlayerActionCancelReason reason)
+        {
+            if (recoveryRoutine != null)
+            {
+                StopCoroutine(recoveryRoutine);
+                recoveryRoutine = null;
+            }
+
+            CancelDraw();
+            animationDriver.ClearForcedState(PlayerActionState.BowFire);
+        }
+
+        void OnDisable()
+        {
+            CancelCurrentAction(PlayerActionCancelReason.Hit);
         }
 
         void ReleaseArrow(float chargeTime)

@@ -10,6 +10,7 @@ namespace MirrorTrial.Level
         [ChineseLabel("关卡ID")] [SerializeField] string levelId = "Level_Reality_01";
         [ChineseLabel("关卡显示名")] [SerializeField] string levelDisplayName = "第一关";
         [ChineseLabel("玩家出生点")] [SerializeField] Transform playerSpawn;
+        [ChineseLabel("玩家预制体")] [SerializeField] GameObject playerPrefab;
 
         [Header("场景根节点")]
         [ChineseLabel("地形根节点")] [SerializeField] Transform geometryRoot;
@@ -27,6 +28,7 @@ namespace MirrorTrial.Level
         public string LevelId => levelId;
         public string LevelDisplayName => levelDisplayName;
         public Transform PlayerSpawn => playerSpawn;
+        public GameObject PlayerPrefab => playerPrefab;
         public Transform GeometryRoot => geometryRoot;
         public Transform GameplayRoot => gameplayRoot;
         public Transform RuntimeRoot => runtimeRoot;
@@ -46,27 +48,61 @@ namespace MirrorTrial.Level
             EnsureRoots();
             if (AutoCollectOnAwake)
                 CollectAll();
+            ResolvePersistentPlayer();
             SetupDefaultCameraFollow();
+        }
+
+        void ResolvePersistentPlayer()
+        {
+            var bridge = MirrorTransitionBridge.Ensure();
+            var players = FindObjectsOfType<MirrorTrial.Player.PlayerInputReader>();
+            GameObject persistent = bridge.PersistentPlayer;
+
+            foreach (var p in players)
+            {
+                if (persistent && p.gameObject != persistent)
+                {
+                    p.gameObject.SetActive(false);
+                    Destroy(p.gameObject);
+                }
+                else if (!persistent)
+                {
+                    persistent = p.gameObject;
+                    bridge.RegisterPersistentPlayer(persistent);
+                }
+            }
+
+            if (!persistent && playerPrefab && playerSpawn)
+            {
+                persistent = Instantiate(playerPrefab, playerSpawn.position, Quaternion.identity);
+                persistent.name = playerPrefab.name;
+                bridge.RegisterPersistentPlayer(persistent);
+            }
+
+            if (persistent && playerSpawn)
+                persistent.transform.position = playerSpawn.position;
         }
 
         void SetupDefaultCameraFollow()
         {
-            if (!setupDefaultCameraFollow || !playerSpawn || !Camera.main) return;
+            if (!setupDefaultCameraFollow || !Camera.main) return;
+            var bridge = MirrorTransitionBridge.Instance;
+            var target = (bridge && bridge.PersistentPlayer) ? bridge.PersistentPlayer.transform : playerSpawn;
+            if (!target) return;
 
-            var follow = Camera.main.GetComponent<CameraFollow2D>();
-            if (!follow)
-                follow = Camera.main.gameObject.AddComponent<CameraFollow2D>();
-            follow.SetTarget(playerSpawn);
-            ConfigureCameraBounds(follow);
-        }
+            var brain = Camera.main.GetComponent<Cinemachine.CinemachineBrain>();
+            if (!brain) brain = Camera.main.gameObject.AddComponent<Cinemachine.CinemachineBrain>();
 
-        void ConfigureCameraBounds(CameraFollow2D follow)
-        {
+            var director = CameraDirector.Ensure();
+            director.SetBrain(brain);
+            director.SyncLens(Camera.main);
+            director.SetPlayerTarget(target);
+
             var bounds = ComputeSceneBounds();
-            if (bounds.minX <= float.MinValue || bounds.maxX >= float.MaxValue || bounds.minX > bounds.maxX)
-                return;
-
-            follow.SetHorizontalBounds(bounds.minX, bounds.maxX);
+            if (bounds.minX > float.MinValue &&
+                bounds.maxX < float.MaxValue &&
+                bounds.minX <= bounds.maxX)
+                director.SetHorizontalBounds(bounds.minX, bounds.maxX);
         }
 
         (float minX, float maxX) ComputeSceneBounds()
@@ -85,6 +121,16 @@ namespace MirrorTrial.Level
             var minX = boundsList.Min(b => b.min.x);
             var maxX = boundsList.Max(b => b.max.x);
             return (minX, maxX);
+        }
+
+        public bool TryGetSceneHorizontalBounds(out float minX, out float maxX)
+        {
+            var bounds = ComputeSceneBounds();
+            minX = bounds.minX;
+            maxX = bounds.maxX;
+            return minX > float.MinValue &&
+                   maxX < float.MaxValue &&
+                   minX <= maxX;
         }
 
 

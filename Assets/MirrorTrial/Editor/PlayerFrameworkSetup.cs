@@ -42,6 +42,13 @@ namespace MirrorTrial.Editor
             var root = PrefabUtility.LoadPrefabContents(PlayerPrefabPath);
             bool changed = false;
 
+            if (!root.GetComponent<PlayerDodgeController>())
+            {
+                root.AddComponent<PlayerDodgeController>();
+                changed = true;
+                Debug.Log("Player prefab: added PlayerDodgeController.");
+            }
+
             if (!root.GetComponent<PlayerStateMachine>())
             {
                 root.AddComponent<PlayerStateMachine>();
@@ -108,6 +115,7 @@ namespace MirrorTrial.Editor
             var loadout = player.AddComponent<PlayerAbilityLoadout>();
             player.AddComponent<Hurtbox>();
             player.AddComponent<PlayerDamageReceiver>();
+            player.AddComponent<PlayerDodgeController>();
 
             var attackHitbox = CreateAttackHitbox(player.transform);
             AssignObject(combat, "attackHitbox", attackHitbox);

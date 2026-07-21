@@ -1,4 +1,4 @@
-﻿using MirrorTrial.Feedback;
+using MirrorTrial.Feedback;
 using UnityEngine;
 
 namespace MirrorTrial.Combat
@@ -40,6 +40,8 @@ namespace MirrorTrial.Combat
 
             hurtbox.ReceiveHit(payload);
             HitStopService.Request(payload.hitStop);
+            CameraFeedbackService.RequestHit(payload);
         }
     }
 }
+

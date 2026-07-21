@@ -1,44 +1,71 @@
+using MirrorTrial.Combat;
 using MirrorTrial.Level;
 using UnityEngine;
 
 namespace MirrorTrial.Enemies
 {
-    [CreateAssetMenu(fileName = "EnemyAIProfile", menuName = "Mirror Trial/敌人AI配置", order = 0)]
+    [CreateAssetMenu(fileName = "EnemyAIProfile", menuName = "镜像试炼/敌兵/敌兵AI配置", order = 0)]
     public class EnemyAIProfile : ScriptableObject
     {
         [Header("基础属性")]
-        [ChineseLabel("最大生命值")] [Tooltip("最大生命值")] public int maxHitPoints = 2;
-        [ChineseLabel("移动速度")] [Tooltip("移动速度")] public float moveSpeed = 2.5f;
-        [ChineseLabel("朝向跟随移动")] [Tooltip("面向方向是否跟随移动方向翻转")] public bool flipVisualByVelocity = true;
+        [ChineseLabel("最大生命值")] [Tooltip("敌兵能够承受的总伤害。")] public int maxHitPoints = 2;
+        [ChineseLabel("移动速度")] [Tooltip("巡逻和追击时的移动速度。")] public float moveSpeed = 2.5f;
+        [ChineseLabel("移动时自动转向")] [Tooltip("根据移动方向左右翻转敌兵图片。")]
+        public bool flipVisualByVelocity = true;
 
-        [Header("侦测与追击")]
-        [ChineseLabel("侦测范围")] [Tooltip("发现玩家的距离")] public float detectionRange = 8f;
-        [ChineseLabel("脱战距离")] [Tooltip("超出此距离将丢失目标")] public float loseInterestRange = 12f;
-        [ChineseLabel("停止距离")] [Tooltip("追击停止距离（近战=攻击范围，远程=射程）")] public float stopDistance = 1.2f;
-        [ChineseLabel("前方侦测")] [Tooltip("是否只在正前方锥形区域内侦测玩家")] public bool useForwardDetection = false;
-        [ChineseLabel("侦测半角")] [Tooltip("前方侦测的角度半角（度）")] public float forwardDetectionAngle = 90f;
-        [ChineseLabel("巡逻等待")] [Tooltip("到达巡逻点后停留时间（秒）")] public float patrolWaitTime = 1f;
-        [ChineseLabel("启用巡逻")] [Tooltip("是否启用巡逻行为")] public bool enablePatrol = false;
+        [Header("探测、巡逻与追击")]
+        [ChineseLabel("默认探测范围")] [Tooltip("关卡中没有单独设置探测矩形时使用的默认距离。")]
+        public float detectionRange = 8f;
+        [HideInInspector] public float loseInterestRange = 12f;
+        [ChineseLabel("开始攻击距离")] [Tooltip("玩家距离敌兵多近时，敌兵停止追击并开始攻击。")]
+        public float stopDistance = 1.2f;
+        [HideInInspector] public bool useForwardDetection = false;
+        [HideInInspector] public float forwardDetectionAngle = 90f;
+        [ChineseLabel("巡逻端点等待时间")] [Tooltip("抵达左右巡逻边界后停留多久。")]
+        public float patrolWaitTime = 1f;
+        [HideInInspector] public bool enablePatrol = false;
 
         [Header("攻击")]
-        [ChineseLabel("攻击前摇")] [Tooltip("攻击动作开始到判定生效的时间（秒）")] public float attackWindup = 0.35f;
-        [ChineseLabel("攻击冷却")] [Tooltip("两次攻击之间的最小间隔（秒）")] public float attackCooldown = 1.2f;
-        [ChineseLabel("攻击范围")] [Tooltip("攻击判定距离")] public float attackRange = 1.2f;
-        [ChineseLabel("攻击伤害")] [Tooltip("每次攻击造成的伤害值")] public int attackDamage = 1;
-        [ChineseLabel("伤害延迟")] [Tooltip("攻击触发后伤害实际生效的延迟（秒）")] public float damageDelay = 0.1f;
-        [ChineseLabel("投射体预制体")] [Tooltip("远程攻击使用的投射体预制体（为空则为近战）")] public GameObject projectilePrefab;
-        [ChineseLabel("投射体偏移")] [Tooltip("投射体发射位置相对角色的偏移")] public Vector2 projectileSpawnOffset = new Vector2(0.4f, 0.2f);
-        [ChineseLabel("攻击时锁定移动")] [Tooltip("攻击过程中是否停止移动")] public bool lockMovementWhileAttacking = true;
+        [ChineseLabel("攻击前摇")] [Tooltip("开始攻击到伤害生效之间的时间。")]
+        public float attackWindup = 0.35f;
+        [ChineseLabel("攻击冷却")] [Tooltip("两次攻击之间至少间隔多久。")]
+        public float attackCooldown = 1.2f;
+        [ChineseLabel("攻击判定距离")] [Tooltip("近战攻击实际能够打到的水平距离。")]
+        public float attackRange = 1.2f;
+        [ChineseLabel("攻击伤害")] [Tooltip("每次攻击造成的伤害。")]
+        public int attackDamage = 1;
+        [Min(0)] public int interruptPower = 1;
+        [Min(0f)] public float poiseDamage = 1f;
+        public HitReactionType playerHitReaction = HitReactionType.LightHurt;
+        public bool breaksSuperArmor;
+        [ChineseLabel("伤害帧延迟")] [Tooltip("攻击开始后，经过多久执行伤害判定。")]
+        public float damageDelay = 0.1f;
+        [ChineseLabel("远程子弹预制体")] [Tooltip("留空表示近战敌兵；设置后表示远程敌兵。")]
+        public GameObject projectilePrefab;
+        [ChineseLabel("子弹生成偏移")] [Tooltip("子弹相对敌兵中心生成的位置。")]
+        public Vector2 projectileSpawnOffset = new Vector2(0.4f, 0.2f);
+        [ChineseLabel("攻击时停止移动")] [Tooltip("攻击动作期间是否锁定敌兵移动。")]
+        public bool lockMovementWhileAttacking = true;
 
         [Header("受击与死亡")]
-        [ChineseLabel("受击硬直")] [Tooltip("受击后硬直时间（秒）")] public float hurtStun = 0.25f;
-        [ChineseLabel("击退力度")] [Tooltip("受击时的击退力")] public float knockbackForce = 4f;
-        [ChineseLabel("死亡延迟")] [Tooltip("死亡后延迟多久销毁（秒）")] public float deathFadeDelay = 0.3f;
+        [ChineseLabel("受击硬直时间")] [Tooltip("受击动画至少保持多久。")]
+        public float hurtStun = 0.25f;
+        [ChineseLabel("受击后退力度")] [Tooltip("敌兵被玩家打中时受到的后退力度。")]
+        public float knockbackForce = 4f;
+        [ChineseLabel("死亡销毁延迟")] [Tooltip("没有图片组件时，死亡后等待多久销毁。")]
+        public float deathFadeDelay = 0.3f;
+        [ChineseLabel("死亡闪烁次数")] [Tooltip("销毁前闪烁几次。")]
+        public int deathBlinkCount = 2;
+        [ChineseLabel("死亡闪烁间隔")] [Tooltip("每次显示或隐藏持续多少秒。")]
+        public float deathBlinkInterval = 0.08f;
 
         [Header("移动限制")]
-        [ChineseLabel("悬崖检测距离")] [Tooltip("检测前方地面的距离，0=不检测")] public float ledgeCheckDistance = 0.5f;
-        [ChineseLabel("墙壁检测距离")] [Tooltip("检测前方墙壁的距离，0=不检测")] public float wallCheckDistance = 0.3f;
-        [ChineseLabel("悬崖处转身")] [Tooltip("到达悬崖边缘时是否自动转身")] public bool canTurnAtLedge = true;
+        [ChineseLabel("悬崖检测距离")] [Tooltip("向前检测地面的距离；设为 0 可关闭。")]
+        public float ledgeCheckDistance = 0.5f;
+        [ChineseLabel("墙壁检测距离")] [Tooltip("向前检测墙壁的距离；设为 0 可关闭。")]
+        public float wallCheckDistance = 0.3f;
+        [ChineseLabel("遇到悬崖时转身")] [Tooltip("到达悬崖边缘后是否自动转身。")]
+        public bool canTurnAtLedge = true;
 
         public bool IsRanged => projectilePrefab != null;
     }

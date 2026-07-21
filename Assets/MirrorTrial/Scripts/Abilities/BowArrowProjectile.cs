@@ -58,7 +58,9 @@ namespace MirrorTrial.Abilities
             if (!hurtbox) return;
             hurtbox.ReceiveHit(payload);
             HitStopService.Request(payload.hitStop);
+            CameraFeedbackService.RequestHit(payload);
             Destroy(gameObject);
         }
     }
 }
+

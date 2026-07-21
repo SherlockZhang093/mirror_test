@@ -1,100 +1,187 @@
+using System.Collections;
+using MirrorTrial.Combat;
 using MirrorTrial.Player;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MirrorTrial.Level
 {
     [RequireComponent(typeof(Collider2D))]
+    [RequireComponent(typeof(Hurtbox))]
     public class MirrorGate : MonoBehaviour
     {
-        [Header("基础")]
-        [ChineseLabel("镜子门ID")] [Tooltip("镜子门ID")] [SerializeField] string gateId = "MirrorGate_Blade";
-        [ChineseLabel("目标Boss战斗名")] [Tooltip("目标Boss战斗名")] [SerializeField] string targetEncounter = "Boss_Blade";
-        [Header("Boss Completion")]
-        [SerializeField] CombatEncounter bossEncounter;
-        [SerializeField] bool completeOnBossEncounterClear = true;
+        [Header("Basic")]
+        [ChineseLabel("镜子门 ID")] [Tooltip("镜子门的唯一 ID")] [SerializeField] string gateId = "MirrorGate_Blade";
+        [ChineseLabel("镜中场景名")] [Tooltip("击碎后加载的镜中场景名或路径")] [SerializeField] string mirrorSceneName = "level_01_mirror";
 
+        [Header("Health")]
+        [ChineseLabel("需要命中次数")] [Tooltip("无论单次伤害多少，镜子都必须被有效命中指定次数")]
+        [FormerlySerializedAs("hitPoints")] [SerializeField] int requiredHits = 3;
+        [ChineseLabel("当前命中次数")] [Tooltip("本次运行中已经命中的次数（只读）")]
+        [FormerlySerializedAs("currentHitPoints")] [SerializeField] int currentHits;
 
-        [Header("传送点")]
-        [ChineseLabel("Boss入口点")] [Tooltip("Boss入口点")] [SerializeField] Transform encounterEntryPoint;
-        [ChineseLabel("返回点")] [Tooltip("返回点")] [SerializeField] Transform returnPoint;
+        [Header("Reward And Progression")]
+        [ChineseLabel("奖励能力")] [Tooltip("镜中战斗完成后解锁的能力")] [SerializeField] MirrorRewardAbility rewardAbility = MirrorRewardAbility.None;
+        [ChineseLabel("后续关卡段落")] [Tooltip("完成镜子门后启用的关卡段落")] [SerializeField] LevelSegment nextSegment;
 
-        [Header("奖励与下一段")]
-        [ChineseLabel("奖励能力")] [Tooltip("奖励能力")] [SerializeField] MirrorRewardAbility rewardAbility = MirrorRewardAbility.None;
-        [ChineseLabel("完成后启用的段落")] [Tooltip("完成后启用的段落")] [SerializeField] LevelSegment nextSegment;
-        [ChineseLabel("进入时直接传送")] [Tooltip("进入时直接传送")] [SerializeField] bool teleportOnEnter = true;
+        [Header("Visual")]
+        [ChineseLabel("镜子 Prefab")] [Tooltip("包含镜面、边框、裂纹和碎裂效果的镜子 Prefab")]
+        [SerializeField] GameObject mirrorPrefab;
+
+        [Header("Transition")]
+        [SerializeField] float enterMirrorDelay = -1f;
+
+        GameObject visualObject;
+        MirrorShatterEffect shatterEffect;
+        Collider2D gateCollider;
+        PlayerInputReader lockedInput;
+        bool completionProcessed;
+        Coroutine enterMirrorRoutine;
 
         public string GateId => gateId;
-        public CombatEncounter BossEncounter => bossEncounter;
-        public string TargetEncounter => targetEncounter;
-        public Transform ReturnPoint => returnPoint;
+        public string MirrorSceneName => mirrorSceneName;
         public MirrorRewardAbility RewardAbility => rewardAbility;
         public LevelSegment NextSegment => nextSegment;
-        public MirrorGateState State { get; private set; } = MirrorGateState.Locked;
+        public GameObject MirrorPrefab => mirrorPrefab;
+        public MirrorGateState State { get; private set; } = MirrorGateState.Intact;
+        public int HitPoints => requiredHits;
+        public int CurrentHitPoints => currentHits;
+        public bool IsCompleted => State == MirrorGateState.Completed;
 
-        public System.Action<MirrorGate> OnActivated;
-        public System.Action<MirrorGate> OnBroken;
+        public System.Action<MirrorGate> OnSmashed;
+        public System.Action<MirrorGate> OnCompleted;
 
         void Awake()
         {
-            var col = GetComponent<Collider2D>();
-            if (col) col.isTrigger = true;
+            requiredHits = Mathf.Max(1, requiredHits);
+            currentHits = 0;
+            gateCollider = GetComponent<Collider2D>();
+            if (gateCollider) gateCollider.isTrigger = true;
+
+            shatterEffect = GetComponentInChildren<MirrorShatterEffect>();
+            if (shatterEffect)
+                visualObject = shatterEffect.gameObject;
+            else if (mirrorPrefab)
+            {
+                visualObject = Instantiate(mirrorPrefab, transform);
+                visualObject.name = mirrorPrefab.name;
+                shatterEffect = visualObject.GetComponentInChildren<MirrorShatterEffect>();
+            }
+
+            var bridge = MirrorTransitionBridge.Ensure();
+            if (bridge.IsGateCompleted(gateId))
+            {
+                State = MirrorGateState.Completed;
+                if (shatterEffect) shatterEffect.ShowCompletedFrameOnly();
+                if (gateCollider) gateCollider.enabled = false;
+                var hurtbox = GetComponent<Hurtbox>();
+                if (hurtbox) hurtbox.enabled = false;
+            }
         }
 
-        void OnEnable()
+        void Start()
         {
-            if (bossEncounter)
-                bossEncounter.OnCleared += OnBossEncounterCleared;
+            if (State == MirrorGateState.Completed && !completionProcessed)
+            {
+                completionProcessed = true;
+                FinalizeCompletion();
+            }
         }
 
-        void OnDisable()
+        public void OnDamagePayloadReceived(DamagePayload payload)
         {
-            if (bossEncounter)
-                bossEncounter.OnCleared -= OnBossEncounterCleared;
+            if (State != MirrorGateState.Intact) return;
+
+            if (payload.damage <= 0) return;
+            currentHits = Mathf.Min(requiredHits, currentHits + 1);
+            if (shatterEffect)
+            {
+                shatterEffect.SetHitProgress(currentHits, requiredHits);
+                if (currentHits < requiredHits) shatterEffect.PlayHit(payload.direction);
+            }
+
+            if (currentHits >= requiredHits)
+                Smash(payload.source, payload.direction);
         }
 
-        void OnTriggerEnter2D(Collider2D other)
+        public void Smash(GameObject attacker)
         {
-            if (!teleportOnEnter || State != MirrorGateState.Active) return;
-            if (IsPlayer(other))
-                EnterGate(other.gameObject);
+            var direction = attacker
+                ? (Vector2)(transform.position - attacker.transform.position)
+                : Vector2.right;
+            Smash(attacker, direction);
         }
 
-        public void Activate()
+        void Smash(GameObject attacker, Vector2 impactDirection)
         {
-            if (State == MirrorGateState.Broken) return;
-            State = MirrorGateState.Active;
-            OnActivated?.Invoke(this);
+            if (State != MirrorGateState.Intact) return;
+            currentHits = requiredHits;
+            State = MirrorGateState.Smashed;
+            OnSmashed?.Invoke(this);
+
+            var player = FindPlayerReader(attacker);
+            LockPlayerInput(player);
+            if (shatterEffect) shatterEffect.Play(impactDirection);
+
+            if (gateCollider) gateCollider.enabled = false;
+            var hurtbox = GetComponent<Hurtbox>();
+            if (hurtbox) hurtbox.enabled = false;
+
+            if (enterMirrorRoutine == null)
+                enterMirrorRoutine = StartCoroutine(EnterMirrorAfterShatter(player));
         }
 
-        public void EnterGate(GameObject player)
+        IEnumerator EnterMirrorAfterShatter(PlayerInputReader player)
         {
-            if (State != MirrorGateState.Active || !player) return;
-            if (encounterEntryPoint)
-                player.transform.position = encounterEntryPoint.position;
+            var delay = enterMirrorDelay >= 0f
+                ? enterMirrorDelay
+                : (shatterEffect ? shatterEffect.RecommendedEnterDelay : 0f);
+            if (delay > 0f)
+                yield return new WaitForSecondsRealtime(delay);
+
+            UnlockPlayerInput();
+            var playerObject = player ? player.gameObject : FindPlayer();
+            var bridge = MirrorTransitionBridge.Ensure();
+            bridge.EnterMirror(gateId, mirrorSceneName, playerObject);
+            enterMirrorRoutine = null;
         }
 
-        public void MarkBossDefeated(GameObject player)
+        void FinalizeCompletion()
         {
-            if (State != MirrorGateState.Active && State != MirrorGateState.Locked) return;
-            State = MirrorGateState.Completed;
+            if (shatterEffect) shatterEffect.ShowCompletedFrameOnly();
+            var bridge = MirrorTransitionBridge.Instance;
+            var player = bridge ? bridge.PersistentPlayer : FindPlayer();
+
             UnlockAbility(player);
-            if (player && returnPoint)
-                player.transform.position = returnPoint.position;
-            Break(player);
-        }
+            if (player)
+                player.transform.position = transform.position;
+            else if (bridge)
+                bridge.PlacePlayerAt(transform.position);
 
-        void OnBossEncounterCleared(CombatEncounter encounter)
-        {
-            if (completeOnBossEncounterClear)
-                MarkBossDefeated(FindPlayer());
-        }
-
-        public void Break(GameObject player)
-        {
-            if (State == MirrorGateState.Broken) return;
-            State = MirrorGateState.Broken;
             if (nextSegment) nextSegment.Enable();
-            OnBroken?.Invoke(this);
+            OnCompleted?.Invoke(this);
+        }
+
+        void LockPlayerInput(PlayerInputReader player)
+        {
+            lockedInput = player;
+            if (lockedInput) lockedInput.InputEnabled = false;
+        }
+
+        void UnlockPlayerInput()
+        {
+            if (lockedInput) lockedInput.InputEnabled = true;
+            lockedInput = null;
+        }
+
+        PlayerInputReader FindPlayerReader(GameObject attacker = null)
+        {
+            if (attacker)
+            {
+                var reader = attacker.GetComponentInParent<PlayerInputReader>();
+                if (reader) return reader;
+            }
+            return FindObjectOfType<PlayerInputReader>();
         }
 
         void UnlockAbility(GameObject player)
@@ -102,21 +189,11 @@ namespace MirrorTrial.Level
             if (!player) return;
             var tuning = player.GetComponent<PlayerTuning>();
             if (!tuning) return;
-
             switch (rewardAbility)
             {
-                case MirrorRewardAbility.MirrorBlade:
-                    tuning.abilities.mirrorBladeUnlocked = true;
-                    break;
-                case MirrorRewardAbility.EchoDash:
-                    tuning.abilities.echoDashUnlocked = true;
-                    break;
+                case MirrorRewardAbility.MirrorBlade: tuning.abilities.mirrorBladeUnlocked = true; break;
+                case MirrorRewardAbility.EchoDash: tuning.abilities.echoDashUnlocked = true; break;
             }
-        }
-
-        bool IsPlayer(Collider2D other)
-        {
-            return other.CompareTag("Player") || other.GetComponent<PlayerInputReader>() != null;
         }
 
         GameObject FindPlayer()
@@ -125,16 +202,19 @@ namespace MirrorTrial.Level
             return player ? player.gameObject : null;
         }
 
+        void OnDisable()
+        {
+            UnlockPlayerInput();
+        }
 
         void OnDrawGizmos()
         {
             Color color;
             switch (State)
             {
-                case MirrorGateState.Active: color = new Color(0.25f, 0.9f, 1f, 0.95f); break;
-                case MirrorGateState.Completed: color = new Color(1f, 0.75f, 0.2f, 0.95f); break;
-                case MirrorGateState.Broken: color = new Color(0.9f, 0.45f, 0.3f, 0.95f); break;
-                default: color = new Color(0.65f, 0.65f, 0.65f, 0.95f); break;
+                case MirrorGateState.Smashed: color = new Color(0.25f, 0.9f, 1f, 0.95f); break;
+                case MirrorGateState.Completed: color = new Color(0.9f, 0.45f, 0.3f, 0.95f); break;
+                default: color = new Color(0.75f, 0.85f, 1f, 0.95f); break;
             }
             Gizmos.color = color;
             Gizmos.DrawWireCube(transform.position, new Vector3(0.8f, 1.2f, 0.1f));

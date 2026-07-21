@@ -1,0 +1,122 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 683cb764d5526d54e8968b2105516413, type: 3}
+  m_Name: Level_Reality_01
+  m_EditorClassIdentifier: 
+  levelId: Level_Reality_01
+  displayName: "\u73B0\u5B9E\u5173\u5361 1"
+  isMirrorLevel: 0
+  playerPrefab: {fileID: 7253538297837963826, guid: 0eb9dd5878ab6d849b4720b03e304987,
+    type: 3}
+  enemyPrefab: {fileID: 0}
+  defaultSprite: {fileID: 0}
+  playerSpawn: {x: -14.44, y: -1.76, z: 0}
+  geometry:
+  - name: Platform_01_04 (1)
+    position: {x: -2.2999997, y: -4.18, z: 0}
+    size: {x: 4, y: 1}
+    isBoundary: 0
+    isPlatform: 1
+    platformVisualIndex: 9
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - name: Platform_01_04
+    position: {x: -5.59, y: -4.18, z: 0}
+    size: {x: 4, y: 1}
+    isBoundary: 0
+    isPlatform: 1
+    platformVisualIndex: 9
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - name: Boundary_01
+    position: {x: -16.59, y: -2.26, z: 0}
+    size: {x: 1.0630093, y: 13.33237}
+    isBoundary: 1
+    isPlatform: 0
+    platformVisualIndex: 0
+    color: {r: 1, g: 0.25, b: 0.25, a: 0.35}
+  - name: Platform_01_03
+    position: {x: -5.4, y: -0.26999998, z: 0}
+    size: {x: 4, y: 0.8588895}
+    isBoundary: 0
+    isPlatform: 1
+    platformVisualIndex: 4
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - name: Platform_01_02
+    position: {x: -8.99, y: -1.97, z: 0}
+    size: {x: 4, y: 1}
+    isBoundary: 0
+    isPlatform: 1
+    platformVisualIndex: 1
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - name: Platform_01
+    position: {x: -13.02, y: -2.75, z: 0}
+    size: {x: 4, y: 1}
+    isBoundary: 0
+    isPlatform: 1
+    platformVisualIndex: 1
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - name: Platform_01_04 (2)
+    position: {x: 1.11, y: -4.18, z: 0}
+    size: {x: 4, y: 1}
+    isBoundary: 0
+    isPlatform: 1
+    platformVisualIndex: 9
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - name: Platform_01_05
+    position: {x: 4.29, y: -2.64, z: 0}
+    size: {x: 4, y: 1}
+    isBoundary: 0
+    isPlatform: 1
+    platformVisualIndex: 7
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - name: Platform_01_06
+    position: {x: -6.44, y: -2.94, z: 0}
+    size: {x: 4, y: 1}
+    isBoundary: 0
+    isPlatform: 1
+    platformVisualIndex: 4
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - name: Platform_01_07
+    position: {x: -1.88, y: 0.37, z: 0}
+    size: {x: 4, y: 0.64284444}
+    isBoundary: 0
+    isPlatform: 1
+    platformVisualIndex: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - name: Platform_01_08
+    position: {x: 1.13, y: -0.7, z: 0}
+    size: {x: 3.5513384, y: 0.9900299}
+    isBoundary: 0
+    isPlatform: 1
+    platformVisualIndex: 10
+    color: {r: 1, g: 1, b: 1, a: 1}
+  segments: []
+  spawnPoints: []
+  encounters:
+  - encounterId: Combat_A_01
+    position: {x: -5.46, y: 0.51, z: 0}
+    size: {x: 3.4849708, y: 2.4119153}
+    startOnPlayerEnter: 1
+    clearCondition: 1
+    lockGateIds: []
+    waves: []
+  gates: []
+  mirrorGates:
+  - gateId: MirrorGate_Blade
+    position: {x: 5.34, y: -1.35, z: 0}
+    mirrorSceneName: Level_Mirror_01
+    hitPoints: 3
+    returnPointPosition: {x: 5.34, y: -1.35, z: 0}
+    rewardAbility: 0
+    nextSegmentId: 
+    platformVisualIndex: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  triggers: []

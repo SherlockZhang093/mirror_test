@@ -4,30 +4,65 @@ namespace MirrorTrial.Level
 {
     public class CameraFollow2D : MonoBehaviour
     {
-        [SerializeField] Transform target;
-        [SerializeField] Vector2 offset = new Vector2(0f, 1f);
-        [SerializeField, Min(0f)] float smoothTime = 0.18f;
-        [SerializeField] bool followX = true;
-        [SerializeField] bool followY = true;
-        [SerializeField] bool clampHorizontal = true;
+        static CameraFollow2D main;
+
+        [SerializeField, InspectorName("跟随目标")] Transform target;
+        [SerializeField, InspectorName("构图偏移")] Vector2 offset = new Vector2(0f, 1f);
+        [SerializeField, Min(0f), InspectorName("跟随平滑时间")] float smoothTime = 0.18f;
+        [SerializeField, Range(0f, 4f), InspectorName("横向提前量")] float lookAheadDistance = 1.2f;
+        [SerializeField, Min(0f), InspectorName("提前量平滑时间")] float lookAheadSmoothTime = 0.16f;
+        [SerializeField, InspectorName("镜头死区")] Vector2 deadZone = new Vector2(0.35f, 1.1f);
+        [SerializeField, InspectorName("跟随横向")] bool followX = true;
+        [SerializeField, InspectorName("跟随纵向")] bool followY = true;
+        [SerializeField, InspectorName("限制横向边界")] bool clampHorizontal = true;
+        [SerializeField, InspectorName("相机 Z 轴位置")] float cameraZ = -10f;
+        [Header("命中镜头反馈")]
+        [SerializeField, Min(0f), InspectorName("轻命中推镜距离")] float lightKickDistance = 0.08f;
+        [SerializeField, Min(0f), InspectorName("重命中推镜距离")] float heavyKickDistance = 0.22f;
+        [SerializeField, Min(0f), InspectorName("推镜回正速度")] float kickReturnSpeed = 18f;
+        [SerializeField, Min(0f), InspectorName("震屏幅度")] float shakeAmplitudePerPower = 0.08f;
+        [SerializeField, Min(0f), InspectorName("震屏持续时间")] float shakeDurationPerPower = 0.08f;
+        [SerializeField, Min(0f), InspectorName("震屏频率")] float shakeFrequency = 38f;
 
         Vector3 velocity;
+        Vector2 lookAhead;
+        Vector2 lookAheadVelocity;
+        Vector2 kickOffset;
+        float shakeTimeRemaining;
+        float shakeDuration;
+        float shakeAmplitude;
+        float shakeSeed;
+        Vector3 lastTargetPosition;
         Camera attachedCamera;
         bool hasHorizontalBounds;
         float horizontalMin;
         float horizontalMax;
 
+        public static CameraFollow2D Main => main ? main : Camera.main ? Camera.main.GetComponent<CameraFollow2D>() : null;
         public Transform Target => target;
 
         void Awake()
         {
             attachedCamera = GetComponent<Camera>();
+            if (!main || attachedCamera && attachedCamera.CompareTag("MainCamera"))
+                main = this;
+            if (target)
+                lastTargetPosition = target.position;
+        }
+
+        void OnDestroy()
+        {
+            if (main == this)
+                main = null;
         }
 
         public void SetTarget(Transform nextTarget, bool snap = true)
         {
             target = nextTarget;
             velocity = Vector3.zero;
+            lookAhead = Vector2.zero;
+            lookAheadVelocity = Vector2.zero;
+            lastTargetPosition = target ? target.position : transform.position;
             if (snap)
                 SnapToTarget();
         }
@@ -45,10 +80,12 @@ namespace MirrorTrial.Level
         {
             if (!target) return;
 
-            var desired = GetDesiredPosition();
+            UpdateLookAhead();
+            UpdateKickOffset();
+            var desired = GetDesiredPosition() + (Vector3)kickOffset + (Vector3)GetShakeOffset();
             transform.position = smoothTime <= 0f
                 ? desired
-                : Vector3.SmoothDamp(transform.position, desired, ref velocity, smoothTime);
+                : Vector3.SmoothDamp(transform.position, desired, ref velocity, smoothTime, Mathf.Infinity, Time.unscaledDeltaTime);
         }
 
         void SnapToTarget()
@@ -61,14 +98,63 @@ namespace MirrorTrial.Level
         {
             var current = transform.position;
             var targetPosition = target.position;
-            var x = followX ? targetPosition.x + offset.x : current.x;
+            var baseX = targetPosition.x + offset.x;
+            var baseY = targetPosition.y + offset.y;
+            var x = followX ? baseX + lookAhead.x : current.x;
+            var y = followY ? baseY + lookAhead.y : current.y;
+
+            if (followX && deadZone.x > 0f && Mathf.Abs(baseX - current.x) <= deadZone.x)
+                x = current.x;
+            if (followY && deadZone.y > 0f && Mathf.Abs(baseY - current.y) <= deadZone.y)
+                y = current.y;
+
             if (clampHorizontal && hasHorizontalBounds)
                 x = ClampCameraCenterX(x);
 
-            return new Vector3(
-                x,
-                followY ? targetPosition.y + offset.y : current.y,
-                current.z);
+            return new Vector3(x, y, cameraZ);
+        }
+
+        void UpdateLookAhead()
+        {
+            var targetPosition = target.position;
+            var delta = targetPosition - lastTargetPosition;
+            var desiredLookAhead = Vector2.zero;
+            if (Mathf.Abs(delta.x) > 0.0001f)
+                desiredLookAhead.x = Mathf.Sign(delta.x) * lookAheadDistance;
+            lookAhead = Vector2.SmoothDamp(lookAhead, desiredLookAhead, ref lookAheadVelocity, lookAheadSmoothTime, Mathf.Infinity, Time.unscaledDeltaTime);
+            lastTargetPosition = targetPosition;
+        }
+
+        void UpdateKickOffset()
+        {
+            kickOffset = Vector2.Lerp(kickOffset, Vector2.zero, 1f - Mathf.Exp(-kickReturnSpeed * Time.unscaledDeltaTime));
+        }
+
+        Vector2 GetShakeOffset()
+        {
+            if (shakeTimeRemaining <= 0f)
+                return Vector2.zero;
+
+            shakeTimeRemaining = Mathf.Max(0f, shakeTimeRemaining - Time.unscaledDeltaTime);
+            var t = shakeDuration > 0f ? shakeTimeRemaining / shakeDuration : 0f;
+            var noiseX = Mathf.PerlinNoise(shakeSeed, Time.unscaledTime * shakeFrequency) * 2f - 1f;
+            var noiseY = Mathf.PerlinNoise(shakeSeed + 17.37f, Time.unscaledTime * shakeFrequency) * 2f - 1f;
+            return new Vector2(noiseX, noiseY) * shakeAmplitude * t;
+        }
+
+        public void PlayHitFeedback(Vector2 direction, float power)
+        {
+            power = Mathf.Clamp01(power);
+            if (direction.sqrMagnitude <= 0f)
+                direction = Vector2.right;
+
+            var kick = Mathf.Lerp(lightKickDistance, heavyKickDistance, power);
+            kickOffset += direction.normalized * kick;
+
+            shakeDuration = shakeDurationPerPower * power;
+            shakeTimeRemaining = Mathf.Max(shakeTimeRemaining, shakeDuration);
+            shakeAmplitude = Mathf.Max(shakeAmplitude, shakeAmplitudePerPower * power);
+            shakeSeed = Random.value * 100f;
         }
 
         float ClampCameraCenterX(float desiredX)

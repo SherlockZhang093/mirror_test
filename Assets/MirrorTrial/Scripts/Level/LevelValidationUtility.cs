@@ -53,9 +53,10 @@ namespace MirrorTrial.Level
                 if (string.IsNullOrWhiteSpace(encounter.EncounterId))
                     issues.Add(new LevelValidationIssue(LevelValidationSeverity.Error, $"Encounter '{encounter.name}' 未设置 ID。", encounter));
 
-                if (!encounter.HasWaves)
+                bool hasPlacedEnemies = encounter.PlacedEnemies != null && encounter.PlacedEnemies.Count > 0;
+                if (!hasPlacedEnemies && !encounter.HasWaves)
                 {
-                    issues.Add(new LevelValidationIssue(LevelValidationSeverity.Error, $"Encounter '{encounter.name}' 没有配置波次。", encounter));
+                    issues.Add(new LevelValidationIssue(LevelValidationSeverity.Warning, $"Encounter '{encounter.name}' 没有登记场景敌人。", encounter));
                     continue;
                 }
 
@@ -111,7 +112,7 @@ namespace MirrorTrial.Level
                 case LevelActionType.StartWave: return action.encounter;
                 case LevelActionType.LockGate:
                 case LevelActionType.OpenGate: return action.gate;
-                case LevelActionType.ActivateMirrorGate: return action.mirrorGate;
+                case LevelActionType.SmashMirrorGate: return action.mirrorGate;
                 case LevelActionType.TeleportPlayer: return action.teleportTarget;
                 case LevelActionType.UnlockAbility: return action.ability != MirrorRewardAbility.None;
                 case LevelActionType.EnableSegment: return action.segment;
@@ -138,10 +139,10 @@ namespace MirrorTrial.Level
             foreach (var mirror in manager.MirrorGates)
             {
                 if (!mirror) continue;
-                if (!mirror.BossEncounter)
-                    issues.Add(new LevelValidationIssue(LevelValidationSeverity.Warning, $"MirrorGate '{mirror.name}' has no Boss Encounter and requires a manual completion call.", mirror));
-                if (!mirror.ReturnPoint)
-                    issues.Add(new LevelValidationIssue(LevelValidationSeverity.Error, $"MirrorGate '{mirror.name}' 未配置 ReturnPoint。", mirror));
+                if (string.IsNullOrWhiteSpace(mirror.MirrorSceneName))
+                    issues.Add(new LevelValidationIssue(LevelValidationSeverity.Error, $"MirrorGate '{mirror.name}' 未配置镜中场景名(MirrorSceneName)。", mirror));
+                if (mirror.HitPoints <= 0)
+                    issues.Add(new LevelValidationIssue(LevelValidationSeverity.Warning, $"MirrorGate '{mirror.name}' 血量 <= 0，将被一击碎裂。", mirror));
             }
         }
 

@@ -7,7 +7,7 @@ namespace MirrorTrial.Player
 {
     [RequireComponent(typeof(PlayerInputReader), typeof(PlayerTuning), typeof(PlayerMotor))]
     [RequireComponent(typeof(PlayerAnimationDriver))]
-    public class PlayerAbilityLoadout : MonoBehaviour
+    public class PlayerAbilityLoadout : MonoBehaviour, IInterruptiblePlayerAction
     {
         [SerializeField] AnimationClip mirrorBladeClip;
         [SerializeField] MirrorBladeProjectile mirrorBladeProjectilePrefab;
@@ -109,6 +109,33 @@ namespace MirrorTrial.Player
             var projectile = Instantiate(mirrorBladeProjectilePrefab, spawnPosition, Quaternion.identity);
             var payload = new DamagePayload(gameObject, ability.mirrorBladeDamage, ability.mirrorBladeKnockback, direction, ability.mirrorBladeHitStop);
             projectile.Launch(payload, direction, ability.mirrorBladeSpeed, ability.mirrorBladeRange);
+        }
+
+        public void CancelCurrentAction(PlayerActionCancelReason reason)
+        {
+            if (mirrorBladeRoutine != null)
+            {
+                StopCoroutine(mirrorBladeRoutine);
+                mirrorBladeRoutine = null;
+            }
+            if (echoDashRoutine != null)
+            {
+                StopCoroutine(echoDashRoutine);
+                echoDashRoutine = null;
+            }
+
+            input.InputEnabled = true;
+            motor.MovementLocked = false;
+            motor.CancelForcedVelocity();
+            animationDriver.StopActionClip();
+            animationDriver.ClearForcedState(PlayerActionState.Attack);
+            animationDriver.ClearForcedState(PlayerActionState.Cast);
+            animationDriver.ClearForcedState(PlayerActionState.Dash);
+        }
+
+        void OnDisable()
+        {
+            CancelCurrentAction(PlayerActionCancelReason.Hit);
         }
     }
 }

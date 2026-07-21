@@ -15,6 +15,10 @@ namespace Platformer.Mechanics
         /// </summary>
         public int maxHP = 1;
 
+        public event Action<int, int> Changed;
+
+        public int CurrentHP => currentHP;
+
         /// <summary>
         /// Indicates if the entity should be considered 'alive'.
         /// </summary>
@@ -28,6 +32,14 @@ namespace Platformer.Mechanics
         public void Increment()
         {
             currentHP = Mathf.Clamp(currentHP + 1, 0, maxHP);
+            Changed?.Invoke(currentHP, maxHP);
+        }
+
+        /// <summary>Restore this entity to full health (for example, after respawning).</summary>
+        public void RestoreFull()
+        {
+            currentHP = Mathf.Max(0, maxHP);
+            Changed?.Invoke(currentHP, maxHP);
         }
 
         /// <summary>
@@ -36,7 +48,16 @@ namespace Platformer.Mechanics
         /// </summary>
         public void Decrement()
         {
-            currentHP = Mathf.Clamp(currentHP - 1, 0, maxHP);
+            Damage(1);
+        }
+
+        public void Damage(int amount)
+        {
+            if (amount <= 0 || currentHP <= 0)
+                return;
+
+            currentHP = Mathf.Clamp(currentHP - amount, 0, maxHP);
+            Changed?.Invoke(currentHP, maxHP);
             if (currentHP == 0)
             {
                 var ev = Schedule<HealthIsZero>();

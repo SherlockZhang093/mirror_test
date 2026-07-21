@@ -11,8 +11,8 @@ namespace MirrorTrial.Level
         [InspectorName("玩家离开")] OnPlayerExit,
         [InspectorName("战斗清场")] OnEncounterClear,
         [InspectorName("Boss击败")] OnBossDefeated,
-        [InspectorName("镜子门激活")] OnMirrorActivated,
-        [InspectorName("镜子门破碎")] OnMirrorBroken,
+        [InspectorName("镜子门击碎")] OnMirrorSmashed,
+        [InspectorName("镜子门完成")] OnMirrorCompleted,
         [InspectorName("段落启用")] OnSegmentEnabled
     }
 
@@ -30,8 +30,8 @@ namespace MirrorTrial.Level
         [InspectorName("段落未完成")] SegmentNotCompleted,
         [InspectorName("战斗未开始")] EncounterNotStarted,
         [InspectorName("战斗已清场")] EncounterCleared,
-        [InspectorName("镜子门已激活")] MirrorGateIsActive,
-        [InspectorName("镜子门已锁定")] MirrorGateIsLocked,
+        [InspectorName("镜子门已击碎")] MirrorGateIsSmashed,
+        [InspectorName("镜子门完好")] MirrorGateIsIntact,
         [InspectorName("玩家拥有能力")] PlayerHasAbility
     }
 
@@ -42,7 +42,7 @@ namespace MirrorTrial.Level
         [InspectorName("开始波次")] StartWave,
         [InspectorName("关门")] LockGate,
         [InspectorName("开门")] OpenGate,
-        [InspectorName("激活镜子门")] ActivateMirrorGate,
+        [InspectorName("击碎镜子门")] SmashMirrorGate,
         [InspectorName("传送玩家")] TeleportPlayer,
         [InspectorName("解锁能力")] UnlockAbility,
         [InspectorName("启用段落")] EnableSegment,
@@ -51,10 +51,9 @@ namespace MirrorTrial.Level
 
     public enum MirrorGateState
     {
-        [InspectorName("锁定")] Locked,
-        [InspectorName("可进入")] Active,
-        [InspectorName("已完成")] Completed,
-        [InspectorName("破碎")] Broken
+        [InspectorName("完好")] Intact,
+        [InspectorName("已击碎")] Smashed,
+        [InspectorName("已完成")] Completed
     }
 
     public enum MirrorRewardAbility

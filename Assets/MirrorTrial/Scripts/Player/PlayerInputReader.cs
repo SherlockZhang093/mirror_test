@@ -13,7 +13,8 @@ namespace MirrorTrial.Player
         WeaponSlot1,
         WeaponSlot2,
         WeaponSlot3,
-        WeaponSlot4
+        WeaponSlot4,
+        Dodge
     }
 
     [Serializable]
@@ -64,6 +65,7 @@ namespace MirrorTrial.Player
         public bool MobilitySkillPressed => WasPressed(PlayerInputCommand.MobilitySkill);
         public bool MirrorBladePressed => WeaponSkillPressed;
         public bool EchoDashPressed => MobilitySkillPressed;
+        public bool DodgePressed => WasPressed(PlayerInputCommand.Dodge);
 
         public IList<PlayerInputBinding> Bindings { get { return bindings; } }
 
@@ -155,7 +157,7 @@ namespace MirrorTrial.Player
             if (bindingSchemaVersion < 2)
             {
                 bindings = CreateDefaultBindings();
-                bindingSchemaVersion = 2;
+                bindingSchemaVersion = 3;
                 return;
             }
             if (bindings == null)
@@ -177,6 +179,17 @@ namespace MirrorTrial.Player
                 if (!exists)
                     bindings.Add(defaults[i]);
             }
+
+            if (bindingSchemaVersion < 3)
+            {
+                for (var i = 0; i < bindings.Count; i++)
+                {
+                    var binding = bindings[i];
+                    if (binding != null && binding.command == PlayerInputCommand.MobilitySkill && binding.key == KeyCode.LeftShift)
+                        binding.key = KeyCode.Q;
+                }
+                bindingSchemaVersion = 3;
+            }
         }
 
         static List<PlayerInputBinding> CreateDefaultBindings()
@@ -186,11 +199,12 @@ namespace MirrorTrial.Player
                 new PlayerInputBinding(PlayerInputCommand.PrimaryAttack, "Fire1", KeyCode.J),
                 new PlayerInputBinding(PlayerInputCommand.SecondaryAttack, "Fire2", KeyCode.K),
                 new PlayerInputBinding(PlayerInputCommand.WeaponSkill, "Fire3", KeyCode.L),
-                new PlayerInputBinding(PlayerInputCommand.MobilitySkill, string.Empty, KeyCode.LeftShift),
+                new PlayerInputBinding(PlayerInputCommand.MobilitySkill, string.Empty, KeyCode.Q),
                 new PlayerInputBinding(PlayerInputCommand.WeaponSlot1, string.Empty, KeyCode.Alpha1),
                 new PlayerInputBinding(PlayerInputCommand.WeaponSlot2, string.Empty, KeyCode.Alpha2),
                 new PlayerInputBinding(PlayerInputCommand.WeaponSlot3, string.Empty, KeyCode.Alpha3),
-                new PlayerInputBinding(PlayerInputCommand.WeaponSlot4, string.Empty, KeyCode.Alpha4)
+                new PlayerInputBinding(PlayerInputCommand.WeaponSlot4, string.Empty, KeyCode.Alpha4),
+                new PlayerInputBinding(PlayerInputCommand.Dodge, string.Empty, KeyCode.LeftShift)
             };
         }
     }

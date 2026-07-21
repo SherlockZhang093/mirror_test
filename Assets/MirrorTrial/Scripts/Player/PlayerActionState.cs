@@ -37,6 +37,7 @@ namespace MirrorTrial.Player
         SwordGuard,
         SwordGuardImpact,
         SwordSprintSlash,
-        CrouchSlash
+        CrouchSlash,
+        Dodge
     }
 }

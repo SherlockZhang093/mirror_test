@@ -76,6 +76,9 @@ namespace MirrorTrial.Editor
         void OnEnable()
         {
             EditorApplication.update += TickPreview;
+            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+            AssemblyReloadEvents.beforeAssemblyReload += StopPreview;
+            EditorApplication.quitting += StopPreview;
             if (!driver && Selection.activeGameObject)
                 SetTarget(Selection.activeGameObject.GetComponent<PlayerAnimationDriver>());
         }
@@ -83,7 +86,16 @@ namespace MirrorTrial.Editor
         void OnDisable()
         {
             EditorApplication.update -= TickPreview;
+            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+            AssemblyReloadEvents.beforeAssemblyReload -= StopPreview;
+            EditorApplication.quitting -= StopPreview;
             StopPreview();
+        }
+
+        void OnPlayModeStateChanged(PlayModeStateChange state)
+        {
+            if (state == PlayModeStateChange.ExitingEditMode || state == PlayModeStateChange.EnteredPlayMode)
+                StopPreview();
         }
 
         void OnSelectionChange()

@@ -67,8 +67,8 @@ namespace MirrorTrial.Level
 
             if (mirrorGateTarget)
             {
-                mirrorGateTarget.OnActivated += OnMirrorActivated;
-                mirrorGateTarget.OnBroken += OnMirrorBroken;
+                mirrorGateTarget.OnSmashed += OnMirrorSmashed;
+                mirrorGateTarget.OnCompleted += OnMirrorCompleted;
             }
         }
 
@@ -82,8 +82,8 @@ namespace MirrorTrial.Level
 
             if (mirrorGateTarget)
             {
-                mirrorGateTarget.OnActivated -= OnMirrorActivated;
-                mirrorGateTarget.OnBroken -= OnMirrorBroken;
+                mirrorGateTarget.OnSmashed -= OnMirrorSmashed;
+                mirrorGateTarget.OnCompleted -= OnMirrorCompleted;
             }
         }
 
@@ -107,15 +107,15 @@ namespace MirrorTrial.Level
                 Evaluate(null);
         }
 
-        void OnMirrorActivated(MirrorGate gate)
+        void OnMirrorSmashed(MirrorGate gate)
         {
-            if (when == LevelTriggerWhen.OnMirrorActivated)
+            if (when == LevelTriggerWhen.OnMirrorSmashed)
                 Evaluate(null);
         }
 
-        void OnMirrorBroken(MirrorGate gate)
+        void OnMirrorCompleted(MirrorGate gate)
         {
-            if (when == LevelTriggerWhen.OnMirrorBroken)
+            if (when == LevelTriggerWhen.OnMirrorCompleted)
                 Evaluate(null);
         }
 
@@ -151,11 +151,11 @@ namespace MirrorTrial.Level
                     case LevelConditionType.EncounterCleared:
                         ok = c.encounter && c.encounter.IsCleared;
                         break;
-                    case LevelConditionType.MirrorGateIsActive:
-                        ok = c.mirrorGate && c.mirrorGate.State == MirrorGateState.Active;
+                    case LevelConditionType.MirrorGateIsSmashed:
+                        ok = c.mirrorGate && c.mirrorGate.State == MirrorGateState.Smashed;
                         break;
-                    case LevelConditionType.MirrorGateIsLocked:
-                        ok = c.mirrorGate && c.mirrorGate.State == MirrorGateState.Locked;
+                    case LevelConditionType.MirrorGateIsIntact:
+                        ok = c.mirrorGate && c.mirrorGate.State == MirrorGateState.Intact;
                         break;
                     case LevelConditionType.PlayerHasAbility:
                         ok = HasAbility(instigator, c.requiredAbility);
@@ -218,8 +218,8 @@ namespace MirrorTrial.Level
                 case LevelActionType.OpenGate:
                     if (action.gate) action.gate.Open();
                     break;
-                case LevelActionType.ActivateMirrorGate:
-                    if (action.mirrorGate) action.mirrorGate.Activate();
+                case LevelActionType.SmashMirrorGate:
+                    if (action.mirrorGate) action.mirrorGate.Smash(null);
                     break;
                 case LevelActionType.TeleportPlayer:
                     if (instigator && action.teleportTarget)

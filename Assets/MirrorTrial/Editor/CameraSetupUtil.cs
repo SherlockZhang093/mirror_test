@@ -1,4 +1,5 @@
 using System.Linq;
+using Cinemachine;
 using MirrorTrial.Level;
 using UnityEditor;
 using UnityEngine;
@@ -25,23 +26,8 @@ namespace MirrorTrial.Editor
             camera.backgroundColor = DefaultBackgroundColor;
             camera.clearFlags = CameraClearFlags.SolidColor;
 
-            if (!followTarget) return;
-
-            var follow = camera.GetComponent<CameraFollow2D>();
-            if (!follow)
-                follow = camera.gameObject.AddComponent<CameraFollow2D>();
-
-            follow.SetTarget(followTarget, snap);
-
-            if (!boundsMinX.HasValue || !boundsMaxX.HasValue)
-            {
-                var bounds = ComputeSceneBounds();
-                boundsMinX = boundsMinX ?? bounds.minX;
-                boundsMaxX = boundsMaxX ?? bounds.maxX;
-            }
-
-            if (boundsMinX.Value > float.MinValue && boundsMaxX.Value < float.MaxValue)
-                follow.SetHorizontalBounds(boundsMinX.Value, boundsMaxX.Value, snap);
+            if (!camera.GetComponent<CinemachineBrain>())
+                camera.gameObject.AddComponent<CinemachineBrain>();
         }
 
         /// <summary>

@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 6139994494679877378}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.55, y: 0, z: 0}
+  m_LocalPosition: {x: 0.65, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -65,7 +65,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.5457905, y: 0.6511194}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -76,7 +76,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.5797812, y: 1.2904896}
+  m_Size: {x: 1, y: 0.8}
   m_EdgeRadius: 0
 --- !u!114 &4388561565866199630
 MonoBehaviour:
@@ -221,6 +221,9 @@ GameObject:
   - component: {fileID: 6901234567890123456}
   - component: {fileID: 5873674232144329648}
   - component: {fileID: 246818073585722775}
+  - component: {fileID: 8430092594526797721}
+  - component: {fileID: 8492326114234726246}
+  - component: {fileID: 8469499064547255756}
   m_Layer: 0
   m_Name: Player_MirrorTrial
   m_TagString: Player
@@ -329,7 +332,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffad43bb006db4856a9c527b89b48db9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 100
+  maxHP: 5
 --- !u!82 &1649567303454630154
 AudioSource:
   m_ObjectHideFlags: 0
@@ -453,7 +456,7 @@ MonoBehaviour:
     key: 108
   - command: 3
     buttonName: 
-    key: 304
+    key: 113
   - command: 4
     buttonName: 
     key: 49
@@ -466,7 +469,10 @@ MonoBehaviour:
   - command: 7
     buttonName: 
     key: 52
-  bindingSchemaVersion: 2
+  - command: 8
+    buttonName: 
+    key: 304
+  bindingSchemaVersion: 3
 --- !u!114 &3517131352704987190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -500,9 +506,28 @@ MonoBehaviour:
     hitStop: 0.04
   hurt:
     hurtLockTime: 0.25
-    invincibleTime: 0.75
-    knockback: {x: 4, y: 2.5}
+    heavyHurtDurationMultiplier: 1.35
+    launchHurtTime: 0.3
+    stunnedTime: 0.7
+    shockLightTime: 0.333
+    shockHeavyTime: 0.45
+    knockdownAnimationTime: 0.6
+    knockdownGroundTime: 0.2
+    getUpTime: 0.7
+    getUpProtectionTime: 0.2
+    knockbackDuration: 0.12
+    invincibleTime: 0.35
     hurtHitStop: 0.05
+    hurtFlashTime: 0.08
+    invincibleBlinkInterval: 0.08
+  dodge:
+    distance: 3.2
+    duration: 0.22
+    invincibleStart: 0.03
+    invincibleDuration: 0.14
+    cooldown: 0.28
+    inputBufferTime: 0.1
+    allowAirDodge: 0
   abilities:
     mirrorBladeUnlocked: 1
     mirrorBladeDamage: 15
@@ -542,7 +567,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundMask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 2048
   groundCheckDistance: 0.04
   minGroundNormalY: 0.9
 --- !u!114 &8265540847525026043
@@ -557,7 +582,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5453ea582ff23234d9b524e743482709, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
+  animator: {fileID: 1458916863051759994}
   fadeDuration: 0.04
   animations:
   - action: 1
@@ -680,6 +705,10 @@ MonoBehaviour:
     animatorState: CrouchSlash
     sourceClipDuration: 0.35
     timingSource: 0
+  - action: 31
+    animatorState: Dash
+    sourceClipDuration: 0.75
+    timingSource: 4
 --- !u!114 &3603827661786735700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -704,7 +733,7 @@ MonoBehaviour:
       animationClip: {fileID: 7400000, guid: d014983ce728ef54db394042da6f09c0, type: 2}
       animationState: 15
       animationFrameRate: 12
-      animationFrameCount: 8
+      animationFrameCount: 7
       mirrorHitboxByFacing: 1
       hitboxKeys:
       - frame: 0
@@ -714,9 +743,14 @@ MonoBehaviour:
         interpolation: 0
       - frame: 1
         enabled: 1
-        offset: {x: 0.65, y: 0}
-        size: {x: 1, y: 0.8}
+        offset: {x: 0.21022987, y: 0.72193456}
+        size: {x: 0.5170145, y: 1.5321026}
         interpolation: 1
+      - frame: 3
+        enabled: 1
+        offset: {x: 1.1456947, y: 0.72447646}
+        size: {x: 2.3879433, y: 1.5270188}
+        interpolation: 0
       - frame: 4
         enabled: 0
         offset: {x: 0.65, y: 0}
@@ -730,6 +764,9 @@ MonoBehaviour:
       damageMultiplier: 1
       knockbackMultiplier: 1
       lockMovement: 1
+      bodyState: 0
+      bodyStateStart: 0
+      bodyStateEnd: 0
     - name: Combo B
       moveCategory: 1
       comboCategory: 1
@@ -737,7 +774,7 @@ MonoBehaviour:
       animationClip: {fileID: 7400000, guid: 047d935fe1f929b44bee471667c8e228, type: 2}
       animationState: 16
       animationFrameRate: 12
-      animationFrameCount: 8
+      animationFrameCount: 6
       mirrorHitboxByFacing: 1
       hitboxKeys:
       - frame: 0
@@ -747,7 +784,7 @@ MonoBehaviour:
         interpolation: 0
       - frame: 1
         enabled: 1
-        offset: {x: 0.72, y: 0}
+        offset: {x: 1.0606318, y: 0.7270185}
         size: {x: 1.1, y: 0.85}
         interpolation: 1
       - frame: 4
@@ -763,6 +800,9 @@ MonoBehaviour:
       damageMultiplier: 1.1
       knockbackMultiplier: 1
       lockMovement: 1
+      bodyState: 0
+      bodyStateStart: 0
+      bodyStateEnd: 0
     - name: Combo C
       moveCategory: 1
       comboCategory: 1
@@ -770,7 +810,7 @@ MonoBehaviour:
       animationClip: {fileID: 7400000, guid: 05db0a10e588a1941af9be8d74518c2b, type: 2}
       animationState: 17
       animationFrameRate: 12
-      animationFrameCount: 8
+      animationFrameCount: 6
       mirrorHitboxByFacing: 1
       hitboxKeys:
       - frame: 0
@@ -780,8 +820,8 @@ MonoBehaviour:
         interpolation: 0
       - frame: 1
         enabled: 1
-        offset: {x: 0.78, y: 0.04}
-        size: {x: 1.15, y: 0.9}
+        offset: {x: 1.5400658, y: 0.51790035}
+        size: {x: 1.5313034, y: 1.0220172}
         interpolation: 1
       - frame: 4
         enabled: 0
@@ -796,6 +836,9 @@ MonoBehaviour:
       damageMultiplier: 1.2
       knockbackMultiplier: 1
       lockMovement: 1
+      bodyState: 0
+      bodyStateStart: 0
+      bodyStateEnd: 0
     - name: Combo D
       moveCategory: 1
       comboCategory: 2
@@ -829,6 +872,9 @@ MonoBehaviour:
       damageMultiplier: 1.35
       knockbackMultiplier: 1
       lockMovement: 1
+      bodyState: 0
+      bodyStateStart: 0
+      bodyStateEnd: 0
   - name: "\u62F3\u51FB\u4E09\u8FDE"
     weaponType: 0
     steps:
@@ -838,8 +884,8 @@ MonoBehaviour:
       input: 0
       animationClip: {fileID: 7400000, guid: b7bc9fd93b409664f9de91ab9e4f8257, type: 2}
       animationState: 19
-      animationFrameRate: 12
-      animationFrameCount: 8
+      animationFrameRate: 16
+      animationFrameCount: 7
       mirrorHitboxByFacing: 1
       hitboxKeys:
       - frame: 0
@@ -849,9 +895,14 @@ MonoBehaviour:
         interpolation: 0
       - frame: 1
         enabled: 1
-        offset: {x: 0.52, y: 0.08}
-        size: {x: 0.72, y: 0.52}
+        offset: {x: 0.52, y: 0.8916312}
+        size: {x: 0.7199998, y: 0.6675694}
         interpolation: 1
+      - frame: 2
+        enabled: 1
+        offset: {x: 0.9656594, y: 0.8916312}
+        size: {x: 0.7199998, y: 0.6675694}
+        interpolation: 0
       - frame: 3
         enabled: 0
         offset: {x: 0.65, y: 0}
@@ -865,14 +916,17 @@ MonoBehaviour:
       damageMultiplier: 0.9
       knockbackMultiplier: 0.75
       lockMovement: 1
+      bodyState: 0
+      bodyStateStart: 0
+      bodyStateEnd: 0
     - name: "\u6446\u62F3\u8854\u63A5"
       moveCategory: 2
       comboCategory: 1
       input: 0
       animationClip: {fileID: 7400000, guid: 85670856356c2e04a8c0a4a52c546fc3, type: 2}
       animationState: 20
-      animationFrameRate: 12
-      animationFrameCount: 8
+      animationFrameRate: 16
+      animationFrameCount: 5
       mirrorHitboxByFacing: 1
       hitboxKeys:
       - frame: 0
@@ -882,7 +936,7 @@ MonoBehaviour:
         interpolation: 0
       - frame: 1
         enabled: 1
-        offset: {x: 0.58, y: 0.1}
+        offset: {x: 0.66854143, y: 0.84670067}
         size: {x: 0.82, y: 0.58}
         interpolation: 1
       - frame: 3
@@ -898,13 +952,16 @@ MonoBehaviour:
       damageMultiplier: 1
       knockbackMultiplier: 0.9
       lockMovement: 1
+      bodyState: 0
+      bodyStateStart: 0
+      bodyStateEnd: 0
     - name: "\u91CD\u62F3\u7EC8\u7ED3"
       moveCategory: 2
       comboCategory: 2
       input: 0
       animationClip: {fileID: 7400000, guid: c597c06a9e9196347857e43072f14058, type: 2}
       animationState: 21
-      animationFrameRate: 12
+      animationFrameRate: 16
       animationFrameCount: 8
       mirrorHitboxByFacing: 1
       hitboxKeys:
@@ -915,8 +972,8 @@ MonoBehaviour:
         interpolation: 0
       - frame: 2
         enabled: 1
-        offset: {x: 0.64, y: 0.06}
-        size: {x: 0.95, y: 0.64}
+        offset: {x: 0.8436464, y: 0.8775339}
+        size: {x: 1.380903, y: 1.1653467}
         interpolation: 1
       - frame: 4
         enabled: 0
@@ -931,7 +988,10 @@ MonoBehaviour:
       damageMultiplier: 1.3
       knockbackMultiplier: 1.35
       lockMovement: 1
-  activeComboSetIndex: 0
+      bodyState: 0
+      bodyStateStart: 0
+      bodyStateEnd: 0
+  activeComboSetIndex: 1
   punchComboCreated: 1
   combo: []
   swordGuardClip: {fileID: 7400000, guid: 2460091f9596b4241972a347066392b9, type: 2}
@@ -971,6 +1031,9 @@ MonoBehaviour:
     damageMultiplier: 1.2
     knockbackMultiplier: 1.15
     lockMovement: 1
+    bodyState: 0
+    bodyStateStart: 0
+    bodyStateEnd: 0
   swordCrouchAttack:
     name: "\u4E0B\u8E72\u65A9"
     moveCategory: 1
@@ -1005,6 +1068,9 @@ MonoBehaviour:
     damageMultiplier: 1.1
     knockbackMultiplier: 1
     lockMovement: 1
+    bodyState: 0
+    bodyStateStart: 0
+    bodyStateEnd: 0
 --- !u!114 &5090720824673183153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1050,6 +1116,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08c82141d97af1b468b27f107692be86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  respawnDelay: 2
+  respawnInvincibility: 1.5
 --- !u!114 &6901234567890123456
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1107,3 +1175,52 @@ MonoBehaviour:
   fireClip: {fileID: 7400000, guid: 1ef75b23fa20025478aa122e114ee448, type: 2}
   arrowSpawnPoint: {fileID: 0}
   fallbackSpawnOffset: {x: 0.65, y: 0.9}
+--- !u!114 &8430092594526797721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7253538297837963826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa1710818419b194c8566c2dea792f3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseState: 0
+  maxPoise: 3
+  recoveryDelay: 0.75
+  recoveryPerSecond: 2
+--- !u!114 &8492326114234726246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7253538297837963826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb71f87253f8c0741b71058955d3aaab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8469499064547255756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7253538297837963826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ac8293c1755eb4a9b371f3cac017c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onDodgeStarted:
+    m_PersistentCalls:
+      m_Calls: []
+  onDodgeEnded:
+    m_PersistentCalls:
+      m_Calls: []
+  onPerfectDodge:
+    m_PersistentCalls:
+      m_Calls: []

@@ -15,7 +15,10 @@ namespace Platformer.Gameplay
 
         public override void Execute()
         {
-            Schedule<PlayerDeath>();
+            // Only the legacy platformer player uses the PlayerDeath/PlayerSpawn event flow.
+            // MirrorTrial actors handle death and respawning in their own controller.
+            if (health && health.GetComponent<PlayerController>())
+                Schedule<PlayerDeath>();
         }
     }
 }

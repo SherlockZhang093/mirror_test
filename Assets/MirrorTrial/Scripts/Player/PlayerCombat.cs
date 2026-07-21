@@ -63,6 +63,9 @@ namespace MirrorTrial.Player
         public float damageMultiplier = 1f;
         public float knockbackMultiplier = 1f;
         public bool lockMovement = true;
+        public PlayerBodyState bodyState = PlayerBodyState.Normal;
+        public float bodyStateStart;
+        public float bodyStateEnd;
     }
 
     [Serializable]
@@ -75,7 +78,7 @@ namespace MirrorTrial.Player
 
     [RequireComponent(typeof(PlayerInputReader), typeof(PlayerTuning), typeof(PlayerMotor))]
     [RequireComponent(typeof(PlayerAnimationDriver))]
-    public class PlayerCombat : MonoBehaviour
+    public class PlayerCombat : MonoBehaviour, IInterruptiblePlayerAction
     {
         [SerializeField] Hitbox attackHitbox;
         [SerializeField] List<PlayerComboSet> comboSets = new List<PlayerComboSet>();
@@ -92,6 +95,7 @@ namespace MirrorTrial.Player
         PlayerMotor motor;
         PlayerAnimationDriver animationDriver;
         PlayerWeaponController weapons;
+        PlayerBodyStateController bodyStateController;
 
         Coroutine attackRoutine;
         Hitbox activeHitbox;
@@ -135,6 +139,7 @@ namespace MirrorTrial.Player
             motor = GetComponent<PlayerMotor>();
             animationDriver = GetComponent<PlayerAnimationDriver>();
             weapons = GetComponent<PlayerWeaponController>();
+            bodyStateController = GetComponent<PlayerBodyStateController>();
             EnsureCombo();
 
             if (attackHitbox)
@@ -269,6 +274,7 @@ namespace MirrorTrial.Player
 
             while (elapsed < totalDuration)
             {
+                UpdateBodyState(step, elapsed);
                 ApplyHitboxFrame(step, combat, elapsed);
 
                 if (elapsed >= step.comboWindowStart && elapsed <= step.comboWindowEnd && input.WasPressed(nextInput))
@@ -279,6 +285,8 @@ namespace MirrorTrial.Player
             }
 
             DeactivateActiveHitbox();
+            if (bodyStateController)
+                bodyStateController.ClearBodyState(this);
             if (step.animationClip)
             {
                 animationDriver.StopActionClip();
@@ -309,6 +317,21 @@ namespace MirrorTrial.Player
             attackHitbox.Configure(new DamagePayload(gameObject, damage, knockback, direction, combat.hitStop));
             activeHitbox = attackHitbox;
             activeHitbox.SetActive(true);
+        }
+
+        void UpdateBodyState(PlayerComboStep step, float elapsed)
+        {
+            if (!bodyStateController)
+                return;
+
+            var active = step.bodyState != PlayerBodyState.Normal
+                && step.bodyStateEnd > step.bodyStateStart
+                && elapsed >= step.bodyStateStart
+                && elapsed < step.bodyStateEnd;
+            if (active)
+                bodyStateController.SetBodyState(this, step.bodyState);
+            else
+                bodyStateController.ClearBodyState(this);
         }
 
         static bool TryEvaluateHitboxKey(PlayerComboStep step, int frame, out PlayerAttackHitboxKey result)
@@ -389,6 +412,36 @@ namespace MirrorTrial.Player
             activeHitbox = null;
             if (attackHitbox)
                 attackHitbox.SetActive(false);
+        }
+
+        public void CancelCurrentAction(PlayerActionCancelReason reason)
+        {
+            if (attackRoutine != null)
+            {
+                StopCoroutine(attackRoutine);
+                attackRoutine = null;
+            }
+            if (guardImpactRoutine != null)
+            {
+                StopCoroutine(guardImpactRoutine);
+                guardImpactRoutine = null;
+            }
+
+            queuedNextComboStep = false;
+            guarding = false;
+            if (bodyStateController)
+                bodyStateController.ClearBodyState(this);
+            DeactivateActiveHitbox();
+            motor.MovementLocked = false;
+            animationDriver.StopActionClip();
+            animationDriver.ClearForcedState(PlayerActionState.Attack);
+            animationDriver.ClearForcedState(PlayerActionState.SwordGuard);
+            animationDriver.ClearForcedState(PlayerActionState.SwordGuardImpact);
+        }
+
+        void OnDisable()
+        {
+            CancelCurrentAction(PlayerActionCancelReason.Hit);
         }
 
 

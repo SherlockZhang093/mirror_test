@@ -12,6 +12,7 @@ namespace MirrorTrial.Player
         AttackWindow,
         CastWindow,
         DashDuration,
+        DodgeDuration,
         HurtLock
     }
 
@@ -62,6 +63,8 @@ namespace MirrorTrial.Player
                     return tuning.abilities.mirrorBladeStartup + tuning.abilities.mirrorBladeRecovery;
                 case PlayerAnimationTimingSource.DashDuration:
                     return tuning.abilities.echoDashDuration;
+                case PlayerAnimationTimingSource.DodgeDuration:
+                    return tuning.dodge.duration;
                 case PlayerAnimationTimingSource.HurtLock:
                     return tuning.hurt.hurtLockTime;
                 default:
@@ -149,16 +152,29 @@ namespace MirrorTrial.Player
 
         public void StopActionClip()
         {
-            if (actionGraph.IsValid())
+            var wasPlaying = actionGraph.IsValid();
+            if (wasPlaying)
                 actionGraph.Destroy();
             actionClipPlaying = false;
             playingState = PlayerActionState.None;
+            if (wasPlaying && animator)
+            {
+                animator.Rebind();
+                animator.Update(0f);
+            }
         }
 
         public void ForceState(PlayerActionState state)
         {
             if (stateMachine != null)
                 stateMachine.RequestAction(state);
+        }
+
+        public void PlayStateImmediately(PlayerActionState state)
+        {
+            StopActionClip();
+            playingState = PlayerActionState.None;
+            Play(state);
         }
 
         public void ClearForcedState(PlayerActionState state)
@@ -246,6 +262,7 @@ namespace MirrorTrial.Player
                 B(PlayerActionState.Attack, "SwordAttack", 0.5f, PlayerAnimationTimingSource.AttackWindow),
                 B(PlayerActionState.Cast, "AirSlash", 0.2857f, PlayerAnimationTimingSource.CastWindow),
                 B(PlayerActionState.Dash, "Dash", 0.75f, PlayerAnimationTimingSource.DashDuration),
+                B(PlayerActionState.Dodge, "Dash", 0.75f, PlayerAnimationTimingSource.DodgeDuration),
                 B(PlayerActionState.Hurt, "HitDamage", 0.2143f, PlayerAnimationTimingSource.HurtLock),
                 B(PlayerActionState.Dead, "Die"),
                 B(PlayerActionState.BowDraw, "BowDraw", 0.25f),

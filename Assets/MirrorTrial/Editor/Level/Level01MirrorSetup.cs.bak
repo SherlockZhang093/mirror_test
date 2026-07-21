@@ -1,0 +1,179 @@
+using System;
+using System.Linq;
+using System.Reflection;
+using MirrorTrial.Editor;
+using MirrorTrial.Level;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+
+namespace MirrorTrial.Editor.Level
+{
+    public static class Level01MirrorSetup
+    {
+        const string ScenePath = "Assets/MirrorTrial/Scenes/level_01_mirror.unity";
+        const string EnemyPrefabPath = "Assets/MirrorTrial/Prefabs/Characters/TrainingEnemy.prefab";
+        const string WhiteSquarePath = "Assets/MirrorTrial/Sprites/WhiteSquare.png";
+
+        [MenuItem("Tools/镜像试炼/关卡/生成第 1 关 - 镜中场景")]
+        public static void Generate()
+        {
+            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(WhiteSquarePath);
+            var enemyPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(EnemyPrefabPath);
+            if (!sprite || !enemyPrefab)
+            {
+                Debug.LogError("生成镜中场景需要 WhiteSquare 和 TrainingEnemy 资源。");
+                return;
+            }
+
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+            scene.name = "level_01_mirror";
+            RemoveDirectionalLight();
+
+            var root = new GameObject("Level_Mirror_01");
+            var geometry = CreateChild(root.transform, "Geometry");
+            BuildGeometry(geometry, sprite);
+
+            var manager = root.AddComponent<LevelManager>();
+            var gameplay = CreateChild(root.transform, "Gameplay");
+            var runtime = CreateChild(root.transform, "Runtime");
+
+            var spawnRoot = CreateChild(gameplay, "SpawnPoints");
+            var combatRoot = CreateChild(gameplay, "Combat");
+
+            var mirrorEntry = CreateMarker(runtime, "MirrorEntry", new Vector2(0f, -0.95f));
+
+            var bossSpawn = CreateSpawnPoint(spawnRoot, "SP_MirrorBoss", new Vector2(4f, -1f), enemyPrefab, 180f);
+            var boss = CreateEncounter(combatRoot, "Boss_Mirror", new Vector2(3.5f, 0f), new Vector2(4f, 4f),
+                Array.Empty<AreaGate>(),
+                new[] { Wave("W01_MirrorSelf", (bossSpawn, 3, 0f, 0.5f)) });
+
+            var returnGO = new GameObject("MirrorReturnHook");
+            returnGO.transform.SetParent(runtime);
+            var returnHook = returnGO.AddComponent<MirrorReturnOnClear>();
+            SetPrivate(returnHook, "encounter", boss);
+
+            ConfigureManager(manager, mirrorEntry, geometry, gameplay, runtime);
+
+            if (Camera.main)
+            {
+                var bounds = CameraSetupUtil.ComputeSceneBounds(geometry);
+                CameraSetupUtil.ApplyDefault(Camera.main, mirrorEntry, boundsMinX: bounds.minX, boundsMaxX: bounds.maxX);
+            }
+
+            EditorSceneManager.SaveScene(scene, ScenePath);
+            AddSceneToBuildSettings();
+            EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            Selection.activeGameObject = root;
+            Debug.Log("[镜像试炼] 镜中场景已生成：Boss 战(复用 W01_MirrorSelf) -> 清场返回现实。");
+        }
+
+        static void BuildGeometry(Transform root, Sprite sprite)
+        {
+            CreateGround(root, sprite, "Ground_Mirror", new Vector2(2f, -2f), new Vector2(10f, 1f));
+            CreateGround(root, sprite, "Boundary_Left", new Vector2(-3f, 2f), new Vector2(0.5f, 8f));
+            CreateGround(root, sprite, "Boundary_Right", new Vector2(7f, 2f), new Vector2(0.5f, 8f));
+        }
+
+        static void CreateGround(Transform parent, Sprite sprite, string name, Vector2 position, Vector2 size)
+        {
+            var go = CreateChild(parent, name);
+            go.transform.position = position;
+            var groundLayer = LayerMask.NameToLayer("Ground");
+            if (groundLayer >= 0) go.gameObject.layer = groundLayer;
+            var renderer = go.AddComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
+            renderer.color = new Color(0.18f, 0.2f, 0.28f);
+            renderer.drawMode = SpriteDrawMode.Tiled;
+            renderer.size = size;
+            go.AddComponent<BoxCollider2D>().size = size;
+        }
+
+        static void RemoveDirectionalLight()
+        {
+            var light = GameObject.Find("Directional Light");
+            if (light) UnityEngine.Object.DestroyImmediate(light);
+        }
+
+        static SpawnPoint CreateSpawnPoint(Transform parent, string id, Vector2 position, GameObject prefab, float facing)
+        {
+            var go = CreateChild(parent, id);
+            go.transform.position = position;
+            var point = go.AddComponent<SpawnPoint>();
+            SetPrivate(point, "spawnId", id);
+            SetPrivate(point, "defaultEnemyPrefab", prefab);
+            SetPrivate(point, "facingDegrees", facing);
+            return point;
+        }
+
+        static CombatEncounter CreateEncounter(Transform parent, string id, Vector2 position, Vector2 size, AreaGate[] gates, WaveDefinition[] waves)
+        {
+            var go = CreateChild(parent, id);
+            go.transform.position = position;
+            var collider = go.AddComponent<BoxCollider2D>();
+            collider.isTrigger = true;
+            collider.size = size;
+            var encounter = go.AddComponent<CombatEncounter>();
+            SetPrivate(encounter, "encounterId", id);
+            SetPrivate(encounter, "lockGates", gates);
+            SetPrivate(encounter, "waves", waves);
+            return encounter;
+        }
+
+        static WaveDefinition Wave(string id, params (SpawnPoint point, int count, float delay, float interval)[] entries)
+        {
+            return new WaveDefinition
+            {
+                waveId = id,
+                clearCondition = CombatClearCondition.AllEnemiesDefeated,
+                nextWaveDelay = 0.8f,
+                spawnEntries = entries.Select(entry => new WaveSpawnEntry
+                {
+                    spawnPoint = entry.point,
+                    count = entry.count,
+                    delay = entry.delay,
+                    interval = entry.interval
+                }).ToArray()
+            };
+        }
+
+        static Transform CreateMarker(Transform parent, string name, Vector2 position)
+        {
+            var marker = CreateChild(parent, name);
+            marker.transform.position = position;
+            return marker.transform;
+        }
+
+        static Transform CreateChild(Transform parent, string name)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent);
+            return go.transform;
+        }
+
+        static void ConfigureManager(LevelManager manager, Transform spawn, Transform geometry, Transform gameplay, Transform runtime)
+        {
+            SetPrivate(manager, "levelId", "Level_Mirror_01");
+            SetPrivate(manager, "levelDisplayName", "镜中试炼 - 镜中世界");
+            SetPrivate(manager, "playerSpawn", spawn);
+            SetPrivate(manager, "geometryRoot", geometry);
+            SetPrivate(manager, "gameplayRoot", gameplay);
+            SetPrivate(manager, "runtimeRoot", runtime);
+            manager.CollectAll();
+        }
+
+        static void AddSceneToBuildSettings()
+        {
+            var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != ScenePath).ToList();
+            scenes.Add(new EditorBuildSettingsScene(ScenePath, true));
+            EditorBuildSettings.scenes = scenes.ToArray();
+        }
+
+        static void SetPrivate(object target, string fieldName, object value)
+        {
+            var field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+            if (field == null) throw new MissingFieldException(target.GetType().Name, fieldName);
+            field.SetValue(target, value);
+        }
+    }
+}

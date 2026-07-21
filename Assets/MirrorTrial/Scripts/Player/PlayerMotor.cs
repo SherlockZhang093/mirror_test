@@ -199,5 +199,13 @@ namespace MirrorTrial.Player
         {
             ApplyForcedVelocity(knockback, duration);
         }
+
+        public void CancelForcedVelocity(bool stopCurrentVelocity = true)
+        {
+            forcedVelocity = Vector2.zero;
+            forcedVelocityTimer = 0f;
+            if (stopCurrentVelocity && body)
+                body.velocity = Vector2.zero;
+        }
     }
 }

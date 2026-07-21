@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using MirrorTrial.Enemies;
 using MirrorTrial.Player;
 using UnityEngine;
 
@@ -15,12 +16,14 @@ namespace MirrorTrial.Level
 
         [Header("门与波次")]
         [ChineseLabel("战斗开始时关闭的门")] [Tooltip("战斗开始时关闭的门")] [SerializeField] AreaGate[] lockGates = new AreaGate[0];
+        [ChineseLabel("场景敌人")] [Tooltip("这场战斗直接管理的场景内敌人，不再按波次生成")] [SerializeField] EnemyAI[] placedEnemies = new EnemyAI[0];
         [ChineseLabel("波次配置")] [Tooltip("波次配置")] [SerializeField] WaveDefinition[] waves = new WaveDefinition[0];
 
         public string EncounterId => encounterId;
         public bool StartOnPlayerEnter => startOnPlayerEnter;
         public CombatClearCondition ClearCondition => clearCondition;
         public IReadOnlyList<AreaGate> LockGates => lockGates;
+        public IReadOnlyList<EnemyAI> PlacedEnemies => placedEnemies;
         public bool HasWaves => waves != null && waves.Length > 0;
         public int WaveCount => waves?.Length ?? 0;
         public IReadOnlyList<WaveDefinition> Waves => waves;
@@ -52,15 +55,13 @@ namespace MirrorTrial.Level
         {
             if (encounterStarted) return;
             encounterStarted = true;
-            allWavesCompleted = !HasWaves;
+            allWavesCompleted = true;
 
             foreach (var g in lockGates)
                 if (g) g.Close();
 
-            if (HasWaves)
-                StartNextWave();
-            else
-                TryClear();
+            RegisterPlacedEnemies();
+            TryClear();
         }
 
         public void StartWave(int waveIndex)
@@ -143,8 +144,33 @@ namespace MirrorTrial.Level
                 enemyAI.SetOverrideHitPoints(spawnPoint.OverrideHitPoints);
             if (spawnPoint.OverrideMoveSpeed > 0f)
                 enemyAI.SetOverrideMoveSpeed(spawnPoint.OverrideMoveSpeed);
+
+            enemyAI.SetInitialFacing(spawnPoint.FacingDirection2D);
+            enemyAI.SetPatrolPath(spawnPoint.PatrolPath);
         }
 
+
+        void RegisterPlacedEnemies()
+        {
+            aliveEnemies.Clear();
+
+            if (placedEnemies != null)
+            {
+                foreach (var enemy in placedEnemies)
+                    TrackPlacedEnemy(enemy);
+            }
+
+            foreach (var enemy in GetComponentsInChildren<EnemyAI>(true))
+                TrackPlacedEnemy(enemy);
+        }
+
+        void TrackPlacedEnemy(EnemyAI enemy)
+        {
+            if (!enemy || !enemy.gameObject.activeInHierarchy) return;
+            aliveEnemies.Add(enemy.gameObject);
+            var link = enemy.GetComponent<SpawnedEnemyLink>() ?? enemy.gameObject.AddComponent<SpawnedEnemyLink>();
+            link.Bind(this);
+        }
         public void NotifyEnemyDefeated(GameObject enemy)
         {
             if (enemy) aliveEnemies.Remove(enemy);

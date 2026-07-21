@@ -8,6 +8,7 @@ namespace MirrorTrial.Player
         public MovementTuning movement = new MovementTuning();
         public CombatTuning combat = new CombatTuning();
         public HurtTuning hurt = new HurtTuning();
+        public DodgeTuning dodge = new DodgeTuning();
         public AbilityTuning abilities = new AbilityTuning();
 
         [Serializable]
@@ -41,9 +42,32 @@ namespace MirrorTrial.Player
         public class HurtTuning
         {
             public float hurtLockTime = 0.25f;
+            public float heavyHurtDurationMultiplier = 1.35f;
+            public float launchHurtTime = 0.30f;
+            public float stunnedTime = 0.70f;
+            public float shockLightTime = 0.333f;
+            public float shockHeavyTime = 0.45f;
+            public float knockdownAnimationTime = 0.60f;
+            public float knockdownGroundTime = 0.20f;
+            public float getUpTime = 0.70f;
+            public float getUpProtectionTime = 0.20f;
+            public float knockbackDuration = 0.12f;
             public float invincibleTime = 0.75f;
-            public Vector2 knockback = new Vector2(4f, 2.5f);
             public float hurtHitStop = 0.05f;
+            public float hurtFlashTime = 0.08f;
+            public float invincibleBlinkInterval = 0.08f;
+        }
+
+        [Serializable]
+        public class DodgeTuning
+        {
+            [Min(0.1f)] public float distance = 3.2f;
+            [Min(0.05f)] public float duration = 0.22f;
+            [Min(0f)] public float invincibleStart = 0.03f;
+            [Min(0f)] public float invincibleDuration = 0.14f;
+            [Min(0f)] public float cooldown = 0.28f;
+            [Min(0f)] public float inputBufferTime = 0.10f;
+            public bool allowAirDodge;
         }
 
         [Serializable]

@@ -1,4 +1,4 @@
-﻿using MirrorTrial.Player;
+using MirrorTrial.Player;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Animations;
@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MirrorTrial.Editor
 {
-    public sealed class PlayerInputComboEditorWindow : EditorWindow
+    public sealed partial class PlayerInputComboEditorWindow : EditorWindow
     {
         static readonly PlayerInputCommand[] CommandValues =
         {
@@ -144,6 +144,8 @@ namespace MirrorTrial.Editor
         bool scenePreviewEnabled = true;
         bool animationPlaying;
         double lastAnimationUpdate;
+        enum EditorTargetMode { Player, MirrorBoss }
+        EditorTargetMode targetMode;
 
         [MenuItem("Tools/镜像试炼/战斗/玩家按键与连招编辑器")]
         public static void OpenFromMenu()
@@ -160,6 +162,9 @@ namespace MirrorTrial.Editor
         {
             SceneView.duringSceneGui += OnSceneGUI;
             EditorApplication.update += TickAnimationPreview;
+            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+            AssemblyReloadEvents.beforeAssemblyReload += StopAnimationPreview;
+            EditorApplication.quitting += StopAnimationPreview;
             if (Selection.activeGameObject)
                 SetTarget(Selection.activeGameObject);
         }
@@ -168,7 +173,17 @@ namespace MirrorTrial.Editor
         {
             SceneView.duringSceneGui -= OnSceneGUI;
             EditorApplication.update -= TickAnimationPreview;
+            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+            AssemblyReloadEvents.beforeAssemblyReload -= StopAnimationPreview;
+            EditorApplication.quitting -= StopAnimationPreview;
             StopAnimationPreview();
+            DisposeBossPreview();
+        }
+
+        void OnPlayModeStateChanged(PlayModeStateChange state)
+        {
+            if (state == PlayModeStateChange.ExitingEditMode || state == PlayModeStateChange.EnteredPlayMode)
+                StopAnimationPreview();
         }
 
         void OnSelectionChange()
@@ -204,6 +219,18 @@ namespace MirrorTrial.Editor
 
         void OnGUI()
         {
+            var nextMode = (EditorTargetMode)GUILayout.Toolbar((int)targetMode, new[] { "玩家连招", "Boss 攻击框" }, GUILayout.Height(25f));
+            if (nextMode != targetMode)
+            {
+                StopAnimationPreview();
+                targetMode = nextMode;
+            }
+            if (targetMode == EditorTargetMode.MirrorBoss)
+            {
+                DrawBossModeGUI();
+                return;
+            }
+
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 EditorGUI.BeginChangeCheck();
@@ -211,6 +238,8 @@ namespace MirrorTrial.Editor
                 if (EditorGUI.EndChangeCheck())
                     SetTarget(nextInput ? nextInput.gameObject : null);
                 GUILayout.FlexibleSpace();
+                if (AnimationMode.InAnimationMode() && GUILayout.Button("\u9000\u51fa\u52a8\u753b\u9884\u89c8", EditorStyles.toolbarButton, GUILayout.Width(110f)))
+                    StopAnimationPreview();
                 if (combat && GUILayout.Button("\u4fdd\u5b58\u5230 Prefab", EditorStyles.toolbarButton, GUILayout.Width(105f)))
                     SaveToPrefab();
                 if (GUILayout.Button("使用当前选中", EditorStyles.toolbarButton, GUILayout.Width(110f)))
@@ -515,6 +544,9 @@ namespace MirrorTrial.Editor
         {
             if (!combat)
                 return;
+            // Never apply a prefab while AnimationMode is holding a sampled attack pose.
+            // Otherwise the sampled sprite, transform and collider values become asset data.
+            StopAnimationPreview();
             if (serializedInput != null)
                 serializedInput.ApplyModifiedProperties();
             if (serializedCombat != null)
@@ -761,6 +793,11 @@ namespace MirrorTrial.Editor
 
         void TickAnimationPreview()
         {
+            if (targetMode == EditorTargetMode.MirrorBoss)
+            {
+                TickBossAnimationPreview();
+                return;
+            }
             if (!animationPlaying || !combat || Application.isPlaying)
                 return;
             EnsureSerializedObjects();
@@ -987,6 +1024,11 @@ namespace MirrorTrial.Editor
 
         void OnSceneGUI(SceneView sceneView)
         {
+            if (targetMode == EditorTargetMode.MirrorBoss)
+            {
+                DrawBossScenePreview(sceneView);
+                return;
+            }
             if (!scenePreviewEnabled || !combat)
                 return;
 

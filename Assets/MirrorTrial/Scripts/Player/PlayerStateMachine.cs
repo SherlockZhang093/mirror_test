@@ -39,12 +39,14 @@ namespace MirrorTrial.Player
             CurrentState == PlayerActionState.Attack ||
             CurrentState == PlayerActionState.Cast ||
             CurrentState == PlayerActionState.Dash ||
+            CurrentState == PlayerActionState.Dodge ||
             CurrentState == PlayerActionState.Hurt ||
             CurrentState == PlayerActionState.Dead;
 
         /// <summary>动作态期间应锁定水平移动（Attack/Hurt/Dead 锁，Dash 由自身控制速度）</summary>
         public bool ShouldLockMovement =>
             CurrentState == PlayerActionState.Attack ||
+            CurrentState == PlayerActionState.Dodge ||
             CurrentState == PlayerActionState.Hurt ||
             CurrentState == PlayerActionState.Dead;
 
@@ -80,8 +82,6 @@ namespace MirrorTrial.Player
             {
                 PreviousState = CurrentState;
                 CurrentState = next;
-                if (logStateChanges)
-                    Debug.Log($"[SM] {PreviousState} → {CurrentState} | grounded={grounded} vel.y={motor.Velocity.y:F2} moveX={input.MoveX:F1}");
             }
         }
 
@@ -114,6 +114,12 @@ namespace MirrorTrial.Player
         {
             if (requestedAction == state)
                 requestedAction = PlayerActionState.None;
+        }
+
+        /// <summary>Used by forced interruptions after every action owner has cleaned up its local state.</summary>
+        public void CancelRequestedAction()
+        {
+            requestedAction = PlayerActionState.None;
         }
     }
 }

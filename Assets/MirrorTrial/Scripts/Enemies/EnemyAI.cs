@@ -1,5 +1,6 @@
 using MirrorTrial.Combat;
 using MirrorTrial.Level;
+using System.Collections;
 using UnityEngine;
 
 namespace MirrorTrial.Enemies
@@ -9,19 +10,29 @@ namespace MirrorTrial.Enemies
     [RequireComponent(typeof(Collider2D))]
     public class EnemyAI : MonoBehaviour
     {
-        [Header("AI 配置")]
-        [ChineseLabel("AI行为配置")] [Tooltip("引用的 EnemyAIProfile 资产")] [SerializeField] EnemyAIProfile profile;
+        [Header("AI配置")]
+        [ChineseLabel("专属AI配置")] [Tooltip("该敌兵Prefab专属的AI配置资源。")] [SerializeField] EnemyAIProfile profile;
 
-        [Header("运行覆盖")]
-        [ChineseLabel("覆盖血量")] [Tooltip("正数=覆盖Profile的最大生命值，-1=不覆盖")] public int overrideMaxHitPoints = -1;
-        [ChineseLabel("覆盖移速")] [Tooltip("正数=覆盖Profile的移动速度，-1=不覆盖")] public float overrideMoveSpeed = -1f;
+        [Header("单独覆盖") ]
+        [ChineseLabel("单独生命值")] [Tooltip("正数覆盖默认生命值，-1使用默认值。")] public int overrideMaxHitPoints = -1;
+        [ChineseLabel("单独移动速度")] [Tooltip("正数覆盖默认速度，-1使用默认值。")] public float overrideMoveSpeed = -1f;
 
-        [Header("调试")]
-        [ChineseLabel("显示Gizmos")] [Tooltip("是否在选中时显示侦测/攻击范围")] [SerializeField] bool showDebugGizmos = true;
+        [Header("关卡内单只敌兵配置")]
+        [SerializeField] Vector2 overrideDetectionSize = new Vector2(-1f, -1f);
+        [SerializeField] float patrolLeftOffset = -2f;
+        [SerializeField] float patrolRightOffset = 2f;
 
+        [Header("攻击特效")]
+        [ChineseLabel("攻击特效预制体")] [SerializeField] GameObject attackEffectPrefab;
+        [ChineseLabel("武器或手部挂点")] [SerializeField] Transform attackEffectPoint;
+        [ChineseLabel("特效保留时间")] [Min(0.01f)] [SerializeField] float attackEffectLifetime = 1f;
+        [ChineseLabel("根据朝向翻转特效")] [SerializeField] bool mirrorAttackEffectByFacing = true;
+
+        [Header("辅助显示")]
+        [ChineseLabel("显示辅助线")] [Tooltip("选中敌兵时显示探测范围和巡逻边界。")] [SerializeField] bool showDebugGizmos = true;
         public enum State
         {
-            [InspectorName("待机")] Idle,
+            [InspectorName("巡逻")] Idle,
             [InspectorName("追击")] Chase,
             [InspectorName("攻击")] Attack,
             [InspectorName("受击")] Hurt,
@@ -37,17 +48,18 @@ namespace MirrorTrial.Enemies
         float attackCooldownTimer;
         float hurtTimer;
         bool attackLanded;
+        bool pendingDeath;
         bool isGrounded;
 
         Rigidbody2D body;
         Collider2D bodyCollider;
         SpriteRenderer spriteRenderer;
         Transform player;
-        int patrolIndex;
-        Vector2[] patrolPath;
-        Vector2 patrolTarget;
+        Vector2 patrolOrigin;
+        float patrolTargetX;
         float patrolWaitTimer;
         bool waitingAtPatrolPoint;
+        bool patrolMovingRight = true;
 
         ContactFilter2D groundFilter = new ContactFilter2D();
         readonly RaycastHit2D[] groundHits = new RaycastHit2D[4];
@@ -56,6 +68,14 @@ namespace MirrorTrial.Enemies
         public int CurrentHitPoints => currentHitPoints;
         public int MaxHitPoints => overrideMaxHitPoints > 0 ? overrideMaxHitPoints : (profile ? profile.maxHitPoints : 2);
         public float MoveSpeed => overrideMoveSpeed > 0 ? overrideMoveSpeed : (profile ? profile.moveSpeed : 2.5f);
+        public Vector2 DetectionSize => IsValidSize(overrideDetectionSize) ? overrideDetectionSize : Vector2.one * (profile ? profile.detectionRange * 2f : 16f);
+        public Vector2 AttackSize => new Vector2(profile ? profile.attackRange : 1.2f, 0.8f);
+        public float PatrolLeftOffset => Mathf.Min(patrolLeftOffset, patrolRightOffset);
+        public float PatrolRightOffset => Mathf.Max(patrolLeftOffset, patrolRightOffset);
+        public Vector2 PatrolOrigin => Application.isPlaying ? patrolOrigin : (Vector2)transform.position;
+        public bool HasDetectionOverride => IsValidSize(overrideDetectionSize);
+
+        static bool IsValidSize(Vector2 size) => size.x >= 0f && size.y >= 0f;
 
         public void SetProfile(EnemyAIProfile nextProfile)
         {
@@ -73,6 +93,33 @@ namespace MirrorTrial.Enemies
         public void SetOverrideMoveSpeed(float value)
         {
             overrideMoveSpeed = value;
+        }
+
+        public void SetInitialFacing(Vector2 direction)
+        {
+            if (direction.sqrMagnitude <= 0.001f) return;
+            FacingDirection = new Vector2(Mathf.Sign(direction.x), 0f);
+            UpdateVisualFacing();
+        }
+
+        public void SetPatrolPath(Transform[] path)
+        {
+            if (path == null || path.Length == 0) return;
+
+            var minX = float.PositiveInfinity;
+            var maxX = float.NegativeInfinity;
+            for (var i = 0; i < path.Length; i++)
+            {
+                if (!path[i]) continue;
+                minX = Mathf.Min(minX, path[i].position.x);
+                maxX = Mathf.Max(maxX, path[i].position.x);
+            }
+
+            if (float.IsInfinity(minX) || float.IsInfinity(maxX)) return;
+            patrolOrigin = transform.position;
+            patrolLeftOffset = minX - patrolOrigin.x;
+            patrolRightOffset = maxX - patrolOrigin.x;
+            ResetPatrolTarget();
         }
 
         void Awake()
@@ -96,14 +143,8 @@ namespace MirrorTrial.Enemies
 
         void Start()
         {
-            var spawnPoint = GetComponentInParent<SpawnPoint>();
-            if (spawnPoint && spawnPoint.PatrolPath.Length > 0)
-            {
-                patrolPath = new Vector2[spawnPoint.PatrolPath.Length];
-                for (var i = 0; i < spawnPoint.PatrolPath.Length; i++)
-                    patrolPath[i] = spawnPoint.PatrolPath[i].position;
-            }
-            patrolTarget = transform.position;
+            patrolOrigin = transform.position;
+            ResetPatrolTarget();
 
             var reader = FindObjectOfType<MirrorTrial.Player.PlayerInputReader>();
             if (reader) player = reader.transform;
@@ -121,7 +162,12 @@ namespace MirrorTrial.Enemies
             }
 
             if (CurrentState == State.Hurt && hurtTimer <= 0f)
-                TransitionTo(State.Idle);
+            {
+                if (pendingDeath)
+                    Die();
+                else
+                    TransitionTo(State.Idle);
+            }
 
             if (CurrentState == State.Dead) return;
 
@@ -149,40 +195,58 @@ namespace MirrorTrial.Enemies
 
         void UpdateIdle()
         {
-            if (player == null) return;
-
-            float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-            bool canDetect = CanDetectPlayer(distanceToPlayer);
-
-            if (canDetect)
+            if (player != null && CanDetectPlayer())
             {
                 TransitionTo(State.Chase);
                 return;
             }
 
-            if (!profile || !profile.enablePatrol || patrolPath == null || patrolPath.Length == 0) return;
+            UpdatePatrol();
+        }
 
+        void UpdatePatrol()
+        {
             if (waitingAtPatrolPoint)
             {
                 patrolWaitTimer -= Time.deltaTime;
-                if (patrolWaitTimer <= 0f) waitingAtPatrolPoint = false;
+                SetVelocityX(0f);
+                if (patrolWaitTimer <= 0f)
+                    waitingAtPatrolPoint = false;
                 return;
             }
 
-            Vector2 toTarget = patrolTarget - (Vector2)transform.position;
-            if (toTarget.magnitude < 0.1f)
+            var targetX = patrolTargetX;
+            var delta = targetX - transform.position.x;
+            if (Mathf.Abs(delta) <= 0.08f)
             {
-                waitingAtPatrolPoint = true;
-                patrolWaitTimer = profile.patrolWaitTime;
-                patrolIndex = (patrolIndex + 1) % patrolPath.Length;
-                patrolTarget = patrolPath[patrolIndex];
                 SetVelocityX(0f);
+                patrolMovingRight = !patrolMovingRight;
+                patrolTargetX = patrolOrigin.x + (patrolMovingRight ? PatrolRightOffset : PatrolLeftOffset);
+                patrolWaitTimer = profile ? Mathf.Max(0f, profile.patrolWaitTime) : 0f;
+                waitingAtPatrolPoint = patrolWaitTimer > 0f;
+                return;
             }
-            else
+
+            var direction = Mathf.Sign(delta);
+            var blocked = profile && profile.wallCheckDistance > 0f && WallInDirection(direction);
+            var ledge = profile && profile.ledgeCheckDistance > 0f && !GroundAhead(direction);
+            if (blocked || ledge)
             {
-                FacingDirection = new Vector2(Mathf.Sign(toTarget.x), 0f);
-                MoveTowards(patrolTarget);
+                SetVelocityX(0f);
+                patrolMovingRight = !patrolMovingRight;
+                patrolTargetX = patrolOrigin.x + (patrolMovingRight ? PatrolRightOffset : PatrolLeftOffset);
+                return;
             }
+
+            FacingDirection = new Vector2(direction, 0f);
+            SetVelocityX(direction * MoveSpeed);
+        }
+
+        void ResetPatrolTarget()
+        {
+            patrolMovingRight = FacingDirection.x >= 0f;
+            patrolTargetX = patrolOrigin.x + (patrolMovingRight ? PatrolRightOffset : PatrolLeftOffset);
+            waitingAtPatrolPoint = false;
         }
 
         void UpdateChase()
@@ -193,8 +257,7 @@ namespace MirrorTrial.Enemies
                 return;
             }
 
-            float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-            if (distanceToPlayer > (profile ? profile.loseInterestRange : 12f))
+            if (!CanDetectPlayer())
             {
                 TransitionTo(State.Idle);
                 return;
@@ -203,8 +266,8 @@ namespace MirrorTrial.Enemies
             Vector2 toPlayer = (Vector2)(player.position - transform.position);
             FacingDirection = new Vector2(Mathf.Sign(toPlayer.x), 0f);
 
-            float stopDist = profile ? profile.stopDistance : 1.2f;
-            if (distanceToPlayer <= stopDist && attackCooldownTimer <= 0f)
+            var stopDistance = profile ? profile.stopDistance : 1.2f;
+            if (Vector2.Distance(transform.position, player.position) <= stopDistance && attackCooldownTimer <= 0f)
             {
                 TransitionTo(State.Attack);
                 return;
@@ -215,6 +278,12 @@ namespace MirrorTrial.Enemies
 
         void UpdateAttack()
         {
+            if (player == null || !CanDetectPlayer())
+            {
+                TransitionTo(State.Idle);
+                return;
+            }
+
             if (stateTimer <= 0f)
             {
                 attackCooldownTimer = profile ? profile.attackCooldown : 1.2f;
@@ -235,6 +304,8 @@ namespace MirrorTrial.Enemies
 
         void PerformAttack()
         {
+            PlayAttackEffect();
+
             if (profile && profile.IsRanged)
             {
                 FireProjectile();
@@ -245,11 +316,33 @@ namespace MirrorTrial.Enemies
             }
         }
 
+        void PlayAttackEffect()
+        {
+            if (!attackEffectPrefab) return;
+
+            var origin = (Vector2)transform.position;
+            var position = attackEffectPoint ? (Vector2)attackEffectPoint.position : origin + FacingDirection * AttackSize.x * 0.5f;
+            if (attackEffectPoint)
+            {
+                var offset = position - origin;
+                position.x = origin.x + Mathf.Abs(offset.x) * Mathf.Sign(FacingDirection.x);
+            }
+
+            var rotation = attackEffectPoint ? attackEffectPoint.rotation : Quaternion.identity;
+            var effect = Instantiate(attackEffectPrefab, position, rotation);
+            if (mirrorAttackEffectByFacing)
+            {
+                var scale = effect.transform.localScale;
+                scale.x = Mathf.Abs(scale.x) * Mathf.Sign(FacingDirection.x);
+                effect.transform.localScale = scale;
+            }
+
+            Destroy(effect, Mathf.Max(0.01f, attackEffectLifetime));
+        }
         void MeleeAttack()
         {
-            float range = profile ? profile.attackRange : 1.2f;
-            var center = (Vector2)transform.position + FacingDirection * range * 0.5f;
-            var size = new Vector2(range, 0.8f);
+            var size = AttackSize;
+            var center = (Vector2)transform.position + FacingDirection * size.x * 0.5f;
             var hits = Physics2D.OverlapBoxAll(center, size, 0f);
             foreach (var hit in hits)
             {
@@ -260,7 +353,11 @@ namespace MirrorTrial.Enemies
                         profile ? profile.attackDamage : 1,
                         FacingDirection * (profile ? profile.knockbackForce : 4f),
                         FacingDirection,
-                        0f
+                        0f,
+                        profile ? profile.interruptPower : 1,
+                        profile ? profile.poiseDamage : 1f,
+                        profile ? profile.playerHitReaction : HitReactionType.LightHurt,
+                        profile && profile.breaksSuperArmor
                     );
                     hit.SendMessage("OnDamagePayloadReceived", payload, SendMessageOptions.DontRequireReceiver);
                 }
@@ -280,7 +377,11 @@ namespace MirrorTrial.Enemies
                     profile.attackDamage,
                     FacingDirection * profile.knockbackForce,
                     FacingDirection,
-                    0f
+                    0f,
+                    profile.interruptPower,
+                    profile.poiseDamage,
+                    profile.playerHitReaction,
+                    profile.breaksSuperArmor
                 );
                 projectile.Launch(payload, FacingDirection, MoveSpeed * 2f, 8f);
             }
@@ -315,22 +416,19 @@ namespace MirrorTrial.Enemies
             SetVelocityX(moveDir * speed);
         }
 
-        bool CanDetectPlayer(float distance)
+        bool CanDetectPlayer()
         {
             if (player == null) return false;
-            float detectRange = profile ? profile.detectionRange : 8f;
-            if (distance > detectRange) return false;
-
-            if (profile && profile.useForwardDetection)
-            {
-                Vector2 toPlayer = (Vector2)(player.position - transform.position);
-                float angle = Vector2.Angle(FacingDirection, toPlayer);
-                if (angle > profile.forwardDetectionAngle) return false;
-            }
+            if (!ContainsCentered(player.position, DetectionSize)) return false;
 
             return true;
         }
 
+        bool ContainsCentered(Vector2 point, Vector2 size)
+        {
+            var delta = point - (Vector2)transform.position;
+            return Mathf.Abs(delta.x) <= size.x * 0.5f && Mathf.Abs(delta.y) <= size.y * 0.5f;
+        }
         void CheckGrounded()
         {
             if (bodyCollider == null) return;
@@ -402,7 +500,7 @@ namespace MirrorTrial.Enemies
 
         void OnDamagePayloadReceived(DamagePayload payload)
         {
-            if (CurrentState == State.Dead) return;
+            if (CurrentState == State.Dead || pendingDeath) return;
 
             currentHitPoints -= payload.damage;
             hurtTimer = profile ? profile.hurtStun : 0.25f;
@@ -410,34 +508,58 @@ namespace MirrorTrial.Enemies
             if (payload.knockback.magnitude > 0.01f && body != null)
                 body.AddForce(payload.knockback, ForceMode2D.Impulse);
 
+            pendingDeath = currentHitPoints <= 0;
             TransitionTo(State.Hurt);
-
-            if (currentHitPoints <= 0)
-                Die();
         }
 
         void Die()
         {
+            pendingDeath = false;
             CurrentState = State.Dead;
             SetVelocityX(0f);
             if (bodyCollider) bodyCollider.enabled = false;
             var hurtbox = GetComponent<Hurtbox>();
             if (hurtbox) hurtbox.enabled = false;
-            Invoke(nameof(DestroySelf), profile ? profile.deathFadeDelay : 0.3f);
+            StartCoroutine(DeathBlinkRoutine());
+        }
+
+        IEnumerator DeathBlinkRoutine()
+        {
+            if (!spriteRenderer)
+            {
+                yield return new WaitForSeconds(profile ? profile.deathFadeDelay : 0.3f);
+                DestroySelf();
+                yield break;
+            }
+
+            int blinkCount = profile ? Mathf.Max(0, profile.deathBlinkCount) : 2;
+            float interval = profile ? Mathf.Max(0.01f, profile.deathBlinkInterval) : 0.08f;
+
+            for (var i = 0; i < blinkCount; i++)
+            {
+                spriteRenderer.enabled = false;
+                yield return new WaitForSeconds(interval);
+                spriteRenderer.enabled = true;
+                yield return new WaitForSeconds(interval);
+            }
+
+            DestroySelf();
         }
 
         void DestroySelf()
         {
+            if (spriteRenderer) spriteRenderer.enabled = true;
             Destroy(gameObject);
         }
 
         void OnDrawGizmosSelected()
         {
-            if (!showDebugGizmos || profile == null) return;
+            if (!showDebugGizmos) return;
             Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, profile.detectionRange);
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, profile.attackRange);
+            Gizmos.DrawWireCube(transform.position, DetectionSize);
+            Gizmos.color = Color.green;
+            var origin = PatrolOrigin;
+            Gizmos.DrawLine(new Vector3(origin.x + PatrolLeftOffset, origin.y), new Vector3(origin.x + PatrolRightOffset, origin.y));
         }
     }
 }

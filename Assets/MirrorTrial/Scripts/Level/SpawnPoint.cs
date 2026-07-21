@@ -7,7 +7,7 @@ namespace MirrorTrial.Level
     {
         [InspectorName("近战")] Melee,
         [InspectorName("远程")] Ranged,
-        [InspectorName("精英/Boss")] EliteOrBoss
+        [InspectorName("精英")] Elite
     }
 
     public class SpawnPoint : MonoBehaviour
@@ -50,7 +50,7 @@ namespace MirrorTrial.Level
                 switch (role)
                 {
                     case SpawnPointRole.Ranged: return new Color(0.2f, 0.6f, 1f, 1f);
-                    case SpawnPointRole.EliteOrBoss: return new Color(0.65f, 0.35f, 1f, 1f);
+                    case SpawnPointRole.Elite: return new Color(0.65f, 0.35f, 1f, 1f);
                     default: return new Color(1f, 0.2f, 0.25f, 1f);
                 }
             }
