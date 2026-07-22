@@ -77,7 +77,10 @@ namespace MirrorTrial.Editor
             if (moves.arraySize > 0)
             {
                 selectedGraphMoveIndex = Mathf.Clamp(selectedGraphMoveIndex, 0, moves.arraySize - 1);
-                DrawSelectedMoveEditor(moves.GetArrayElementAtIndex(selectedGraphMoveIndex), selectedGraphMoveIndex);
+                if (selectedTransitionIndex >= 0 && selectedTransitionIndex < links.arraySize)
+                    DrawSelectedConnectionEditor(links.GetArrayElementAtIndex(selectedTransitionIndex), selectedTransitionIndex, moves);
+                else
+                    DrawSelectedMoveEditor(moves.GetArrayElementAtIndex(selectedGraphMoveIndex), selectedGraphMoveIndex);
             }
         }
 
@@ -201,65 +204,165 @@ namespace MirrorTrial.Editor
             for (var i = 0; i < moves.arraySize; i++)
                 indexById[moves.GetArrayElementAtIndex(i).FindPropertyRelative("id").stringValue] = i;
 
+            var evt = Event.current;
+            var clickedLink = -1;
+            var clickedDistance = 10f;
             Handles.BeginGUI();
             for (var i = 0; i < links.arraySize; i++)
             {
                 var link = links.GetArrayElementAtIndex(i);
                 if (!indexById.TryGetValue(link.FindPropertyRelative("fromInstanceId").stringValue, out var from) ||
-                    !indexById.TryGetValue(link.FindPropertyRelative("toInstanceId").stringValue, out var to))
-                    continue;
+                    !indexById.TryGetValue(link.FindPropertyRelative("toInstanceId").stringValue, out var to)) continue;
                 var fromRect = OffsetRect(layouts[from].rect, canvas.position);
                 var toRect = OffsetRect(layouts[to].rect, canvas.position);
                 var start = new Vector3(fromRect.xMax, fromRect.center.y);
                 var end = new Vector3(toRect.xMin, toRect.center.y);
                 var tangent = Mathf.Max(45f, Mathf.Abs(end.x - start.x) * 0.42f);
-                var color = GetConditionColor((ComboInputCondition)link.FindPropertyRelative("condition").enumValueIndex);
-                Handles.DrawBezier(start, end, start + Vector3.right * tangent, end + Vector3.left * tangent, color, null, 3f);
+                var controlA = start + Vector3.right * tangent;
+                var controlB = end + Vector3.left * tangent;
+                var baseColor = GetConditionColor((ComboInputCondition)link.FindPropertyRelative("condition").enumValueIndex);
+                var selected = selectedTransitionIndex == i;
+                var color = selected ? new Color(1f, 0.88f, 0.2f) : baseColor;
+                Handles.DrawBezier(start, end, controlA, controlB, color, null, selected ? 5f : 3f);
                 Handles.color = color;
                 Handles.DrawAAConvexPolygon(end, end + new Vector3(-10f, -5f), end + new Vector3(-10f, 5f));
+                if (evt.type == EventType.MouseDown && evt.button == 0)
+                {
+                    var distance = DistanceToBezier(evt.mousePosition, start, controlA, controlB, end);
+                    if (distance < clickedDistance) { clickedDistance = distance; clickedLink = i; }
+                }
             }
             Handles.EndGUI();
+
+            if (clickedLink >= 0)
+            {
+                selectedTransitionIndex = clickedLink;
+                draggingNodeIndex = -1;
+                connectingFromNodeIndex = -1;
+                evt.Use();
+                Repaint();
+            }
 
             for (var i = 0; i < links.arraySize; i++)
             {
                 var link = links.GetArrayElementAtIndex(i);
                 if (!indexById.TryGetValue(link.FindPropertyRelative("fromInstanceId").stringValue, out var from) ||
-                    !indexById.TryGetValue(link.FindPropertyRelative("toInstanceId").stringValue, out var to))
-                    continue;
+                    !indexById.TryGetValue(link.FindPropertyRelative("toInstanceId").stringValue, out var to)) continue;
                 var fromRect = OffsetRect(layouts[from].rect, canvas.position);
                 var toRect = OffsetRect(layouts[to].rect, canvas.position);
                 var center = Vector2.Lerp(new Vector2(fromRect.xMax, fromRect.center.y), new Vector2(toRect.xMin, toRect.center.y), 0.5f);
                 var labelRect = new Rect(center.x - 58f, center.y - 25f, 116f, 38f);
-                GUI.Box(labelRect, BuildTransitionLabel(link), EditorStyles.helpBox);
+                GUI.Box(labelRect, BuildTransitionLabel(link), selectedTransitionIndex == i ? EditorStyles.helpBox : EditorStyles.miniButton);
             }
         }
 
         void DrawComboNodes(Rect canvas, List<ComboNodeLayout> layouts, SerializedProperty moves, string entryId, string[] labels)
         {
+            var evt = Event.current;
             for (var i = 0; i < layouts.Count; i++)
             {
                 var layout = layouts[i];
                 var node = moves.GetArrayElementAtIndex(layout.index);
                 var move = node.FindPropertyRelative("move");
                 var rect = OffsetRect(layout.rect, canvas.position);
+                var inputPort = new Rect(rect.x - 7f, rect.center.y - 7f, 14f, 14f);
+                var outputPort = new Rect(rect.xMax - 7f, rect.center.y - 7f, 14f, 14f);
                 var isEntry = node.FindPropertyRelative("id").stringValue == entryId;
-                var isSelected = layout.index == selectedGraphMoveIndex;
+                var isSelected = layout.index == selectedGraphMoveIndex && selectedTransitionIndex < 0;
                 var charge = node.FindPropertyRelative("enableCharge").boolValue;
                 var heavy = move != null && move.FindPropertyRelative("attackType").enumValueIndex == 1;
+
+                HandleNodeMouse(evt, canvas, rect, outputPort, layout.index, node);
+
                 var old = GUI.backgroundColor;
                 GUI.backgroundColor = charge ? new Color(0.72f, 0.46f, 0.95f) : heavy ? new Color(1f, 0.63f, 0.25f) : new Color(0.42f, 0.66f, 0.84f);
                 var subtitle = charge ? "蓄力" : heavy ? "重击" : "普通";
-                if (GUI.Button(rect, (isEntry ? "起手  " : string.Empty) + labels[layout.index] + "\n" + subtitle))
-                {
-                    selectedGraphMoveIndex = layout.index;
-                    selectedComboIndex = layout.index;
-                    currentFrame = 0;
-                    animationPlaying = false;
-                    Repaint();
-                }
+                GUI.Box(rect, (isEntry ? "起手  " : string.Empty) + labels[layout.index] + "\n" + subtitle, GUI.skin.button);
                 GUI.backgroundColor = old;
+                EditorGUI.DrawRect(inputPort, new Color(0.75f, 0.82f, 0.9f));
+                EditorGUI.DrawRect(outputPort, connectingFromNodeIndex == layout.index ? new Color(0.2f, 1f, 1f) : new Color(0.35f, 0.85f, 1f));
                 if (isSelected) DrawRectOutline(rect, new Color(0.25f, 0.85f, 1f), 3f);
             }
+            HandleConnectionRelease(evt, canvas, layouts);
+            if (evt.type == EventType.MouseUp && evt.button == 0) draggingNodeIndex = -1;
+        }
+
+        void HandleNodeMouse(Event evt, Rect canvas, Rect rect, Rect outputPort, int index, SerializedProperty node)
+        {
+            if (evt.type == EventType.MouseDown && evt.button == 0 && outputPort.Contains(evt.mousePosition))
+            {
+                connectingFromNodeIndex = index;
+                selectedGraphMoveIndex = index;
+                selectedTransitionIndex = -1;
+                evt.Use();
+                return;
+            }
+            if (evt.type == EventType.MouseDown && evt.button == 0 && rect.Contains(evt.mousePosition))
+            {
+                selectedGraphMoveIndex = index;
+                selectedComboIndex = index;
+                selectedTransitionIndex = -1;
+                currentFrame = 0;
+                animationPlaying = false;
+                draggingNodeIndex = index;
+                nodeDragOffset = evt.mousePosition - canvas.position - node.FindPropertyRelative("graphPosition").vector2Value;
+                Undo.RecordObject(combat, "移动连招节点");
+                evt.Use();
+                Repaint();
+                return;
+            }
+            if (evt.type == EventType.MouseDrag && evt.button == 0 && draggingNodeIndex == index)
+            {
+                var next = evt.mousePosition - canvas.position - nodeDragOffset;
+                node.FindPropertyRelative("graphPosition").vector2Value = new Vector2(Mathf.Max(12f, next.x), Mathf.Max(12f, next.y));
+                EditorUtility.SetDirty(combat);
+                evt.Use();
+                Repaint();
+                return;
+            }
+            if (evt.type == EventType.ContextClick && rect.Contains(evt.mousePosition))
+            {
+                var capturedIndex = index;
+                var menu = new GenericMenu();
+                menu.AddItem(new GUIContent("设为起手"), false, () => SetEntryMove(capturedIndex));
+                menu.AddItem(new GUIContent("复制招式"), false, () => DuplicateComboMove(capturedIndex));
+                menu.AddSeparator(string.Empty);
+                menu.AddItem(new GUIContent("删除招式"), false, () => DeleteComboMove(capturedIndex));
+                menu.ShowAsContext();
+                evt.Use();
+            }
+        }
+
+        void HandleConnectionRelease(Event evt, Rect canvas, List<ComboNodeLayout> layouts)
+        {
+            if (evt.type != EventType.MouseUp || evt.button != 0 || connectingFromNodeIndex < 0) return;
+            var target = -1;
+            for (var i = 0; i < layouts.Count; i++)
+            {
+                var rect = OffsetRect(layouts[i].rect, canvas.position);
+                var inputPort = new Rect(rect.x - 10f, rect.center.y - 12f, 24f, 24f);
+                if (inputPort.Contains(evt.mousePosition)) { target = i; break; }
+            }
+            var source = connectingFromNodeIndex;
+            connectingFromNodeIndex = -1;
+            if (target >= 0 && target != source) CreateGraphConnection(source, target);
+            evt.Use();
+            Repaint();
+        }
+
+        static float DistanceToBezier(Vector2 point, Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+        {
+            var best = float.MaxValue;
+            var previous = (Vector2)a;
+            for (var i = 1; i <= 24; i++)
+            {
+                var t = i / 24f;
+                var u = 1f - t;
+                var current = (Vector2)(u * u * u * a + 3f * u * u * t * b + 3f * u * t * t * c + t * t * t * d);
+                best = Mathf.Min(best, HandleUtility.DistancePointToLineSegment(point, previous, current));
+                previous = current;
+            }
+            return best;
         }
 
         string BuildTransitionLabel(SerializedProperty link)
@@ -293,6 +396,40 @@ namespace MirrorTrial.Editor
             EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - width, rect.width, width), color);
             EditorGUI.DrawRect(new Rect(rect.x, rect.y, width, rect.height), color);
             EditorGUI.DrawRect(new Rect(rect.xMax - width, rect.y, width, rect.height), color);
+        }
+
+        void DrawSelectedConnectionEditor(SerializedProperty link, int index, SerializedProperty moves)
+        {
+            EditorGUILayout.Space(8f);
+            using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
+            {
+                GUILayout.Label("当前连接", EditorStyles.boldLabel);
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("删除连接", EditorStyles.toolbarButton, GUILayout.Width(72f))) { DeleteComboTransition(index); return; }
+            }
+            var labels = BuildNameLabels(moves, "招式");
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    DrawMoveIdPopup(link.FindPropertyRelative("fromInstanceId"), moves, labels, "从"थ);
+                    GUILayout.Label("→", GUILayout.Width(18f));
+                    DrawMoveIdPopup(link.FindPropertyRelative("toInstanceId"), moves, labels, "到");
+                }
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    DrawCommandPopup(link.FindPropertyRelative("input"), new GUIContent("输入"));
+                    EditorGUILayout.PropertyField(link.FindPropertyRelative("condition"), new GUIContent("方式"));
+                }
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.PropertyField(link.FindPropertyRelative("windowStart"), new GUIContent("窗口开始"));
+                    EditorGUILayout.PropertyField(link.FindPropertyRelative("windowEnd"), new GUIContent("窗口结束"));
+                }
+                var condition = (ComboInputCondition)link.FindPropertyRelative("condition").enumValueIndex;
+                if (condition == ComboInputCondition.Hold || condition == ComboInputCondition.Tap)
+                    EditorGUILayout.PropertyField(link.FindPropertyRelative("holdThreshold"), new GUIContent(condition == ComboInputCondition.Hold ? "按住判定" : "轻点最长时间"));
+            }
         }
 
         void DrawSelectedMoveEditor(SerializedProperty node, int index)
