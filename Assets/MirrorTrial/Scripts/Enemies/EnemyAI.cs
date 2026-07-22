@@ -54,6 +54,7 @@ namespace MirrorTrial.Enemies
         Rigidbody2D body;
         Collider2D bodyCollider;
         SpriteRenderer spriteRenderer;
+        EnemyDamageVisual damageVisual;
         Transform player;
         Vector2 patrolOrigin;
         float patrolTargetX;
@@ -128,6 +129,8 @@ namespace MirrorTrial.Enemies
             bodyCollider = GetComponent<Collider2D>();
             spriteRenderer = GetComponentInChildren<SpriteRenderer>(true);
             body.gravityScale = 1f;
+            damageVisual = GetComponent<EnemyDamageVisual>();
+            if (!damageVisual) damageVisual = gameObject.AddComponent<EnemyDamageVisual>();
             body.freezeRotation = true;
             body.interpolation = RigidbodyInterpolation2D.Interpolate;
             body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
@@ -502,14 +505,31 @@ namespace MirrorTrial.Enemies
         {
             if (CurrentState == State.Dead || pendingDeath) return;
 
-            currentHitPoints -= payload.damage;
-            hurtTimer = profile ? profile.hurtStun : 0.25f;
-
-            if (payload.knockback.magnitude > 0.01f && body != null)
-                body.AddForce(payload.knockback, ForceMode2D.Impulse);
+            var beforeDamage = currentHitPoints;
+            currentHitPoints = Mathf.Max(0, currentHitPoints - payload.damage);
+            if (damageVisual)
+                damageVisual.PlayDamage(beforeDamage - currentHitPoints, MaxHitPoints);
 
             pendingDeath = currentHitPoints <= 0;
+            if (payload.reaction == HitReactionType.None)
+            {
+                if (pendingDeath) Die();
+                return;
+            }
+
+            var baseHurtTime = profile ? profile.hurtStun : 0.25f;
+            hurtTimer = payload.reaction == HitReactionType.Launch ? baseHurtTime * 1.45f
+                : payload.reaction == HitReactionType.HeavyHurt ? baseHurtTime * 1.2f
+                : baseHurtTime;
+
             TransitionTo(State.Hurt);
+
+            if (payload.knockback.sqrMagnitude > 0.0001f && body)
+            {
+                if (payload.reaction == HitReactionType.Launch)
+                    body.velocity = new Vector2(body.velocity.x, Mathf.Max(0f, body.velocity.y));
+                body.AddForce(payload.knockback, ForceMode2D.Impulse);
+            }
         }
 
         void Die()

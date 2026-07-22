@@ -17,7 +17,8 @@ namespace MirrorTrial.Editor
             PlayerInputCommand.WeaponSlot1,
             PlayerInputCommand.WeaponSlot2,
             PlayerInputCommand.WeaponSlot3,
-            PlayerInputCommand.WeaponSlot4
+            PlayerInputCommand.WeaponSlot4,
+            PlayerInputCommand.Dodge
         };
 
         static readonly string[] CommandLabels =
@@ -29,7 +30,8 @@ namespace MirrorTrial.Editor
             "\u6b66\u5668\u69fd 1",
             "\u6b66\u5668\u69fd 2",
             "\u6b66\u5668\u69fd 3",
-            "\u6b66\u5668\u69fd 4"
+            "\u6b66\u5668\u69fd 4",
+            "\u95ea\u907f"
         };
 
         static readonly PlayerMoveCategory[] MoveCategoryValues =
@@ -263,12 +265,7 @@ namespace MirrorTrial.Editor
             if (serializedBow != null) serializedBow.Update();
             if (serializedAbilities != null) serializedAbilities.Update();
             scroll = EditorGUILayout.BeginScrollView(scroll);
-            DrawWeaponSlots();
-            DrawSelectedWeaponSettings();
-            EditorGUILayout.Space(8f);
-            DrawInputBindings();
-            EditorGUILayout.Space(8f);
-            DrawCombo();
+            DrawMoveComboWorkspace();
             EditorGUILayout.EndScrollView();
 
             if (serializedInput.ApplyModifiedProperties())
@@ -471,6 +468,21 @@ namespace MirrorTrial.Editor
             return sets.GetArrayElementAtIndex(activeIndex.intValue).FindPropertyRelative("steps");
         }
 
+        SerializedProperty GetPreviewMoveProperty()
+        {
+            if (workspacePage == 0)
+            {
+                var selectedMove = GetSelectedGraphMoveProperty();
+                if (selectedMove != null)
+                    return selectedMove;
+            }
+            var combo = GetActiveComboProperty();
+            if (combo == null || combo.arraySize == 0)
+                return null;
+            selectedComboIndex = Mathf.Clamp(selectedComboIndex, 0, combo.arraySize - 1);
+            return combo.GetArrayElementAtIndex(selectedComboIndex);
+        }
+
         void DrawComboSetToolbar()
         {
             var sets = serializedCombat.FindProperty("comboSets");
@@ -544,27 +556,29 @@ namespace MirrorTrial.Editor
         {
             if (!combat)
                 return;
-            // Never apply a prefab while AnimationMode is holding a sampled attack pose.
-            // Otherwise the sampled sprite, transform and collider values become asset data.
             StopAnimationPreview();
-            if (serializedInput != null)
-                serializedInput.ApplyModifiedProperties();
-            if (serializedCombat != null)
-                serializedCombat.ApplyModifiedProperties();
-            if (serializedWeapons != null)
-                serializedWeapons.ApplyModifiedProperties();
-            if (serializedTuning != null)
-                serializedTuning.ApplyModifiedProperties();
+            if (serializedInput != null) serializedInput.ApplyModifiedProperties();
+            if (serializedCombat != null) serializedCombat.ApplyModifiedProperties();
+            if (serializedWeapons != null) serializedWeapons.ApplyModifiedProperties();
+            if (serializedTuning != null) serializedTuning.ApplyModifiedProperties();
             if (serializedBow != null) serializedBow.ApplyModifiedProperties();
             if (serializedAbilities != null) serializedAbilities.ApplyModifiedProperties();
-            var root = PrefabUtility.GetOutermostPrefabInstanceRoot(combat.gameObject);
-            if (!root)
+
+            if (PrefabUtility.IsPartOfPrefabAsset(combat.gameObject))
             {
-                ShowNotification(new GUIContent("\u5f53\u524d\u73a9\u5bb6\u4e0d\u662f Prefab \u5b9e\u4f8b"));
+                EditorUtility.SetDirty(combat);
+                AssetDatabase.SaveAssets();
+                ShowNotification(new GUIContent("已保存 Prefab 资源"));
                 return;
             }
-            PrefabUtility.ApplyPrefabInstance(root, InteractionMode.UserAction);
-            ShowNotification(new GUIContent("\u5df2\u4fdd\u5b58\u5230 Prefab"));
+            var root = PrefabUtility.GetOutermostPrefabInstanceRoot(combat.gameObject);
+            if (root)
+            {
+                PrefabUtility.ApplyPrefabInstance(root, InteractionMode.UserAction);
+                ShowNotification(new GUIContent("已应用到 Prefab"));
+                return;
+            }
+            ShowNotification(new GUIContent("当前对象不是 Prefab"));
         }
 
         PlayerWeaponType GetSelectedWeaponType()
@@ -624,6 +638,7 @@ namespace MirrorTrial.Editor
                             EditorGUILayout.PropertyField(step.FindPropertyRelative("mirrorHitboxByFacing"), new GUIContent("\u6309\u671d\u5411\u955c\u50cf"));
                         }
                         DrawHitboxKeyEditor(step, i);
+                        DrawHitFeedbackEditor(step);
                         using (new EditorGUILayout.HorizontalScope())
                         {
                             EditorGUILayout.PropertyField(step.FindPropertyRelative("startup"), new GUIContent("\u524d\u6447"));
@@ -648,6 +663,85 @@ namespace MirrorTrial.Editor
             }
         }
 
+        void DrawHitFeedbackEditor(SerializedProperty step)
+        {
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField("\u547d\u4e2d\u5224\u5b9a\u4e0e\u53cd\u9988", EditorStyles.boldLabel);
+                EditorGUILayout.HelpBox("\u8fd9\u4e9b\u9009\u9879\u5c5e\u4e8e\u4e0a\u65b9\u9010\u5e27\u653b\u51fb\u6846\uff1a\u8be5\u653b\u51fb\u6846\u547d\u4e2d\u65f6\u6267\u884c\u3002\u591a\u76ee\u6807\u65f6\u6bcf\u4e2a\u76ee\u6807\u90fd\u53d7\u4f24\u5e76\u64ad\u653e\u547d\u4e2d\u7279\u6548\uff0c\u987f\u5e27/\u955c\u5934/\u97f3\u6548/\u73a9\u5bb6\u53cd\u4f5c\u7528\u53ea\u89e6\u53d1\u4e00\u6b21\u3002", MessageType.Info);
+
+                EditorGUILayout.PropertyField(step.FindPropertyRelative("attackType"), new GUIContent("\u6280\u80fd\u653b\u51fb\u7c7b\u578b"));
+
+                var targetReaction = step.FindPropertyRelative("enableTargetReaction");
+                EditorGUILayout.PropertyField(targetReaction, new GUIContent("\u542f\u7528\u76ee\u6807\u53cd\u5e94"));
+                if (targetReaction.boolValue)
+                {
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.PropertyField(step.FindPropertyRelative("targetReaction"), new GUIContent("\u53cd\u5e94\u7c7b\u578b\uff08\u6280\u80fd\u76f4\u63a5\u51b3\u5b9a\uff09"));
+                    var customKnockback = step.FindPropertyRelative("useCustomKnockback");
+                    EditorGUILayout.PropertyField(customKnockback, new GUIContent("\u81ea\u5b9a\u4e49\u51fb\u9000/\u51fb\u98de\u5411\u91cf"));
+                    if (customKnockback.boolValue)
+                        EditorGUILayout.PropertyField(step.FindPropertyRelative("customKnockback"), new GUIContent("\u6c34\u5e73 X / \u5782\u76f4 Y"));
+                    else
+                        EditorGUILayout.PropertyField(step.FindPropertyRelative("knockbackMultiplier"), new GUIContent("\u4f7f\u7528\u73a9\u5bb6\u57fa\u7840\u51fb\u9000\u500d\u7387"));
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.PropertyField(step.FindPropertyRelative("interruptPower"), new GUIContent("\u4e2d\u65ad\u5f3a\u5ea6"));
+                        EditorGUILayout.PropertyField(step.FindPropertyRelative("poiseDamage"), new GUIContent("\u524a\u97e7"));
+                        EditorGUILayout.PropertyField(step.FindPropertyRelative("breaksSuperArmor"), new GUIContent("\u7834\u9738\u4f53"));
+                    }
+                    EditorGUI.indentLevel--;
+                }
+
+                var feedback = step.FindPropertyRelative("hitFeedback");
+                if (feedback == null) return;
+
+                var effectEnabled = feedback.FindPropertyRelative("enableHitEffect");
+                EditorGUILayout.PropertyField(effectEnabled, new GUIContent("\u64ad\u653e\u547d\u4e2d\u7279\u6548"));
+                if (effectEnabled.boolValue)
+                {
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.PropertyField(feedback.FindPropertyRelative("hitEffectPrefab"), new GUIContent("\u7ed1\u5b9a\u7279\u6548 Prefab"));
+                    EditorGUILayout.PropertyField(feedback.FindPropertyRelative("hitEffectOffset"), new GUIContent("\u63a5\u89e6\u70b9\u504f\u79fb"));
+                    EditorGUILayout.PropertyField(feedback.FindPropertyRelative("mirrorHitEffectByDirection"), new GUIContent("\u6309\u653b\u51fb\u65b9\u5411\u7ffb\u8f6c"));
+                    EditorGUILayout.PropertyField(feedback.FindPropertyRelative("hitEffectLifetime"), new GUIContent("\u5b58\u5728\u65f6\u95f4"));
+                    EditorGUI.indentLevel--;
+                }
+
+                var hitStopEnabled = feedback.FindPropertyRelative("enableHitStop");
+                EditorGUILayout.PropertyField(hitStopEnabled, new GUIContent("\u5168\u5c40\u547d\u4e2d\u987f\u5e27"));
+                if (hitStopEnabled.boolValue)
+                {
+                    EditorGUI.indentLevel++;
+                    var useDefault = feedback.FindPropertyRelative("useAttackTypeDefaultHitStop");
+                    EditorGUILayout.PropertyField(useDefault, new GUIContent("\u4f7f\u7528\u666e\u901a/\u91cd\u51fb\u9ed8\u8ba4\u65f6\u95f4"));
+                    if (!useDefault.boolValue)
+                        EditorGUILayout.PropertyField(feedback.FindPropertyRelative("hitStopDuration"), new GUIContent("\u987f\u5e27\u65f6\u95f4"));
+                    EditorGUI.indentLevel--;
+                }
+
+                var cameraEnabled = feedback.FindPropertyRelative("enableCameraFeedback");
+                EditorGUILayout.PropertyField(cameraEnabled, new GUIContent("\u955c\u5934\u53cd\u9988"));
+                if (cameraEnabled.boolValue)
+                {
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.PropertyField(feedback.FindPropertyRelative("cameraPower"), new GUIContent("\u955c\u5934\u5f3a\u5ea6"));
+                    EditorGUI.indentLevel--;
+                }
+
+                var soundEnabled = feedback.FindPropertyRelative("enableHitSound");
+                EditorGUILayout.PropertyField(soundEnabled, new GUIContent("\u547d\u4e2d\u97f3\u6548"));
+                if (soundEnabled.boolValue)
+                {
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.PropertyField(feedback.FindPropertyRelative("hitSound"), new GUIContent("AudioClip"));
+                    EditorGUILayout.PropertyField(feedback.FindPropertyRelative("hitSoundVolume"), new GUIContent("\u97f3\u91cf"));
+                    EditorGUI.indentLevel--;
+                }
+
+                EditorGUILayout.PropertyField(feedback.FindPropertyRelative("notifyPlayerReaction"), new GUIContent("\u901a\u77e5 Player \u6267\u884c\u53cd\u4f5c\u7528"));
+            }
+        }
         void DrawHitboxKeyEditor(SerializedProperty step, int stepIndex)
         {
             var frameCountProperty = step.FindPropertyRelative("animationFrameCount");
@@ -804,11 +898,9 @@ namespace MirrorTrial.Editor
             if (serializedCombat == null)
                 return;
             serializedCombat.Update();
-            var combo = GetActiveComboProperty();
-            if (combo == null || combo.arraySize == 0)
+            var step = GetPreviewMoveProperty();
+            if (step == null)
                 return;
-            selectedComboIndex = Mathf.Clamp(selectedComboIndex, 0, combo.arraySize - 1);
-            var step = combo.GetArrayElementAtIndex(selectedComboIndex);
             var action = (PlayerActionState)step.FindPropertyRelative("animationState").enumValueIndex;
             var clipProperty = step.FindPropertyRelative("animationClip");
             var clip = clipProperty != null ? clipProperty.objectReferenceValue as AnimationClip : null;
@@ -834,6 +926,12 @@ namespace MirrorTrial.Editor
         {
             if (Application.isPlaying || !combat || !clip)
                 return;
+            if (EditorUtility.IsPersistent(combat.gameObject))
+            {
+                animationPlaying = false;
+                ShowNotification(new GUIContent("\u4e3a\u4e86\u907f\u514d\u6c61\u67d3 Prefab\uff0c\u8bf7\u5728\u573a\u666f\u4e2d\u9009\u62e9\u73a9\u5bb6\u5b9e\u4f8b\u540e\u9884\u89c8"));
+                return;
+            }
             var animator = GetEditorAnimator();
             if (!animator)
                 return;
@@ -1037,12 +1135,9 @@ namespace MirrorTrial.Editor
                 return;
 
             serializedCombat.Update();
-            var combo = GetActiveComboProperty();
-            if (combo == null || combo.arraySize == 0)
+            var step = GetPreviewMoveProperty();
+            if (step == null)
                 return;
-
-            selectedComboIndex = Mathf.Clamp(selectedComboIndex, 0, combo.arraySize - 1);
-            var step = combo.GetArrayElementAtIndex(selectedComboIndex);
             var keys = step.FindPropertyRelative("hitboxKeys");
             var key = FindKeyAtFrame(keys, currentFrame);
             if (key == null)
@@ -1195,6 +1290,11 @@ namespace MirrorTrial.Editor
         {
             var current = (PlayerInputCommand)property.enumValueIndex;
             var selected = IndexOf(CommandValues, current);
+            if (selected < 0)
+            {
+                EditorGUILayout.PropertyField(property, label, options);
+                return;
+            }
             selected = label == GUIContent.none
                 ? EditorGUILayout.Popup(selected, CommandLabels, options)
                 : EditorGUILayout.Popup(label, selected, CommandLabels, options);

@@ -16,8 +16,6 @@ namespace MirrorTrial.Boss.Editor
         const string SessionKey = "MirrorTrial.MirrorBossBehaviourTreeSetup.v2";
 
         static MirrorBossBehaviourTreeSetup() => EditorApplication.delayCall += InstallOnce;
-
-        [MenuItem("Mirror Trial/Boss/NodeCanvas/重新生成中文 Boss 行为树 BT")]
         public static void RebuildFromMenu() => Build(true);
 
         static void InstallOnce()

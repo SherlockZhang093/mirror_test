@@ -57,6 +57,9 @@ namespace MirrorTrial.Level
             }
 
             OnEnterMirrorScene?.Invoke();
+            // Never carry a hit-stop freeze across a scene transition.
+            Time.timeScale = 1f;
+            Time.fixedDeltaTime = 0.02f;
             SceneManager.LoadScene(mirrorSceneName, LoadSceneMode.Single);
         }
 

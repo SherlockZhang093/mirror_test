@@ -157,11 +157,24 @@ namespace MirrorTrial.Player
             if (bindingSchemaVersion < 2)
             {
                 bindings = CreateDefaultBindings();
-                bindingSchemaVersion = 3;
+                bindingSchemaVersion = 4;
                 return;
             }
             if (bindings == null)
                 bindings = new List<PlayerInputBinding>();
+
+            if (bindingSchemaVersion < 3)
+            {
+                for (var i = 0; i < bindings.Count; i++)
+                {
+                    var binding = bindings[i];
+                    if (binding != null && binding.command == PlayerInputCommand.MobilitySkill && binding.key == KeyCode.LeftShift)
+                        binding.key = KeyCode.Q;
+                }
+            }
+
+            if (bindingSchemaVersion < 4)
+                RemoveBindingsCreatedByDodgePopupBug();
 
             var defaults = CreateDefaultBindings();
             for (var i = 0; i < defaults.Count; i++)
@@ -175,20 +188,29 @@ namespace MirrorTrial.Player
                         break;
                     }
                 }
-
                 if (!exists)
                     bindings.Add(defaults[i]);
             }
+            bindingSchemaVersion = 4;
+        }
 
-            if (bindingSchemaVersion < 3)
+        void RemoveBindingsCreatedByDodgePopupBug()
+        {
+            var seen = new HashSet<string>();
+            for (var i = bindings.Count - 1; i >= 0; i--)
             {
-                for (var i = 0; i < bindings.Count; i++)
+                var binding = bindings[i];
+                if (binding == null)
                 {
-                    var binding = bindings[i];
-                    if (binding != null && binding.command == PlayerInputCommand.MobilitySkill && binding.key == KeyCode.LeftShift)
-                        binding.key = KeyCode.Q;
+                    bindings.RemoveAt(i);
+                    continue;
                 }
-                bindingSchemaVersion = 3;
+
+                var isBuggedDodgeRow = binding.command == PlayerInputCommand.PrimaryAttack &&
+                    string.IsNullOrEmpty(binding.buttonName) && binding.key == KeyCode.LeftShift;
+                var signature = ((int)binding.command) + "|" + (binding.buttonName ?? string.Empty) + "|" + (int)binding.key;
+                if (isBuggedDodgeRow || !seen.Add(signature))
+                    bindings.RemoveAt(i);
             }
         }
 

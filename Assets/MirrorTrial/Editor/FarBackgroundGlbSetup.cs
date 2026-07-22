@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -46,7 +46,6 @@ namespace MirrorTrial.Editor
             SessionState.SetBool(AutoRunKey, true);
             EditorApplication.delayCall += PlaceFarBackgroundIslands;
         }
-        [MenuItem("Mirror Trial/Environment/Place Far Background GLB Islands")]
         private static void PlaceFarBackgroundIslands()
         {
             foreach (string path in AssetPaths)

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3931810769508925516}
   - component: {fileID: 5245713053005979062}
   - component: {fileID: 4388561565866199630}
+  - component: {fileID: 5385937002698116603}
   m_Layer: 0
   m_Name: AttackHitbox
   m_TagString: Untagged
@@ -88,6 +89,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 539723cc2f96b004eab8c6d42cdee363, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitboxCollider: {fileID: 0}
+--- !u!114 &5385937002698116603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6139994494679877378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33e8f9cdc5638a44da7021ed6f8c9510, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   hitboxCollider: {fileID: 0}
@@ -472,7 +486,7 @@ MonoBehaviour:
   - command: 8
     buttonName: 
     key: 304
-  bindingSchemaVersion: 3
+  bindingSchemaVersion: 4
 --- !u!114 &3517131352704987190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -756,6 +770,29 @@ MonoBehaviour:
         offset: {x: 0.65, y: 0}
         size: {x: 1, y: 0.8}
         interpolation: 0
+      attackType: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      interruptPower: 1
+      poiseDamage: 1
+      breaksSuperArmor: 0
+      hitFeedback:
+        enableHitEffect: 0
+        hitEffectPrefab: {fileID: 0}
+        hitEffectOffset: {x: 0, y: 0}
+        mirrorHitEffectByDirection: 1
+        hitEffectLifetime: 0.15
+        enableHitStop: 1
+        useAttackTypeDefaultHitStop: 1
+        hitStopDuration: 0.035
+        enableCameraFeedback: 0
+        cameraPower: 0.35
+        enableHitSound: 0
+        hitSound: {fileID: 0}
+        hitSoundVolume: 1
+        notifyPlayerReaction: 1
       startup: 0.08
       activeTime: 0.08
       recovery: 0.16
@@ -792,6 +829,29 @@ MonoBehaviour:
         offset: {x: 0.65, y: 0}
         size: {x: 1, y: 0.8}
         interpolation: 0
+      attackType: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      interruptPower: 1
+      poiseDamage: 1
+      breaksSuperArmor: 0
+      hitFeedback:
+        enableHitEffect: 0
+        hitEffectPrefab: {fileID: 0}
+        hitEffectOffset: {x: 0, y: 0}
+        mirrorHitEffectByDirection: 1
+        hitEffectLifetime: 0.15
+        enableHitStop: 1
+        useAttackTypeDefaultHitStop: 1
+        hitStopDuration: 0.035
+        enableCameraFeedback: 0
+        cameraPower: 0.35
+        enableHitSound: 0
+        hitSound: {fileID: 0}
+        hitSoundVolume: 1
+        notifyPlayerReaction: 1
       startup: 0.08
       activeTime: 0.08
       recovery: 0.16
@@ -828,6 +888,29 @@ MonoBehaviour:
         offset: {x: 0.65, y: 0}
         size: {x: 1, y: 0.8}
         interpolation: 0
+      attackType: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      interruptPower: 1
+      poiseDamage: 1
+      breaksSuperArmor: 0
+      hitFeedback:
+        enableHitEffect: 0
+        hitEffectPrefab: {fileID: 0}
+        hitEffectOffset: {x: 0, y: 0}
+        mirrorHitEffectByDirection: 1
+        hitEffectLifetime: 0.15
+        enableHitStop: 1
+        useAttackTypeDefaultHitStop: 1
+        hitStopDuration: 0.035
+        enableCameraFeedback: 0
+        cameraPower: 0.35
+        enableHitSound: 0
+        hitSound: {fileID: 0}
+        hitSoundVolume: 1
+        notifyPlayerReaction: 1
       startup: 0.08
       activeTime: 0.08
       recovery: 0.16
@@ -864,6 +947,29 @@ MonoBehaviour:
         offset: {x: 0.65, y: 0}
         size: {x: 1, y: 0.8}
         interpolation: 0
+      attackType: 1
+      enableTargetReaction: 1
+      targetReaction: 3
+      useCustomKnockback: 1
+      customKnockback: {x: 6, y: 3.4}
+      interruptPower: 1
+      poiseDamage: 1
+      breaksSuperArmor: 0
+      hitFeedback:
+        enableHitEffect: 0
+        hitEffectPrefab: {fileID: 0}
+        hitEffectOffset: {x: 0, y: 0}
+        mirrorHitEffectByDirection: 1
+        hitEffectLifetime: 0.15
+        enableHitStop: 1
+        useAttackTypeDefaultHitStop: 1
+        hitStopDuration: 0.035
+        enableCameraFeedback: 0
+        cameraPower: 0.35
+        enableHitSound: 0
+        hitSound: {fileID: 0}
+        hitSoundVolume: 1
+        notifyPlayerReaction: 1
       startup: 0.08
       activeTime: 0.08
       recovery: 0.16
@@ -908,6 +1014,29 @@ MonoBehaviour:
         offset: {x: 0.65, y: 0}
         size: {x: 1, y: 0.8}
         interpolation: 0
+      attackType: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      interruptPower: 1
+      poiseDamage: 1
+      breaksSuperArmor: 0
+      hitFeedback:
+        enableHitEffect: 0
+        hitEffectPrefab: {fileID: 0}
+        hitEffectOffset: {x: 0, y: 0}
+        mirrorHitEffectByDirection: 1
+        hitEffectLifetime: 0.15
+        enableHitStop: 1
+        useAttackTypeDefaultHitStop: 1
+        hitStopDuration: 0.035
+        enableCameraFeedback: 0
+        cameraPower: 0.35
+        enableHitSound: 0
+        hitSound: {fileID: 0}
+        hitSoundVolume: 1
+        notifyPlayerReaction: 1
       startup: 0.05
       activeTime: 0.08
       recovery: 0.12
@@ -944,6 +1073,29 @@ MonoBehaviour:
         offset: {x: 0.65, y: 0}
         size: {x: 1, y: 0.8}
         interpolation: 0
+      attackType: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      interruptPower: 1
+      poiseDamage: 1
+      breaksSuperArmor: 0
+      hitFeedback:
+        enableHitEffect: 0
+        hitEffectPrefab: {fileID: 0}
+        hitEffectOffset: {x: 0, y: 0}
+        mirrorHitEffectByDirection: 1
+        hitEffectLifetime: 0.15
+        enableHitStop: 1
+        useAttackTypeDefaultHitStop: 1
+        hitStopDuration: 0.035
+        enableCameraFeedback: 0
+        cameraPower: 0.35
+        enableHitSound: 0
+        hitSound: {fileID: 0}
+        hitSoundVolume: 1
+        notifyPlayerReaction: 1
       startup: 0.06
       activeTime: 0.08
       recovery: 0.11
@@ -980,6 +1132,29 @@ MonoBehaviour:
         offset: {x: 0.65, y: 0}
         size: {x: 1, y: 0.8}
         interpolation: 0
+      attackType: 1
+      enableTargetReaction: 1
+      targetReaction: 3
+      useCustomKnockback: 1
+      customKnockback: {x: 5.5, y: 3.2}
+      interruptPower: 1
+      poiseDamage: 1
+      breaksSuperArmor: 0
+      hitFeedback:
+        enableHitEffect: 0
+        hitEffectPrefab: {fileID: 0}
+        hitEffectOffset: {x: 0, y: 0}
+        mirrorHitEffectByDirection: 1
+        hitEffectLifetime: 0.15
+        enableHitStop: 1
+        useAttackTypeDefaultHitStop: 1
+        hitStopDuration: 0.035
+        enableCameraFeedback: 1
+        cameraPower: 0.35
+        enableHitSound: 0
+        hitSound: {fileID: 0}
+        hitSoundVolume: 1
+        notifyPlayerReaction: 1
       startup: 0.08
       activeTime: 0.1
       recovery: 0.18
@@ -991,9 +1166,10 @@ MonoBehaviour:
       bodyState: 0
       bodyStateStart: 0
       bodyStateEnd: 0
-  activeComboSetIndex: 1
+  activeComboSetIndex: 0
   punchComboCreated: 1
   combo: []
+  hitFeedbackSchemaVersion: 1
   swordGuardClip: {fileID: 7400000, guid: 2460091f9596b4241972a347066392b9, type: 2}
   swordGuardImpactClip: {fileID: 7400000, guid: 59ec72e765455be439cfe9a5bcf40d2c,
     type: 2}
@@ -1023,6 +1199,29 @@ MonoBehaviour:
       offset: {x: 0.65, y: 0}
       size: {x: 1, y: 0.8}
       interpolation: 0
+    attackType: 0
+    enableTargetReaction: 1
+    targetReaction: 1
+    useCustomKnockback: 0
+    customKnockback: {x: 4, y: 1}
+    interruptPower: 1
+    poiseDamage: 1
+    breaksSuperArmor: 0
+    hitFeedback:
+      enableHitEffect: 0
+      hitEffectPrefab: {fileID: 0}
+      hitEffectOffset: {x: 0, y: 0}
+      mirrorHitEffectByDirection: 1
+      hitEffectLifetime: 0.15
+      enableHitStop: 1
+      useAttackTypeDefaultHitStop: 1
+      hitStopDuration: 0.035
+      enableCameraFeedback: 0
+      cameraPower: 0.35
+      enableHitSound: 0
+      hitSound: {fileID: 0}
+      hitSoundVolume: 1
+      notifyPlayerReaction: 1
     startup: 0.06
     activeTime: 0.1
     recovery: 0.19
@@ -1060,6 +1259,29 @@ MonoBehaviour:
       offset: {x: 0.65, y: 0}
       size: {x: 1, y: 0.8}
       interpolation: 0
+    attackType: 0
+    enableTargetReaction: 1
+    targetReaction: 1
+    useCustomKnockback: 0
+    customKnockback: {x: 4, y: 1}
+    interruptPower: 1
+    poiseDamage: 1
+    breaksSuperArmor: 0
+    hitFeedback:
+      enableHitEffect: 0
+      hitEffectPrefab: {fileID: 0}
+      hitEffectOffset: {x: 0, y: 0}
+      mirrorHitEffectByDirection: 1
+      hitEffectLifetime: 0.15
+      enableHitStop: 1
+      useAttackTypeDefaultHitStop: 1
+      hitStopDuration: 0.035
+      enableCameraFeedback: 0
+      cameraPower: 0.35
+      enableHitSound: 0
+      hitSound: {fileID: 0}
+      hitSoundVolume: 1
+      notifyPlayerReaction: 1
     startup: 0.07
     activeTime: 0.1
     recovery: 0.18
@@ -1071,6 +1293,733 @@ MonoBehaviour:
     bodyState: 0
     bodyStateStart: 0
     bodyStateEnd: 0
+  attackReaction:
+    enabled: 1
+    normalRecoilSpeed: 0.35
+    normalRecoilDuration: 0.025
+    heavyRecoilSpeed: 1.1
+    heavyRecoilDuration: 0.055
+  moveLibrary: []
+  comboGraphs:
+  - name: "\u5251\u672F\u56DB\u8FDE"
+    weaponType: 1
+    entryInput: 0
+    entryInstanceId: legacy-instance-0-0
+    instances:
+    - id: legacy-instance-0-0
+      name: Combo A
+      move:
+        name: Combo A
+        moveCategory: 1
+        comboCategory: 0
+        input: 0
+        animationClip: {fileID: 7400000, guid: d014983ce728ef54db394042da6f09c0, type: 2}
+        animationState: 15
+        animationFrameRate: 12
+        animationFrameCount: 7
+        mirrorHitboxByFacing: 1
+        hitboxKeys:
+        - frame: 0
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        - frame: 1
+          enabled: 1
+          offset: {x: 0.21022987, y: 0.72193456}
+          size: {x: 0.5170145, y: 1.5321026}
+          interpolation: 1
+        - frame: 3
+          enabled: 1
+          offset: {x: 1.1456947, y: 0.72447646}
+          size: {x: 2.3879433, y: 1.5270188}
+          interpolation: 0
+        - frame: 4
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        attackType: 0
+        enableTargetReaction: 1
+        targetReaction: 1
+        useCustomKnockback: 0
+        customKnockback: {x: 4, y: 1}
+        interruptPower: 1
+        poiseDamage: 1
+        breaksSuperArmor: 0
+        hitFeedback:
+          enableHitEffect: 0
+          hitEffectPrefab: {fileID: 0}
+          hitEffectOffset: {x: 0, y: 0}
+          mirrorHitEffectByDirection: 1
+          hitEffectLifetime: 0.15
+          enableHitStop: 1
+          useAttackTypeDefaultHitStop: 1
+          hitStopDuration: 0.035
+          enableCameraFeedback: 0
+          cameraPower: 0.35
+          enableHitSound: 0
+          hitSound: {fileID: 0}
+          hitSoundVolume: 1
+          notifyPlayerReaction: 1
+        startup: 0.08
+        activeTime: 0.08
+        recovery: 0.16
+        comboWindowStart: 0.1
+        comboWindowEnd: 0.28
+        damageMultiplier: 1
+        knockbackMultiplier: 1
+        lockMovement: 1
+        bodyState: 0
+        bodyStateStart: 0
+        bodyStateEnd: 0
+      moveId: legacy-move-0-0
+      damageMultiplier: 1
+      knockbackMultiplier: 1
+      poiseMultiplier: 1
+      animationSpeed: 1
+      overrideAttackType: 0
+      attackType: 0
+      overrideTargetReaction: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      enableCharge: 0
+      chargeAnimation: {fileID: 0}
+      minimumChargeTime: 0.18
+      maximumChargeTime: 0.7
+      fullChargeDamageMultiplier: 1.5
+      fullChargeKnockbackMultiplier: 1.35
+      autoReleaseAtFullCharge: 1
+    - id: legacy-instance-0-1
+      name: Combo B
+      move:
+        name: Combo B
+        moveCategory: 1
+        comboCategory: 1
+        input: 0
+        animationClip: {fileID: 7400000, guid: 047d935fe1f929b44bee471667c8e228, type: 2}
+        animationState: 16
+        animationFrameRate: 12
+        animationFrameCount: 6
+        mirrorHitboxByFacing: 1
+        hitboxKeys:
+        - frame: 0
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        - frame: 1
+          enabled: 1
+          offset: {x: 1.0606318, y: 0.7270185}
+          size: {x: 1.1, y: 0.85}
+          interpolation: 1
+        - frame: 4
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        attackType: 0
+        enableTargetReaction: 1
+        targetReaction: 1
+        useCustomKnockback: 0
+        customKnockback: {x: 4, y: 1}
+        interruptPower: 1
+        poiseDamage: 1
+        breaksSuperArmor: 0
+        hitFeedback:
+          enableHitEffect: 0
+          hitEffectPrefab: {fileID: 0}
+          hitEffectOffset: {x: 0, y: 0}
+          mirrorHitEffectByDirection: 1
+          hitEffectLifetime: 0.15
+          enableHitStop: 1
+          useAttackTypeDefaultHitStop: 1
+          hitStopDuration: 0.035
+          enableCameraFeedback: 0
+          cameraPower: 0.35
+          enableHitSound: 0
+          hitSound: {fileID: 0}
+          hitSoundVolume: 1
+          notifyPlayerReaction: 1
+        startup: 0.08
+        activeTime: 0.08
+        recovery: 0.16
+        comboWindowStart: 0.1
+        comboWindowEnd: 0.28
+        damageMultiplier: 1.1
+        knockbackMultiplier: 1
+        lockMovement: 1
+        bodyState: 0
+        bodyStateStart: 0
+        bodyStateEnd: 0
+      moveId: legacy-move-0-1
+      damageMultiplier: 1
+      knockbackMultiplier: 1
+      poiseMultiplier: 1
+      animationSpeed: 1
+      overrideAttackType: 0
+      attackType: 0
+      overrideTargetReaction: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      enableCharge: 0
+      chargeAnimation: {fileID: 0}
+      minimumChargeTime: 0.18
+      maximumChargeTime: 0.7
+      fullChargeDamageMultiplier: 1.5
+      fullChargeKnockbackMultiplier: 1.35
+      autoReleaseAtFullCharge: 1
+    - id: legacy-instance-0-2
+      name: Combo C
+      move:
+        name: Combo C
+        moveCategory: 1
+        comboCategory: 1
+        input: 0
+        animationClip: {fileID: 7400000, guid: 05db0a10e588a1941af9be8d74518c2b, type: 2}
+        animationState: 17
+        animationFrameRate: 12
+        animationFrameCount: 6
+        mirrorHitboxByFacing: 1
+        hitboxKeys:
+        - frame: 0
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        - frame: 1
+          enabled: 1
+          offset: {x: 1.5400658, y: 0.51790035}
+          size: {x: 1.5313034, y: 1.0220172}
+          interpolation: 1
+        - frame: 4
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        attackType: 0
+        enableTargetReaction: 1
+        targetReaction: 1
+        useCustomKnockback: 0
+        customKnockback: {x: 4, y: 1}
+        interruptPower: 1
+        poiseDamage: 1
+        breaksSuperArmor: 0
+        hitFeedback:
+          enableHitEffect: 0
+          hitEffectPrefab: {fileID: 0}
+          hitEffectOffset: {x: 0, y: 0}
+          mirrorHitEffectByDirection: 1
+          hitEffectLifetime: 0.15
+          enableHitStop: 1
+          useAttackTypeDefaultHitStop: 1
+          hitStopDuration: 0.035
+          enableCameraFeedback: 0
+          cameraPower: 0.35
+          enableHitSound: 0
+          hitSound: {fileID: 0}
+          hitSoundVolume: 1
+          notifyPlayerReaction: 1
+        startup: 0.08
+        activeTime: 0.08
+        recovery: 0.16
+        comboWindowStart: 0.1
+        comboWindowEnd: 0.28
+        damageMultiplier: 1.2
+        knockbackMultiplier: 1
+        lockMovement: 1
+        bodyState: 0
+        bodyStateStart: 0
+        bodyStateEnd: 0
+      moveId: legacy-move-0-2
+      damageMultiplier: 1
+      knockbackMultiplier: 1
+      poiseMultiplier: 1
+      animationSpeed: 1
+      overrideAttackType: 0
+      attackType: 0
+      overrideTargetReaction: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      enableCharge: 0
+      chargeAnimation: {fileID: 0}
+      minimumChargeTime: 0.18
+      maximumChargeTime: 0.7
+      fullChargeDamageMultiplier: 1.5
+      fullChargeKnockbackMultiplier: 1.35
+      autoReleaseAtFullCharge: 1
+    - id: legacy-instance-0-3
+      name: Combo D
+      move:
+        name: Combo D
+        moveCategory: 1
+        comboCategory: 2
+        input: 0
+        animationClip: {fileID: 7400000, guid: fbe4f8e8a1ea96343a9bcded7cdd48f3, type: 2}
+        animationState: 18
+        animationFrameRate: 12
+        animationFrameCount: 8
+        mirrorHitboxByFacing: 1
+        hitboxKeys:
+        - frame: 0
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        - frame: 1
+          enabled: 1
+          offset: {x: 0.86, y: 0.06}
+          size: {x: 1.25, y: 0.95}
+          interpolation: 1
+        - frame: 4
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        attackType: 1
+        enableTargetReaction: 1
+        targetReaction: 3
+        useCustomKnockback: 1
+        customKnockback: {x: 6, y: 3.4}
+        interruptPower: 1
+        poiseDamage: 1
+        breaksSuperArmor: 0
+        hitFeedback:
+          enableHitEffect: 0
+          hitEffectPrefab: {fileID: 0}
+          hitEffectOffset: {x: 0, y: 0}
+          mirrorHitEffectByDirection: 1
+          hitEffectLifetime: 0.15
+          enableHitStop: 1
+          useAttackTypeDefaultHitStop: 1
+          hitStopDuration: 0.035
+          enableCameraFeedback: 0
+          cameraPower: 0.35
+          enableHitSound: 0
+          hitSound: {fileID: 0}
+          hitSoundVolume: 1
+          notifyPlayerReaction: 1
+        startup: 0.08
+        activeTime: 0.08
+        recovery: 0.16
+        comboWindowStart: 0.1
+        comboWindowEnd: 0.28
+        damageMultiplier: 1.35
+        knockbackMultiplier: 1
+        lockMovement: 1
+        bodyState: 0
+        bodyStateStart: 0
+        bodyStateEnd: 0
+      moveId: legacy-move-0-3
+      damageMultiplier: 1
+      knockbackMultiplier: 1
+      poiseMultiplier: 1
+      animationSpeed: 1
+      overrideAttackType: 0
+      attackType: 0
+      overrideTargetReaction: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      enableCharge: 0
+      chargeAnimation: {fileID: 0}
+      minimumChargeTime: 0.18
+      maximumChargeTime: 0.7
+      fullChargeDamageMultiplier: 1.5
+      fullChargeKnockbackMultiplier: 1.35
+      autoReleaseAtFullCharge: 1
+    transitions:
+    - id: legacy-link-0-0
+      fromInstanceId: legacy-instance-0-0
+      toInstanceId: legacy-instance-0-1
+      input: 0
+      condition: 0
+      windowStart: 0.1
+      windowEnd: 0.28
+      holdThreshold: 0.15
+    - id: legacy-link-0-1
+      fromInstanceId: legacy-instance-0-1
+      toInstanceId: legacy-instance-0-2
+      input: 0
+      condition: 0
+      windowStart: 0.1
+      windowEnd: 0.28
+      holdThreshold: 0.15
+    - id: legacy-link-0-2
+      fromInstanceId: legacy-instance-0-2
+      toInstanceId: legacy-instance-0-3
+      input: 0
+      condition: 0
+      windowStart: 0.1
+      windowEnd: 0.28
+      holdThreshold: 0.15
+  - name: "\u62F3\u51FB\u4E09\u8FDE"
+    weaponType: 0
+    entryInput: 0
+    entryInstanceId: legacy-instance-1-0
+    instances:
+    - id: legacy-instance-1-0
+      name: "\u76F4\u62F3\u8D77\u624B"
+      move:
+        name: "\u76F4\u62F3\u8D77\u624B"
+        moveCategory: 2
+        comboCategory: 0
+        input: 0
+        animationClip: {fileID: 7400000, guid: b7bc9fd93b409664f9de91ab9e4f8257, type: 2}
+        animationState: 19
+        animationFrameRate: 16
+        animationFrameCount: 7
+        mirrorHitboxByFacing: 1
+        hitboxKeys:
+        - frame: 0
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        - frame: 1
+          enabled: 1
+          offset: {x: 0.52, y: 0.8916312}
+          size: {x: 0.7199998, y: 0.6675694}
+          interpolation: 1
+        - frame: 2
+          enabled: 1
+          offset: {x: 0.9656594, y: 0.8916312}
+          size: {x: 0.7199998, y: 0.6675694}
+          interpolation: 0
+        - frame: 3
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        attackType: 0
+        enableTargetReaction: 1
+        targetReaction: 1
+        useCustomKnockback: 0
+        customKnockback: {x: 4, y: 1}
+        interruptPower: 1
+        poiseDamage: 1
+        breaksSuperArmor: 0
+        hitFeedback:
+          enableHitEffect: 0
+          hitEffectPrefab: {fileID: 0}
+          hitEffectOffset: {x: 0, y: 0}
+          mirrorHitEffectByDirection: 1
+          hitEffectLifetime: 0.15
+          enableHitStop: 1
+          useAttackTypeDefaultHitStop: 1
+          hitStopDuration: 0.035
+          enableCameraFeedback: 0
+          cameraPower: 0.35
+          enableHitSound: 0
+          hitSound: {fileID: 0}
+          hitSoundVolume: 1
+          notifyPlayerReaction: 1
+        startup: 0.05
+        activeTime: 0.08
+        recovery: 0.12
+        comboWindowStart: 0.1
+        comboWindowEnd: 0.28
+        damageMultiplier: 0.9
+        knockbackMultiplier: 0.75
+        lockMovement: 1
+        bodyState: 0
+        bodyStateStart: 0
+        bodyStateEnd: 0
+      moveId: legacy-move-1-0
+      damageMultiplier: 1
+      knockbackMultiplier: 1
+      poiseMultiplier: 1
+      animationSpeed: 1
+      overrideAttackType: 0
+      attackType: 0
+      overrideTargetReaction: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      enableCharge: 0
+      chargeAnimation: {fileID: 0}
+      minimumChargeTime: 0.18
+      maximumChargeTime: 0.7
+      fullChargeDamageMultiplier: 1.5
+      fullChargeKnockbackMultiplier: 1.35
+      autoReleaseAtFullCharge: 1
+    - id: legacy-instance-1-1
+      name: "\u6446\u62F3\u8854\u63A5"
+      move:
+        name: "\u6446\u62F3\u8854\u63A5"
+        moveCategory: 2
+        comboCategory: 1
+        input: 0
+        animationClip: {fileID: 7400000, guid: 85670856356c2e04a8c0a4a52c546fc3, type: 2}
+        animationState: 20
+        animationFrameRate: 16
+        animationFrameCount: 5
+        mirrorHitboxByFacing: 1
+        hitboxKeys:
+        - frame: 0
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        - frame: 1
+          enabled: 1
+          offset: {x: 0.66854143, y: 0.84670067}
+          size: {x: 0.82, y: 0.58}
+          interpolation: 1
+        - frame: 3
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        attackType: 0
+        enableTargetReaction: 1
+        targetReaction: 1
+        useCustomKnockback: 0
+        customKnockback: {x: 4, y: 1}
+        interruptPower: 1
+        poiseDamage: 1
+        breaksSuperArmor: 0
+        hitFeedback:
+          enableHitEffect: 0
+          hitEffectPrefab: {fileID: 0}
+          hitEffectOffset: {x: 0, y: 0}
+          mirrorHitEffectByDirection: 1
+          hitEffectLifetime: 0.15
+          enableHitStop: 1
+          useAttackTypeDefaultHitStop: 1
+          hitStopDuration: 0.035
+          enableCameraFeedback: 0
+          cameraPower: 0.35
+          enableHitSound: 0
+          hitSound: {fileID: 0}
+          hitSoundVolume: 1
+          notifyPlayerReaction: 1
+        startup: 0.06
+        activeTime: 0.08
+        recovery: 0.11
+        comboWindowStart: 0.1
+        comboWindowEnd: 0.28
+        damageMultiplier: 1
+        knockbackMultiplier: 0.9
+        lockMovement: 1
+        bodyState: 0
+        bodyStateStart: 0
+        bodyStateEnd: 0
+      moveId: legacy-move-1-1
+      damageMultiplier: 1
+      knockbackMultiplier: 1
+      poiseMultiplier: 1
+      animationSpeed: 1
+      overrideAttackType: 0
+      attackType: 0
+      overrideTargetReaction: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      enableCharge: 0
+      chargeAnimation: {fileID: 0}
+      minimumChargeTime: 0.18
+      maximumChargeTime: 0.7
+      fullChargeDamageMultiplier: 1.5
+      fullChargeKnockbackMultiplier: 1.35
+      autoReleaseAtFullCharge: 1
+    - id: legacy-instance-1-2
+      name: "\u84C4\u529B\u91CD\u51FB\u7EC8\u7ED3"
+      move:
+        name: "\u91CD\u62F3\u7EC8\u7ED3"
+        moveCategory: 2
+        comboCategory: 2
+        input: 0
+        animationClip: {fileID: 7400000, guid: c597c06a9e9196347857e43072f14058, type: 2}
+        animationState: 21
+        animationFrameRate: 16
+        animationFrameCount: 8
+        mirrorHitboxByFacing: 1
+        hitboxKeys:
+        - frame: 0
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        - frame: 2
+          enabled: 1
+          offset: {x: 0.8436464, y: 0.8775339}
+          size: {x: 1.380903, y: 1.1653467}
+          interpolation: 1
+        - frame: 4
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        attackType: 1
+        enableTargetReaction: 1
+        targetReaction: 3
+        useCustomKnockback: 1
+        customKnockback: {x: 5.5, y: 3.2}
+        interruptPower: 1
+        poiseDamage: 1
+        breaksSuperArmor: 0
+        hitFeedback:
+          enableHitEffect: 0
+          hitEffectPrefab: {fileID: 0}
+          hitEffectOffset: {x: 0, y: 0}
+          mirrorHitEffectByDirection: 1
+          hitEffectLifetime: 0.15
+          enableHitStop: 1
+          useAttackTypeDefaultHitStop: 1
+          hitStopDuration: 0.035
+          enableCameraFeedback: 1
+          cameraPower: 0.35
+          enableHitSound: 0
+          hitSound: {fileID: 0}
+          hitSoundVolume: 1
+          notifyPlayerReaction: 1
+        startup: 0.08
+        activeTime: 0.1
+        recovery: 0.18
+        comboWindowStart: 0.1
+        comboWindowEnd: 0.28
+        damageMultiplier: 1.3
+        knockbackMultiplier: 1.35
+        lockMovement: 1
+        bodyState: 0
+        bodyStateStart: 0
+        bodyStateEnd: 0
+      moveId: legacy-move-1-2
+      damageMultiplier: 1
+      knockbackMultiplier: 1
+      poiseMultiplier: 1
+      animationSpeed: 1
+      overrideAttackType: 0
+      attackType: 1
+      overrideTargetReaction: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      enableCharge: 1
+      chargeAnimation: {fileID: 0}
+      minimumChargeTime: 0.15
+      maximumChargeTime: 0.7
+      fullChargeDamageMultiplier: 1.5
+      fullChargeKnockbackMultiplier: 1.35
+      autoReleaseAtFullCharge: 1
+    - id: legacy-quick-finisher-Unarmed
+      name: "\u5FEB\u901F\u7EC8\u7ED3"
+      move:
+        name: "\u91CD\u62F3\u7EC8\u7ED3"
+        moveCategory: 2
+        comboCategory: 2
+        input: 0
+        animationClip: {fileID: 7400000, guid: c597c06a9e9196347857e43072f14058, type: 2}
+        animationState: 21
+        animationFrameRate: 16
+        animationFrameCount: 8
+        mirrorHitboxByFacing: 1
+        hitboxKeys:
+        - frame: 0
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        - frame: 2
+          enabled: 1
+          offset: {x: 0.8436464, y: 0.8775339}
+          size: {x: 1.380903, y: 1.1653467}
+          interpolation: 1
+        - frame: 4
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        attackType: 0
+        enableTargetReaction: 1
+        targetReaction: 1
+        useCustomKnockback: 0
+        customKnockback: {x: 4, y: 1}
+        interruptPower: 1
+        poiseDamage: 1
+        breaksSuperArmor: 0
+        hitFeedback:
+          enableHitEffect: 0
+          hitEffectPrefab: {fileID: 0}
+          hitEffectOffset: {x: 0, y: 0}
+          mirrorHitEffectByDirection: 1
+          hitEffectLifetime: 0.15
+          enableHitStop: 1
+          useAttackTypeDefaultHitStop: 1
+          hitStopDuration: 0.035
+          enableCameraFeedback: 1
+          cameraPower: 0.35
+          enableHitSound: 0
+          hitSound: {fileID: 0}
+          hitSoundVolume: 1
+          notifyPlayerReaction: 1
+        startup: 0.08
+        activeTime: 0.1
+        recovery: 0.18
+        comboWindowStart: 0.1
+        comboWindowEnd: 0.28
+        damageMultiplier: 1.04
+        knockbackMultiplier: 0.945
+        lockMovement: 1
+        bodyState: 0
+        bodyStateStart: 0
+        bodyStateEnd: 0
+      moveId: legacy-move-1-2
+      damageMultiplier: 1
+      knockbackMultiplier: 1
+      poiseMultiplier: 1
+      animationSpeed: 1
+      overrideAttackType: 0
+      attackType: 0
+      overrideTargetReaction: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      enableCharge: 0
+      chargeAnimation: {fileID: 0}
+      minimumChargeTime: 0.18
+      maximumChargeTime: 0.7
+      fullChargeDamageMultiplier: 1.5
+      fullChargeKnockbackMultiplier: 1.35
+      autoReleaseAtFullCharge: 1
+    transitions:
+    - id: legacy-link-1-0
+      fromInstanceId: legacy-instance-1-0
+      toInstanceId: legacy-instance-1-1
+      input: 0
+      condition: 0
+      windowStart: 0.1
+      windowEnd: 0.22
+      holdThreshold: 0.15
+    - id: legacy-link-1-1
+      fromInstanceId: legacy-instance-1-1
+      toInstanceId: legacy-instance-1-2
+      input: 0
+      condition: 2
+      windowStart: 0.1
+      windowEnd: 0.22
+      holdThreshold: 0.15
+    - id: legacy-tap-finisher-link-Unarmed
+      fromInstanceId: legacy-instance-1-1
+      toInstanceId: legacy-quick-finisher-Unarmed
+      input: 0
+      condition: 1
+      windowStart: 0.1
+      windowEnd: 0.22
+      holdThreshold: 0.15
+  moveComboSchemaVersion: 4
 --- !u!114 &5090720824673183153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1157,7 +2106,7 @@ MonoBehaviour:
   - name: "\u9884\u7559"
     weaponType: 3
     available: 1
-  activeSlotIndex: 0
+  activeSlotIndex: 1
 --- !u!114 &246818073585722775
 MonoBehaviour:
   m_ObjectHideFlags: 0

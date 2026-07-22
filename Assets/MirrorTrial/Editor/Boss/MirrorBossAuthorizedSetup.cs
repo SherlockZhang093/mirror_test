@@ -24,7 +24,8 @@ namespace MirrorTrial.EditorTools
             SessionState.SetBool(SessionKey, true);
             SetPlayerHealthToFive();
             SetBossDamageToOne();
-            MirrorBossBuilder.BuildBossPrefab();
+            // Disabled: rebuilding the prefab changes component file IDs and breaks scene references.
+            // MirrorBossBuilder.BuildBossPrefab();
         }
 
         static void SetPlayerHealthToFive()

@@ -16,8 +16,6 @@ namespace MirrorTrial.Editor
         private const string ForegroundPath = "Assets/MirrorTrial/Art/Background2D/foreground_frame_v1.png";
         private const string FogPath = "Assets/MirrorTrial/Art/Background2D/procedural_fog_v1.png";
         private const string RootName = "Generated2DBackground";
-
-        [MenuItem("Mirror Trial/Environment/Install Generated 2D Background")]
         private static void Install()
         {
             CreateFogTexture();

@@ -1,5 +1,6 @@
 using System.Collections;
 using MirrorTrial.Enemies;
+using MirrorTrial.Boss;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -26,6 +27,9 @@ namespace MirrorTrial.Level
         void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             if (!scene.name.ToLowerInvariant().Contains("mirror")) return;
+            // Boss battle areas own their intro camera and activation callback.
+            // Starting a second global shot would cancel that callback and leave the fight locked.
+            if (FindObjectOfType<MirrorBossBattleAreaV3>()) return;
             transitionInput = FindObjectOfType<MirrorTrial.Player.PlayerInputReader>();
             if (transitionInput) transitionInput.InputEnabled = false;
             var encounter = FindObjectOfType<CombatEncounter>();

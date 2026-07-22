@@ -17,8 +17,6 @@ namespace MirrorTrial.Editor
         {
             EditorApplication.delayCall += TryAutomaticInstall;
         }
-
-        [MenuItem("Mirror Trial/Environment/Install Structural Supports")]
         public static void InstallFromMenu()
         {
             Install(true);

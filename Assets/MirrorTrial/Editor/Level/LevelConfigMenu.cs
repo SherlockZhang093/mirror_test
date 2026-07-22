@@ -1,6 +1,7 @@
+using System.IO;
+using System.Text.RegularExpressions;
 using MirrorTrial.Level;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace MirrorTrial.Editor.Level
@@ -26,19 +27,27 @@ namespace MirrorTrial.Editor.Level
                 EditorUtility.DisplayDialog("生成场景", "请在 Project 窗口选中一个 LevelConfig 资产后再执行。", "确定");
                 return;
             }
-            LevelConfigImporter.GenerateScene(config);
+            var scenePath = string.Format("{0}/{1}.unity", SceneFolder, config.levelId);
+            var overwrite = !AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath) ||
+                EditorUtility.DisplayDialog(
+                    "确认覆盖场景",
+                    "场景已经存在：\n" + scenePath + "\n\n只有确认后才会覆盖。",
+                    "确认覆盖",
+                    "取消");
+            if (overwrite)
+                LevelConfigImporter.GenerateScene(config, scenePath, true);
         }
 
         [MenuItem("Tools/镜像试炼/关卡/新建现实关卡")]
         public static void NewRealityLevel()
         {
-            LevelNamePromptWindow.Show(false);
+            CreateNextLevel(false);
         }
 
         [MenuItem("Tools/镜像试炼/关卡/新建镜中关卡")]
         public static void NewMirrorLevel()
         {
-            LevelNamePromptWindow.Show(true);
+            CreateNextLevel(true);
         }
 
         [MenuItem("Tools/镜像试炼/关卡/批量生成所有配置场景")]
@@ -64,16 +73,21 @@ namespace MirrorTrial.Editor.Level
             Debug.Log("[镜像试炼] 批量生成完成：" + n + " 个场景");
         }
 
-        static bool CreateNewLevel(bool mirror, string levelId, out string error)
+        static void CreateNextLevel(bool mirror)
         {
-            error = ValidateLevelId(levelId);
-            if (!string.IsNullOrEmpty(error))
-                return false;
+            var prefix = mirror ? "Level_Mirror_" : "Level_Reality_";
+            var nextNumber = FindNextLevelNumber(prefix);
+            var levelId = prefix + nextNumber.ToString("00");
 
-            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            var configPath = string.Format("{0}/{1}.asset", ConfigFolder, levelId);
+            var scenePath = string.Format("{0}/{1}.unity", SceneFolder, levelId);
+            if (AssetDatabase.LoadAssetAtPath<Object>(configPath) || AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath))
             {
-                error = "已取消创建；当前场景没有被替换。";
-                return false;
+                EditorUtility.DisplayDialog(
+                    "无法新建关卡",
+                    "自动编号得到的关卡名已经存在：" + levelId + "\n请检查关卡配置和场景文件。",
+                    "确定");
+                return;
             }
 
             if (!AssetDatabase.IsValidFolder(ConfigFolder))
@@ -81,80 +95,58 @@ namespace MirrorTrial.Editor.Level
 
             var config = ScriptableObject.CreateInstance<LevelConfig>();
             config.levelId = levelId;
-            config.displayName = levelId;
+            config.displayName = mirror ? "镜中关卡 " + nextNumber : "现实关卡 " + nextNumber;
             config.isMirrorLevel = mirror;
             if (!mirror)
                 config.playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
 
-            var path = string.Format("{0}/{1}.asset", ConfigFolder, config.levelId);
-            AssetDatabase.CreateAsset(config, path);
+            AssetDatabase.CreateAsset(config, configPath);
             EditorUtility.SetDirty(config);
             AssetDatabase.SaveAssets();
 
-            LevelConfigImporter.GenerateScene(config);
+            LevelConfigImporter.GenerateScene(config, scenePath);
             EditorGUIUtility.PingObject(config);
-            return true;
         }
 
-        static string ValidateLevelId(string levelId)
+        static int FindNextLevelNumber(string prefix)
         {
-            if (string.IsNullOrWhiteSpace(levelId))
-                return "请输入关卡名。";
+            var maxNumber = 0;
+            var pattern = "^" + Regex.Escape(prefix) + "(\\d+)$";
 
-            levelId = levelId.Trim();
-            if (levelId.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) >= 0 || levelId.Contains("/") || levelId.Contains("\\"))
-                return "关卡名包含文件名不支持的字符。";
-
-            var configPath = string.Format("{0}/{1}.asset", ConfigFolder, levelId);
-            var scenePath = string.Format("{0}/{1}.unity", SceneFolder, levelId);
-            if (AssetDatabase.LoadAssetAtPath<Object>(configPath) || AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath))
-                return "已经存在同名关卡配置或场景，请换一个名字。";
-
-            return string.Empty;
-        }
-
-        sealed class LevelNamePromptWindow : EditorWindow
-        {
-            bool mirror;
-            string levelId = string.Empty;
-            string validationMessage = string.Empty;
-
-            public static void Show(bool mirror)
+            if (AssetDatabase.IsValidFolder(ConfigFolder))
             {
-                var window = CreateInstance<LevelNamePromptWindow>();
-                window.mirror = mirror;
-                window.titleContent = new GUIContent(mirror ? "新建镜中关卡" : "新建现实关卡");
-                window.minSize = new Vector2(420f, 165f);
-                window.maxSize = window.minSize;
-                window.ShowModalUtility();
-            }
-
-            void OnGUI()
-            {
-                EditorGUILayout.Space(12f);
-                EditorGUILayout.LabelField(mirror ? "请输入新的镜中关卡名" : "请输入新的现实关卡名", EditorStyles.boldLabel);
-                EditorGUILayout.HelpBox("必须输入唯一名称；不会自动命名，也不会覆盖已有配置或场景。", MessageType.Info);
-
-                GUI.SetNextControlName("LevelIdField");
-                levelId = EditorGUILayout.TextField("关卡名", levelId);
-                if (Event.current.type == EventType.Repaint)
-                    EditorGUI.FocusTextInControl("LevelIdField");
-
-                if (!string.IsNullOrEmpty(validationMessage))
-                    EditorGUILayout.HelpBox(validationMessage, MessageType.Error);
-
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.FlexibleSpace();
-                if (GUILayout.Button("取消", GUILayout.Width(90f)))
-                    Close();
-                if (GUILayout.Button("创建", GUILayout.Width(90f)))
+                var configGuids = AssetDatabase.FindAssets("t:LevelConfig", new[] { ConfigFolder });
+                foreach (var guid in configGuids)
                 {
-                    var trimmedId = levelId.Trim();
-                    if (CreateNewLevel(mirror, trimmedId, out validationMessage))
-                        Close();
+                    var path = AssetDatabase.GUIDToAssetPath(guid);
+                    var config = AssetDatabase.LoadAssetAtPath<LevelConfig>(path);
+                    if (config)
+                        UpdateMaxNumber(config.levelId, pattern, ref maxNumber);
+                    UpdateMaxNumber(Path.GetFileNameWithoutExtension(path), pattern, ref maxNumber);
                 }
-                EditorGUILayout.EndHorizontal();
             }
+
+            if (AssetDatabase.IsValidFolder(SceneFolder))
+            {
+                var sceneGuids = AssetDatabase.FindAssets("t:Scene", new[] { SceneFolder });
+                foreach (var guid in sceneGuids)
+                {
+                    var path = AssetDatabase.GUIDToAssetPath(guid);
+                    UpdateMaxNumber(Path.GetFileNameWithoutExtension(path), pattern, ref maxNumber);
+                }
+            }
+
+            return maxNumber + 1;
+        }
+
+        static void UpdateMaxNumber(string candidate, string pattern, ref int maxNumber)
+        {
+            if (string.IsNullOrEmpty(candidate))
+                return;
+
+            var match = Regex.Match(candidate, pattern, RegexOptions.IgnoreCase);
+            if (match.Success && int.TryParse(match.Groups[1].Value, out var number) && number > maxNumber)
+                maxNumber = number;
         }
     }
 }

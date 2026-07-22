@@ -36,6 +36,10 @@ MonoBehaviour:
     hitboxSize: {x: 1.3, y: 0.9}
     knockback: {x: 5, y: 2}
     hitStop: 0.06
+    interruptPower: 1
+    poiseDamage: 1
+    playerHitReaction: 1
+    breaksSuperArmor: 0
     advanceSpeed: 0
     advanceDuration: 0
   doubleSecond:
@@ -49,6 +53,10 @@ MonoBehaviour:
     hitboxSize: {x: 1.3, y: 0.9}
     knockback: {x: 5, y: 2}
     hitStop: 0.06
+    interruptPower: 1
+    poiseDamage: 1
+    playerHitReaction: 1
+    breaksSuperArmor: 0
     advanceSpeed: 0
     advanceDuration: 0
   tripleFirst:
@@ -62,6 +70,10 @@ MonoBehaviour:
     hitboxSize: {x: 1.3, y: 0.9}
     knockback: {x: 5, y: 2}
     hitStop: 0.06
+    interruptPower: 1
+    poiseDamage: 1
+    playerHitReaction: 1
+    breaksSuperArmor: 0
     advanceSpeed: 0
     advanceDuration: 0
   tripleSecond:
@@ -75,6 +87,10 @@ MonoBehaviour:
     hitboxSize: {x: 1.3, y: 0.9}
     knockback: {x: 5, y: 2}
     hitStop: 0.06
+    interruptPower: 1
+    poiseDamage: 1
+    playerHitReaction: 1
+    breaksSuperArmor: 0
     advanceSpeed: 0
     advanceDuration: 0
   tripleFinisher:
@@ -88,6 +104,10 @@ MonoBehaviour:
     hitboxSize: {x: 1.7, y: 0.75}
     knockback: {x: 5, y: 2}
     hitStop: 0.06
+    interruptPower: 2
+    poiseDamage: 2
+    playerHitReaction: 2
+    breaksSuperArmor: 0
     advanceSpeed: 0
     advanceDuration: 0
   heavySlash:
@@ -101,6 +121,10 @@ MonoBehaviour:
     hitboxSize: {x: 1.55, y: 1.15}
     knockback: {x: 7, y: 3}
     hitStop: 0.1
+    interruptPower: 3
+    poiseDamage: 4
+    playerHitReaction: 4
+    breaksSuperArmor: 1
     advanceSpeed: 0
     advanceDuration: 0
   pursuitSlash:
@@ -114,5 +138,9 @@ MonoBehaviour:
     hitboxSize: {x: 1.4, y: 0.85}
     knockback: {x: 5, y: 2}
     hitStop: 0.06
+    interruptPower: 1
+    poiseDamage: 1
+    playerHitReaction: 1
+    breaksSuperArmor: 0
     advanceSpeed: 7
     advanceDuration: 0.28

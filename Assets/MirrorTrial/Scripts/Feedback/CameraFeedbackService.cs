@@ -8,8 +8,12 @@ namespace MirrorTrial.Feedback
     {
         public static void RequestHit(DamagePayload payload)
         {
-            var power = EstimatePower(payload);
-            CameraDirector.Ensure().PlayHitFeedback(payload.direction, power);
+            RequestHit(payload.direction, EstimatePower(payload));
+        }
+
+        public static void RequestHit(Vector2 direction, float power)
+        {
+            CameraDirector.Ensure().PlayHitFeedback(direction, Mathf.Clamp01(power));
         }
 
         static float EstimatePower(DamagePayload payload)

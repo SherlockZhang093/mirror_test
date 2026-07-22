@@ -102,7 +102,10 @@ namespace MirrorTrial.Player
                 animator = GetComponentInChildren<Animator>(true);
 
             if (animator)
+            {
+                animator.enabled = true;
                 animator.applyRootMotion = false;
+            }
 
             stateMachine = GetComponent<PlayerStateMachine>();
             tuning = GetComponent<PlayerTuning>();

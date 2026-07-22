@@ -17,8 +17,6 @@ namespace MirrorTrial.Boss.Editor
         {
             EditorApplication.delayCall += InstallOnce;
         }
-
-        [MenuItem("Mirror Trial/Boss/NodeCanvas/重新生成中文 Boss FSM")]
         public static void RebuildFromMenu()
         {
             BuildOrUpdate(true);

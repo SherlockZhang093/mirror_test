@@ -16,8 +16,6 @@ namespace MirrorTrial.EditorTools
         const string PlayerPrefabPath = "Assets/MirrorTrial/Prefabs/Characters/Player_MirrorTrial.prefab";
         const string ProfilePath = "Assets/MirrorTrial/Boss/MirrorBossProfile.asset";
         const string BossPrefabPath = "Assets/MirrorTrial/Prefabs/Boss/MirrorBoss.prefab";
-
-        [MenuItem("Mirror Trial/Boss/1. 生成或更新镜像 Boss 预制体")]
         public static void BuildBossPrefab()
         {
             EnsureFolder("Assets/MirrorTrial/Boss");
@@ -58,8 +56,6 @@ namespace MirrorTrial.EditorTools
             Selection.activeObject = AssetDatabase.LoadAssetAtPath<GameObject>(BossPrefabPath);
             Debug.Log("镜像 Boss 预制体已生成：" + BossPrefabPath);
         }
-
-        [MenuItem("Mirror Trial/Boss/2. 在当前关卡创建 Boss 战斗区域")]
         public static void CreateBattleArea()
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(BossPrefabPath);

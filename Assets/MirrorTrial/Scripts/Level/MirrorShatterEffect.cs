@@ -188,7 +188,7 @@ namespace MirrorTrial.Level
             var elapsed = 0f;
             if (hitStopDuration > 0f)
             {
-                timeScaleBeforeHitStop = Time.timeScale;
+                timeScaleBeforeHitStop = Time.timeScale > 0f ? Time.timeScale : 1f;
                 ownsHitStop = true;
                 Time.timeScale = 0f;
             }

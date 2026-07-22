@@ -13,8 +13,6 @@ namespace MirrorTrial.Editor
         private const string MaterialFolder = "Assets/MirrorTrial/Art/Materials";
         private const string MaterialPath = MaterialFolder + "/MAT_HunyuanFloatingTemple_Background.mat";
         private const string SceneObjectName = "Background_FloatingTemple_Hunyuan";
-
-        [MenuItem("Mirror Trial/Environment/Place Hunyuan Floating Temple")]
         private static void PlaceFloatingTemple()
         {
             ConfigureStaticModelImport();

@@ -15,12 +15,28 @@ namespace MirrorTrial.Editor.Level
         const string DefaultPlayerPrefabPath = "Assets/MirrorTrial/Prefabs/Characters/Player_MirrorTrial.prefab";
         const string MirrorGatePrefabPath = "Assets/MirrorTrial/Prefabs/Level/MirrorGate.prefab";
 
-        public static void GenerateScene(LevelConfig config, string scenePath = null)
+        public static void GenerateScene(LevelConfig config, string scenePath = null, bool overwriteExisting = false)
         {
             if (!config) { Debug.LogError("[Mirror Trial] LevelConfig is null; scene generation cancelled."); return; }
 
             if (string.IsNullOrEmpty(scenePath))
                 scenePath = string.Format("{0}/{1}.unity", SceneFolder, config.levelId);
+
+            if (!overwriteExisting && AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath))
+            {
+                Debug.LogError("[Mirror Trial] Scene generation cancelled because the target already exists: " + scenePath);
+                EditorUtility.DisplayDialog(
+                    "禁止覆盖场景",
+                    "目标场景已经存在，生成操作已取消：\n" + scenePath + "\n\n请使用新的关卡名，或通过“从配置生成场景”明确确认覆盖。",
+                    "确定");
+                return;
+            }
+
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            {
+                Debug.Log("[Mirror Trial] Scene generation cancelled by the user before switching scenes.");
+                return;
+            }
 
             Scene scene;
             if (!AssetDatabase.IsValidFolder(SceneFolder))
@@ -124,11 +140,6 @@ namespace MirrorTrial.Editor.Level
                 var col = go.AddComponent<BoxCollider2D>();
                 col.size = g.size;
                 col.isTrigger = false;
-                var sr = go.AddComponent<SpriteRenderer>();
-                sr.color = g.color;
-                sr.sortingOrder = 0;
-                if (g.isPlatform && g.platformVisualIndex > 0)
-                    LevelPlatformVisualUtility.ApplyPlatformVisual(go, g.platformVisualIndex);
             }
         }
 

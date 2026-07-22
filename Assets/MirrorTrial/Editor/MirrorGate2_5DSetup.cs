@@ -21,8 +21,6 @@ namespace MirrorTrial.Editor
             EditorApplication.delayCall += TryAutomaticInstall;
             PrefabStage.prefabStageClosing += OnPrefabStageClosing;
         }
-
-        [MenuItem("Mirror Trial/Environment/Install 2.5D Mirror Gate")]
         public static void InstallFromMenu()
         {
             Install(true);

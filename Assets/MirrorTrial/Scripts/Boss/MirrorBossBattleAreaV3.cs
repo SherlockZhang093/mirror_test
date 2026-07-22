@@ -1,4 +1,4 @@
-﻿using MirrorTrial.Level;
+using MirrorTrial.Level;
 using MirrorTrial.Player;
 using UnityEngine;
 
@@ -22,11 +22,31 @@ namespace MirrorTrial.Boss
             if (encounter) encounter.enabled = false;
         }
 
+        void Start()
+        {
+            // The persistent player is repositioned into this area during scene loading.
+            // That does not reliably produce an OnTriggerEnter2D callback, so start the
+            // mirror fight directly when the player already exists in the scene.
+            var player = FindObjectOfType<PlayerInputReader>();
+            if (player) BeginFight(player);
+        }
+
         void OnTriggerEnter2D(Collider2D other)
         {
-            if (started) return;
             var player = other.GetComponentInParent<PlayerInputReader>();
-            if (!player) return;
+            if (player) BeginFight(player);
+        }
+
+        void BeginFight(PlayerInputReader player)
+        {
+            if (started) return;
+            if (!bossPrefab)
+            {
+                Debug.LogError("[MirrorBossBattleAreaV3] Missing MirrorBossActorV2 prefab reference.", this);
+                player.InputEnabled = true;
+                return;
+            }
+
             started = true;
             var point = spawnPoint ? spawnPoint.transform : transform;
             var boss = Instantiate(bossPrefab, point.position, point.rotation, transform);

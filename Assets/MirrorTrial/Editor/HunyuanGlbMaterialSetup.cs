@@ -1,4 +1,4 @@
-﻿using UnityEditor;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -11,8 +11,6 @@ namespace MirrorTrial.Editor
         private const string Root = "Assets/MirrorTrial/Art/HunyuanFloatingTemple/Textures/";
         private const string MaterialPath = "Assets/MirrorTrial/Art/Materials/MAT_HunyuanFloatingTemple_GLB.mat";
         private const string ObjectName = "Background_FloatingTemple_Hunyuan";
-
-        [MenuItem("Mirror Trial/Environment/Apply Hunyuan GLB Material")]
         private static void Apply()
         {
             ConfigureTexture(Root + "HunyuanTemple_BaseColor.png", false, true);

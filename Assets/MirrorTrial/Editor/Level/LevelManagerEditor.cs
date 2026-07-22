@@ -39,7 +39,6 @@ namespace MirrorTrial.Editor.Level
 
         GeometryKind geometryKind = GeometryKind.Platform;
         Vector2 geometrySize = new Vector2(4f, 1f);
-        int geometryPlatformSpriteIndex = 1;
         GameObject enemyPrefab;
         bool enemySnapToGround = true;
         float enemySnapOffsetY = 1f;
@@ -91,8 +90,6 @@ namespace MirrorTrial.Editor.Level
                     break;
                 case EditorTab.Geometry:
                     DrawGeometryTools();
-                    EditorGUILayout.Space(12);
-                    DrawPlatformArtTools();
                     break;
                 case EditorTab.Gameplay:
                     DrawAddButtons();
@@ -174,10 +171,7 @@ namespace MirrorTrial.Editor.Level
             geometryKind = (GeometryKind)EditorGUILayout.Popup("地形类型", (int)geometryKind, new[] { "平台", "边界", "实体块" });
             geometrySize = EditorGUILayout.Vector2Field("默认尺寸", geometrySize);
 
-            if (geometryKind == GeometryKind.Platform)
-            {
-                geometryPlatformSpriteIndex = EditorGUILayout.IntSlider("平台贴图", geometryPlatformSpriteIndex, 1, LevelPlatformVisualUtility.PlatformSpriteCount);
-            }
+            EditorGUILayout.HelpBox("这里只创建不可见的 BoxCollider2D。平台美术请在独立美术层中摆放。", MessageType.Info);
 
             DrawGeometryPreview();
 
@@ -209,15 +203,9 @@ namespace MirrorTrial.Editor.Level
             col.size = geometrySize;
             col.isTrigger = false;
 
-            var sr = go.AddComponent<SpriteRenderer>();
-            sr.color = GetGeometryColor(kind);
-            sr.sortingOrder = 0;
-
-            if (kind == GeometryKind.Platform)
-                LevelPlatformVisualUtility.ApplyPlatformVisual(go, geometryPlatformSpriteIndex);
             ApplyGroundLayerRecursive(go);
 
-            Selection.activeObject = manager;
+            Selection.activeGameObject = go;
             EditorUtility.SetDirty(manager);
             EditorSceneManager.MarkSceneDirty(go.scene);
         }
@@ -234,19 +222,7 @@ namespace MirrorTrial.Editor.Level
             var size = safeSize * scale;
             var shapeRect = new Rect(previewRect.center.x - size.x * 0.5f, previewRect.center.y - size.y * 0.5f, size.x, size.y);
 
-            if (geometryKind == GeometryKind.Platform)
-            {
-                var sprite = LevelPlatformVisualUtility.GetPlatformSprite(geometryPlatformSpriteIndex);
-                var texture = sprite ? AssetPreview.GetAssetPreview(sprite) ?? AssetPreview.GetMiniThumbnail(sprite) : null;
-                if (texture)
-                    GUI.DrawTexture(shapeRect, texture, ScaleMode.ScaleToFit, true);
-                else
-                    EditorGUI.DrawRect(shapeRect, new Color(0.3f, 0.45f, 0.65f, 0.9f));
-            }
-            else
-            {
-                EditorGUI.DrawRect(shapeRect, GetGeometryColor(geometryKind));
-            }
+            EditorGUI.DrawRect(shapeRect, new Color(0.32f, 0.24f, 0.52f, 0.22f));
 
             Handles.BeginGUI();
             Handles.color = new Color(1f, 1f, 1f, 0.7f);

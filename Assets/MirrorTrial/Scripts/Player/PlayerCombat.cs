@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using MirrorTrial.Combat;
@@ -55,6 +55,16 @@ namespace MirrorTrial.Player
         public int animationFrameCount = 8;
         public bool mirrorHitboxByFacing = true;
         public List<PlayerAttackHitboxKey> hitboxKeys = new List<PlayerAttackHitboxKey>();
+        public SkillAttackType attackType = SkillAttackType.Normal;
+        public bool enableTargetReaction = true;
+        public HitReactionType targetReaction = HitReactionType.LightHurt;
+        public bool useCustomKnockback;
+        public Vector2 customKnockback = new Vector2(4f, 1f);
+        [Min(0)] public int interruptPower = 1;
+        [Min(0f)] public float poiseDamage = 1f;
+        public bool breaksSuperArmor;
+        public SkillHitFeedbackSettings hitFeedback = new SkillHitFeedbackSettings();
+
         public float startup = 0.08f;
         public float activeTime = 0.08f;
         public float recovery = 0.16f;
@@ -76,19 +86,37 @@ namespace MirrorTrial.Player
         public List<PlayerComboStep> steps = new List<PlayerComboStep>();
     }
 
+
+    [Serializable]
+    public sealed class PlayerAttackReactionSettings
+    {
+        public bool enabled = true;
+        [Min(0f)] public float normalRecoilSpeed = 0.35f;
+        [Min(0f)] public float normalRecoilDuration = 0.025f;
+        [Min(0f)] public float heavyRecoilSpeed = 1.1f;
+        [Min(0f)] public float heavyRecoilDuration = 0.055f;
+
+        public void Resolve(SkillAttackType attackType, out float speed, out float duration)
+        {
+            speed = attackType == SkillAttackType.Heavy ? heavyRecoilSpeed : normalRecoilSpeed;
+            duration = attackType == SkillAttackType.Heavy ? heavyRecoilDuration : normalRecoilDuration;
+        }
+    }
     [RequireComponent(typeof(PlayerInputReader), typeof(PlayerTuning), typeof(PlayerMotor))]
     [RequireComponent(typeof(PlayerAnimationDriver))]
-    public class PlayerCombat : MonoBehaviour, IInterruptiblePlayerAction
+    public partial class PlayerCombat : MonoBehaviour, IInterruptiblePlayerAction
     {
         [SerializeField] Hitbox attackHitbox;
         [SerializeField] List<PlayerComboSet> comboSets = new List<PlayerComboSet>();
         [SerializeField] int activeComboSetIndex;
         [SerializeField, HideInInspector] bool punchComboCreated;
         [SerializeField, HideInInspector] List<PlayerComboStep> combo = CreateDefaultCombo();
+        [SerializeField, HideInInspector] int hitFeedbackSchemaVersion;
         [SerializeField] AnimationClip swordGuardClip;
         [SerializeField] AnimationClip swordGuardImpactClip;
         [SerializeField] PlayerComboStep swordRunAttack = CreateSwordRunAttack();
         [SerializeField] PlayerComboStep swordCrouchAttack = CreateSwordCrouchAttack();
+        [SerializeField] PlayerAttackReactionSettings attackReaction = new PlayerAttackReactionSettings();
 
         PlayerInputReader input;
         PlayerTuning tuning;
@@ -125,11 +153,13 @@ namespace MirrorTrial.Player
         void OnValidate()
         {
             EnsureCombo();
+            EnsureMoveComboData();
         }
 
         public void EnsureComboData()
         {
             EnsureCombo();
+            EnsureMoveComboData();
         }
 
         void Awake()
@@ -141,6 +171,7 @@ namespace MirrorTrial.Player
             weapons = GetComponent<PlayerWeaponController>();
             bodyStateController = GetComponent<PlayerBodyStateController>();
             EnsureCombo();
+            EnsureMoveComboData();
 
             if (attackHitbox)
                 attackHitbox.SetActive(false);
@@ -164,6 +195,21 @@ namespace MirrorTrial.Player
             }
 
             var activeCombo = ActiveCombo;
+            if (HasGraphForWeapon(weapon))
+            {
+                if (weapon == PlayerWeaponType.Sword && input.WasPressed(PlayerInputCommand.PrimaryAttack) && attackRoutine == null)
+                {
+                    if (input.MoveY < -0.5f)
+                        attackRoutine = StartCoroutine(SingleStepRoutine(swordCrouchAttack));
+                    else if (Mathf.Abs(input.MoveX) > 0.1f)
+                        attackRoutine = StartCoroutine(SingleStepRoutine(swordRunAttack));
+                    else
+                        UpdateGraphCombat(weapon);
+                }
+                else
+                    UpdateGraphCombat(weapon);
+                return;
+            }
             if (activeCombo.Count == 0)
                 return;
             if (weapon == PlayerWeaponType.Sword && input.WasPressed(PlayerInputCommand.PrimaryAttack) && attackRoutine == null)
@@ -313,10 +359,37 @@ namespace MirrorTrial.Player
             ApplyHitboxShape(attackHitbox, key.offset, key.size, step.mirrorHitboxByFacing, direction);
 
             var damage = Mathf.RoundToInt(combat.attackDamage * Mathf.Max(0f, step.damageMultiplier));
-            var knockback = combat.attackKnockback * Mathf.Max(0f, step.knockbackMultiplier);
-            attackHitbox.Configure(new DamagePayload(gameObject, damage, knockback, direction, combat.hitStop));
+            var reaction = step.enableTargetReaction ? step.targetReaction : HitReactionType.None;
+            var knockback = Vector2.zero;
+            if (step.enableTargetReaction)
+            {
+                knockback = step.useCustomKnockback
+                    ? step.customKnockback
+                    : combat.attackKnockback * Mathf.Max(0f, step.knockbackMultiplier);
+                knockback.x = Mathf.Abs(knockback.x) * direction.x;
+            }
+
+            var feedback = step.hitFeedback != null
+                ? step.hitFeedback.BuildRequest(step.attackType)
+                : default(HitFeedbackRequest);
+            attackHitbox.Configure(new DamagePayload(gameObject, damage, knockback, direction,
+                feedback.requestHitStop ? feedback.hitStopDuration : 0f,
+                step.enableTargetReaction ? step.interruptPower : 0,
+                step.enableTargetReaction ? step.poiseDamage : 0f,
+                reaction, step.enableTargetReaction && step.breaksSuperArmor,
+                step.attackType, feedback));
             activeHitbox = attackHitbox;
             activeHitbox.SetActive(true);
+        }
+
+        void OnAttackHitConfirmed(DamagePayload payload)
+        {
+            if (!motor || payload.source != gameObject || attackReaction == null || !attackReaction.enabled)
+                return;
+            float speed;
+            float duration;
+            attackReaction.Resolve(payload.attackType, out speed, out duration);
+            motor.ApplyForcedVelocity(-payload.direction * speed, duration);
         }
 
         void UpdateBodyState(PlayerComboStep step, float elapsed)
@@ -476,10 +549,35 @@ namespace MirrorTrial.Player
                 if (set.steps == null)
                     set.steps = new List<PlayerComboStep>();
                 for (var i = 0; i < set.steps.Count; i++)
+                {
                     EnsureHitboxKeys(set.steps[i]);
+                    if (set.steps[i].hitFeedback == null)
+                        set.steps[i].hitFeedback = new SkillHitFeedbackSettings();
+                }
             }
+            MigrateHitFeedbackDefaults();
         }
 
+        void MigrateHitFeedbackDefaults()
+        {
+            if (hitFeedbackSchemaVersion >= 1) return;
+            foreach (var set in comboSets)
+            {
+                if (set == null || set.steps == null) continue;
+                foreach (var step in set.steps)
+                {
+                    if (step == null || step.comboCategory != PlayerComboCategory.Finisher) continue;
+                    step.attackType = SkillAttackType.Heavy;
+                    step.enableTargetReaction = true;
+                    step.targetReaction = HitReactionType.Launch;
+                    step.useCustomKnockback = true;
+                    step.customKnockback = set.weaponType == PlayerWeaponType.Unarmed
+                        ? new Vector2(5.5f, 3.2f)
+                        : new Vector2(6f, 3.4f);
+                }
+            }
+            hitFeedbackSchemaVersion = 1;
+        }
         static void EnsureHitboxKeys(PlayerComboStep step)
         {
             if (step.hitboxKeys == null)
@@ -580,6 +678,10 @@ namespace MirrorTrial.Player
                         name = "\u91cd\u62f3\u7ec8\u7ed3",
                         moveCategory = PlayerMoveCategory.Punch,
                         comboCategory = PlayerComboCategory.Finisher,
+                        attackType = SkillAttackType.Heavy,
+                        targetReaction = HitReactionType.Launch,
+                        useCustomKnockback = true,
+                        customKnockback = new Vector2(5.5f, 3.2f),
                         input = PlayerInputCommand.PrimaryAttack,
                         animationState = PlayerActionState.PunchC,
                         startup = 0.08f, activeTime = 0.1f, recovery = 0.18f,
@@ -603,7 +705,7 @@ namespace MirrorTrial.Player
                 new PlayerComboStep { name = "Combo A", moveCategory = PlayerMoveCategory.Sword, comboCategory = PlayerComboCategory.Opener, animationState = PlayerActionState.ComboAttackA, hitboxKeys = new List<PlayerAttackHitboxKey> { new PlayerAttackHitboxKey { frame = 0, enabled = false }, new PlayerAttackHitboxKey { frame = 1, enabled = true, offset = new Vector2(0.65f, 0f), size = new Vector2(1f, 0.8f), interpolation = AttackHitboxInterpolation.Linear }, new PlayerAttackHitboxKey { frame = 4, enabled = false } } },
                 new PlayerComboStep { name = "Combo B", moveCategory = PlayerMoveCategory.Sword, comboCategory = PlayerComboCategory.Chain, animationState = PlayerActionState.ComboAttackB, hitboxKeys = new List<PlayerAttackHitboxKey> { new PlayerAttackHitboxKey { frame = 0, enabled = false }, new PlayerAttackHitboxKey { frame = 1, enabled = true, offset = new Vector2(0.72f, 0f), size = new Vector2(1.1f, 0.85f), interpolation = AttackHitboxInterpolation.Linear }, new PlayerAttackHitboxKey { frame = 4, enabled = false } }, damageMultiplier = 1.1f },
                 new PlayerComboStep { name = "Combo C", moveCategory = PlayerMoveCategory.Sword, comboCategory = PlayerComboCategory.Chain, animationState = PlayerActionState.ComboAttackC, hitboxKeys = new List<PlayerAttackHitboxKey> { new PlayerAttackHitboxKey { frame = 0, enabled = false }, new PlayerAttackHitboxKey { frame = 1, enabled = true, offset = new Vector2(0.78f, 0.04f), size = new Vector2(1.15f, 0.9f), interpolation = AttackHitboxInterpolation.Linear }, new PlayerAttackHitboxKey { frame = 4, enabled = false } }, damageMultiplier = 1.2f },
-                new PlayerComboStep { name = "Combo D", moveCategory = PlayerMoveCategory.Sword, comboCategory = PlayerComboCategory.Finisher, animationState = PlayerActionState.ComboAttackD, hitboxKeys = new List<PlayerAttackHitboxKey> { new PlayerAttackHitboxKey { frame = 0, enabled = false }, new PlayerAttackHitboxKey { frame = 1, enabled = true, offset = new Vector2(0.86f, 0.06f), size = new Vector2(1.25f, 0.95f), interpolation = AttackHitboxInterpolation.Linear }, new PlayerAttackHitboxKey { frame = 4, enabled = false } }, damageMultiplier = 1.35f }
+                new PlayerComboStep { name = "Combo D", moveCategory = PlayerMoveCategory.Sword, comboCategory = PlayerComboCategory.Finisher, attackType = SkillAttackType.Heavy, targetReaction = HitReactionType.Launch, useCustomKnockback = true, customKnockback = new Vector2(6f, 3.4f), animationState = PlayerActionState.ComboAttackD, hitboxKeys = new List<PlayerAttackHitboxKey> { new PlayerAttackHitboxKey { frame = 0, enabled = false }, new PlayerAttackHitboxKey { frame = 1, enabled = true, offset = new Vector2(0.86f, 0.06f), size = new Vector2(1.25f, 0.95f), interpolation = AttackHitboxInterpolation.Linear }, new PlayerAttackHitboxKey { frame = 4, enabled = false } }, damageMultiplier = 1.35f }
             };
         }
     }
