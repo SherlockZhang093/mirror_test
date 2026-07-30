@@ -18,6 +18,16 @@ namespace MirrorTrial.Player
         [SerializeField] float hitFlashDuration = 0.08f;
         [SerializeField] int lowHealthThreshold = 1;
 
+        [Header("Health Reserve")]
+        [SerializeField] Image reserveFill;
+        [SerializeField] CanvasGroup reserveGroup;
+        [SerializeField] Text recoverKeyText;
+
+        [Header("Reserve Colors")]
+        [SerializeField] Color reserveReadyColor = new Color(0.16f, 0.95f, 0.86f, 1f);
+        [SerializeField] Color reserveEmptyColor = new Color(0.16f, 0.95f, 0.86f, 0.28f);
+        [SerializeField] Color reserveCastingColor = new Color(0.72f, 1f, 0.86f, 1f);
+
         int previousHealth = -1;
 
         public void SetHealth(int currentHP, int maxHP)
@@ -41,6 +51,31 @@ namespace MirrorTrial.Player
 
             if (wasInitialized && current < oldHealth)
                 PlayLostHealthFlash(current, oldHealth);
+        }
+
+        public void SetReserve(int current, int capacity, bool isCasting)
+        {
+            var normalized = capacity > 0
+                ? Mathf.Clamp01((float)current / capacity)
+                : 0f;
+
+            if (reserveFill)
+            {
+                reserveFill.fillAmount = normalized;
+                reserveFill.color = isCasting
+                    ? reserveCastingColor
+                    : current > 0 ? reserveReadyColor : reserveEmptyColor;
+            }
+
+            if (reserveGroup)
+                reserveGroup.alpha = current > 0 || isCasting ? 1f : 0.62f;
+
+            if (recoverKeyText)
+            {
+                recoverKeyText.color = isCasting
+                    ? reserveCastingColor
+                    : current > 0 ? reserveReadyColor : reserveEmptyColor;
+            }
         }
 
         void PlayLostHealthFlash(int current, int oldHealth)

@@ -8,14 +8,13 @@ using UnityEngine.SceneManagement;
 
 namespace MirrorTrial.EditorTools
 {
-    [InitializeOnLoad]
+    // Legacy migration only. Do not run automatically: it installs MirrorBossHudV2,
+    // whose RequireComponent adds the retired MirrorBossActor back to the V2 prefab.
     static class MirrorBossHotfixSetup
     {
         const string SessionKey = "MirrorTrial.MirrorBossHotfixSetup.v2";
         const string BossPrefabPath = "Assets/MirrorTrial/Prefabs/Boss/MirrorBoss.prefab";
         const string MirrorScenePath = "Assets/MirrorTrial/Scenes/Level_Mirror_01.unity";
-
-        static MirrorBossHotfixSetup() => EditorApplication.delayCall += Apply;
 
         static void Apply()
         {

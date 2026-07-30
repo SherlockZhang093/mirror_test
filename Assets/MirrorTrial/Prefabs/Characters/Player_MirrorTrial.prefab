@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 3931810769508925516}
   - component: {fileID: 5245713053005979062}
   - component: {fileID: 4388561565866199630}
-  - component: {fileID: 5385937002698116603}
   m_Layer: 0
   m_Name: AttackHitbox
   m_TagString: Untagged
@@ -92,19 +91,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitboxCollider: {fileID: 0}
---- !u!114 &5385937002698116603
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6139994494679877378}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33e8f9cdc5638a44da7021ed6f8c9510, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hitboxCollider: {fileID: 0}
 --- !u!1 &7000000000000000001
 GameObject:
   m_ObjectHideFlags: 0
@@ -178,7 +164,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 10
   m_Sprite: {fileID: 21300000, guid: 0ccd2b99e9b547b498330df9c7104170, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -238,6 +224,8 @@ GameObject:
   - component: {fileID: 8430092594526797721}
   - component: {fileID: 8492326114234726246}
   - component: {fileID: 8469499064547255756}
+  - component: {fileID: 89275410039288737}
+  - component: {fileID: 6472099761644701565}
   m_Layer: 0
   m_Name: Player_MirrorTrial
   m_TagString: Player
@@ -260,6 +248,7 @@ Transform:
   m_Children:
   - {fileID: 3931810769508925516}
   - {fileID: 7000000000000000002}
+  - {fileID: 8586523037403515996}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &1376214869525727879
@@ -486,7 +475,10 @@ MonoBehaviour:
   - command: 8
     buttonName: 
     key: 304
-  bindingSchemaVersion: 4
+  - command: 9
+    buttonName: 
+    key: 103
+  bindingSchemaVersion: 5
 --- !u!114 &3517131352704987190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -504,6 +496,7 @@ MonoBehaviour:
     acceleration: 30
     deceleration: 20
     airAcceleration: 30
+    airDeceleration: 3
     jumpSpeed: 7.5
     baseGravityModifier: 1
     fallGravityMultiplier: 1.15
@@ -553,7 +546,7 @@ MonoBehaviour:
     mirrorBladeKnockback: {x: 2.5, y: 0.5}
     mirrorBladeHitStop: 0.04
     echoDashUnlocked: 1
-    echoDashDistance: 5
+    echoDashDistance: 2
     echoDashDuration: 0.18
     echoDashInvincibleTime: 0.15
     echoDashCooldown: 3
@@ -779,7 +772,7 @@ MonoBehaviour:
       poiseDamage: 1
       breaksSuperArmor: 0
       hitFeedback:
-        enableHitEffect: 0
+        enableHitEffect: 1
         hitEffectPrefab: {fileID: 0}
         hitEffectOffset: {x: 0, y: 0}
         mirrorHitEffectByDirection: 1
@@ -838,7 +831,7 @@ MonoBehaviour:
       poiseDamage: 1
       breaksSuperArmor: 0
       hitFeedback:
-        enableHitEffect: 0
+        enableHitEffect: 1
         hitEffectPrefab: {fileID: 0}
         hitEffectOffset: {x: 0, y: 0}
         mirrorHitEffectByDirection: 1
@@ -897,7 +890,7 @@ MonoBehaviour:
       poiseDamage: 1
       breaksSuperArmor: 0
       hitFeedback:
-        enableHitEffect: 0
+        enableHitEffect: 1
         hitEffectPrefab: {fileID: 0}
         hitEffectOffset: {x: 0, y: 0}
         mirrorHitEffectByDirection: 1
@@ -956,7 +949,7 @@ MonoBehaviour:
       poiseDamage: 1
       breaksSuperArmor: 0
       hitFeedback:
-        enableHitEffect: 0
+        enableHitEffect: 1
         hitEffectPrefab: {fileID: 0}
         hitEffectOffset: {x: 0, y: 0}
         mirrorHitEffectByDirection: 1
@@ -1023,7 +1016,7 @@ MonoBehaviour:
       poiseDamage: 1
       breaksSuperArmor: 0
       hitFeedback:
-        enableHitEffect: 0
+        enableHitEffect: 1
         hitEffectPrefab: {fileID: 0}
         hitEffectOffset: {x: 0, y: 0}
         mirrorHitEffectByDirection: 1
@@ -1082,7 +1075,7 @@ MonoBehaviour:
       poiseDamage: 1
       breaksSuperArmor: 0
       hitFeedback:
-        enableHitEffect: 0
+        enableHitEffect: 1
         hitEffectPrefab: {fileID: 0}
         hitEffectOffset: {x: 0, y: 0}
         mirrorHitEffectByDirection: 1
@@ -1141,7 +1134,7 @@ MonoBehaviour:
       poiseDamage: 1
       breaksSuperArmor: 0
       hitFeedback:
-        enableHitEffect: 0
+        enableHitEffect: 1
         hitEffectPrefab: {fileID: 0}
         hitEffectOffset: {x: 0, y: 0}
         mirrorHitEffectByDirection: 1
@@ -1166,7 +1159,7 @@ MonoBehaviour:
       bodyState: 0
       bodyStateStart: 0
       bodyStateEnd: 0
-  activeComboSetIndex: 0
+  activeComboSetIndex: 1
   punchComboCreated: 1
   combo: []
   hitFeedbackSchemaVersion: 1
@@ -1208,7 +1201,7 @@ MonoBehaviour:
     poiseDamage: 1
     breaksSuperArmor: 0
     hitFeedback:
-      enableHitEffect: 0
+      enableHitEffect: 1
       hitEffectPrefab: {fileID: 0}
       hitEffectOffset: {x: 0, y: 0}
       mirrorHitEffectByDirection: 1
@@ -1268,7 +1261,7 @@ MonoBehaviour:
     poiseDamage: 1
     breaksSuperArmor: 0
     hitFeedback:
-      enableHitEffect: 0
+      enableHitEffect: 1
       hitEffectPrefab: {fileID: 0}
       hitEffectOffset: {x: 0, y: 0}
       mirrorHitEffectByDirection: 1
@@ -1348,7 +1341,7 @@ MonoBehaviour:
         poiseDamage: 1
         breaksSuperArmor: 0
         hitFeedback:
-          enableHitEffect: 0
+          enableHitEffect: 1
           hitEffectPrefab: {fileID: 0}
           hitEffectOffset: {x: 0, y: 0}
           mirrorHitEffectByDirection: 1
@@ -1373,6 +1366,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
+      graphPosition: {x: 79.00001, y: 73.33334}
       moveId: legacy-move-0-0
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -1386,9 +1380,65 @@ MonoBehaviour:
       useCustomKnockback: 0
       customKnockback: {x: 4, y: 1}
       enableCharge: 0
+      chargeHoldFrame: 1
+      chargeHoldNormalizedTime: 0.35
       chargeAnimation: {fileID: 0}
+      showChargeEffect: 1
+      chargeEffectPrefab: {fileID: 0}
+      chargeEffectOffset: {x: 0.65, y: 0.15}
+      chargeEffectScale: 0.75
+      chargeEffectRotationSpeed: 55
+      chargeEffectPulseSpeed: 18
+      chargeEffectPulseAmount: 0.12
+      chargeEffectStartScale: 0.9
+      chargeEffectFullScale: 1.8
+      chargeEffectStartAlpha: 0.55
+      chargeEffectFullAlpha: 1
+      chargeEffectParticleIntensity: 1
+      chargePresentation:
+        style: 0
+        coreStartColor: {r: 0.22, g: 0.58, b: 1, a: 0.55}
+        coreFullColor: {r: 0.82, g: 0.95, b: 1, a: 1}
+        bodyGlowColor: {r: 0.18, g: 0.62, b: 1, a: 0.42}
+        coreStartScale: 0.12
+        coreFullScale: 0.32
+        finalFlashStart: 0.9
+        pulseSpeed: 18
+        pulseAmount: 0.12
+        rotationSpeed: 0
+        particleIntensity: 1
+        particleRadius: 0.9
+        particleSpeed: 2.2
+        bodyGlowMaxAlpha: 0.32
+        bodyGlowScale: 1.035
+        readyChargeThreshold: 0.7
+        readyChargeCue: {fileID: 0}
+        swordOuterColor: {r: 0.2, g: 1, b: 0.45, a: 0.42}
+        swordCoreColor: {r: 0.82, g: 1, b: 0.86, a: 0.9}
+        swordAngle: 0
+        swordLength: 1.35
+        swordWidth: 0.12
+        swordJitterStart: 0.55
+        swordJitterAmount: 0.03125
+        leftFootOffset: {x: -0.3, y: 0.03}
+        rightFootOffset: {x: 0.3, y: 0.03}
+        dustIntensity: 1
+        punchFieldRadius: 1.35
+        punchCoreStartScale: 0.18
+        punchCoreReadyScale: 0.72
+        punchStreamIntensity: 1.25
+        punchAfterimageAlpha: 0.16
+        punchGroundPull: 1
+        chargingLoop: {fileID: 0}
+        fullChargeCue: {fileID: 0}
+        releaseCue: {fileID: 0}
+        feintCue: {fileID: 0}
+        interruptedCue: {fileID: 0}
+        audioVolume: 0.8
       minimumChargeTime: 0.18
       maximumChargeTime: 0.7
+      launchChargeThreshold: 0.65
+      insufficientLaunchReaction: 2
       fullChargeDamageMultiplier: 1.5
       fullChargeKnockbackMultiplier: 1.35
       autoReleaseAtFullCharge: 1
@@ -1429,7 +1479,7 @@ MonoBehaviour:
         poiseDamage: 1
         breaksSuperArmor: 0
         hitFeedback:
-          enableHitEffect: 0
+          enableHitEffect: 1
           hitEffectPrefab: {fileID: 0}
           hitEffectOffset: {x: 0, y: 0}
           mirrorHitEffectByDirection: 1
@@ -1454,6 +1504,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
+      graphPosition: {x: 417.33334, y: 69.33334}
       moveId: legacy-move-0-1
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -1467,9 +1518,65 @@ MonoBehaviour:
       useCustomKnockback: 0
       customKnockback: {x: 4, y: 1}
       enableCharge: 0
+      chargeHoldFrame: 1
+      chargeHoldNormalizedTime: 0.35
       chargeAnimation: {fileID: 0}
+      showChargeEffect: 1
+      chargeEffectPrefab: {fileID: 0}
+      chargeEffectOffset: {x: 0.65, y: 0.15}
+      chargeEffectScale: 0.75
+      chargeEffectRotationSpeed: 55
+      chargeEffectPulseSpeed: 18
+      chargeEffectPulseAmount: 0.12
+      chargeEffectStartScale: 0.9
+      chargeEffectFullScale: 1.8
+      chargeEffectStartAlpha: 0.55
+      chargeEffectFullAlpha: 1
+      chargeEffectParticleIntensity: 1
+      chargePresentation:
+        style: 0
+        coreStartColor: {r: 0.22, g: 0.58, b: 1, a: 0.55}
+        coreFullColor: {r: 0.82, g: 0.95, b: 1, a: 1}
+        bodyGlowColor: {r: 0.18, g: 0.62, b: 1, a: 0.42}
+        coreStartScale: 0.12
+        coreFullScale: 0.32
+        finalFlashStart: 0.9
+        pulseSpeed: 18
+        pulseAmount: 0.12
+        rotationSpeed: 0
+        particleIntensity: 1
+        particleRadius: 0.9
+        particleSpeed: 2.2
+        bodyGlowMaxAlpha: 0.32
+        bodyGlowScale: 1.035
+        readyChargeThreshold: 0.7
+        readyChargeCue: {fileID: 0}
+        swordOuterColor: {r: 0.2, g: 1, b: 0.45, a: 0.42}
+        swordCoreColor: {r: 0.82, g: 1, b: 0.86, a: 0.9}
+        swordAngle: 0
+        swordLength: 1.35
+        swordWidth: 0.12
+        swordJitterStart: 0.55
+        swordJitterAmount: 0.03125
+        leftFootOffset: {x: -0.3, y: 0.03}
+        rightFootOffset: {x: 0.3, y: 0.03}
+        dustIntensity: 1
+        punchFieldRadius: 1.35
+        punchCoreStartScale: 0.18
+        punchCoreReadyScale: 0.72
+        punchStreamIntensity: 1.25
+        punchAfterimageAlpha: 0.16
+        punchGroundPull: 1
+        chargingLoop: {fileID: 0}
+        fullChargeCue: {fileID: 0}
+        releaseCue: {fileID: 0}
+        feintCue: {fileID: 0}
+        interruptedCue: {fileID: 0}
+        audioVolume: 0.8
       minimumChargeTime: 0.18
       maximumChargeTime: 0.7
+      launchChargeThreshold: 0.65
+      insufficientLaunchReaction: 2
       fullChargeDamageMultiplier: 1.5
       fullChargeKnockbackMultiplier: 1.35
       autoReleaseAtFullCharge: 1
@@ -1510,7 +1617,7 @@ MonoBehaviour:
         poiseDamage: 1
         breaksSuperArmor: 0
         hitFeedback:
-          enableHitEffect: 0
+          enableHitEffect: 1
           hitEffectPrefab: {fileID: 0}
           hitEffectOffset: {x: 0, y: 0}
           mirrorHitEffectByDirection: 1
@@ -1535,6 +1642,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
+      graphPosition: {x: 811, y: 12}
       moveId: legacy-move-0-2
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -1548,9 +1656,65 @@ MonoBehaviour:
       useCustomKnockback: 0
       customKnockback: {x: 4, y: 1}
       enableCharge: 0
+      chargeHoldFrame: 1
+      chargeHoldNormalizedTime: 0.35
       chargeAnimation: {fileID: 0}
+      showChargeEffect: 1
+      chargeEffectPrefab: {fileID: 0}
+      chargeEffectOffset: {x: 0.65, y: 0.15}
+      chargeEffectScale: 0.75
+      chargeEffectRotationSpeed: 55
+      chargeEffectPulseSpeed: 18
+      chargeEffectPulseAmount: 0.12
+      chargeEffectStartScale: 0.9
+      chargeEffectFullScale: 1.8
+      chargeEffectStartAlpha: 0.55
+      chargeEffectFullAlpha: 1
+      chargeEffectParticleIntensity: 1
+      chargePresentation:
+        style: 0
+        coreStartColor: {r: 0.22, g: 0.58, b: 1, a: 0.55}
+        coreFullColor: {r: 0.82, g: 0.95, b: 1, a: 1}
+        bodyGlowColor: {r: 0.18, g: 0.62, b: 1, a: 0.42}
+        coreStartScale: 0.12
+        coreFullScale: 0.32
+        finalFlashStart: 0.9
+        pulseSpeed: 18
+        pulseAmount: 0.12
+        rotationSpeed: 0
+        particleIntensity: 1
+        particleRadius: 0.9
+        particleSpeed: 2.2
+        bodyGlowMaxAlpha: 0.32
+        bodyGlowScale: 1.035
+        readyChargeThreshold: 0.7
+        readyChargeCue: {fileID: 0}
+        swordOuterColor: {r: 0.2, g: 1, b: 0.45, a: 0.42}
+        swordCoreColor: {r: 0.82, g: 1, b: 0.86, a: 0.9}
+        swordAngle: 0
+        swordLength: 1.35
+        swordWidth: 0.12
+        swordJitterStart: 0.55
+        swordJitterAmount: 0.03125
+        leftFootOffset: {x: -0.3, y: 0.03}
+        rightFootOffset: {x: 0.3, y: 0.03}
+        dustIntensity: 1
+        punchFieldRadius: 1.35
+        punchCoreStartScale: 0.18
+        punchCoreReadyScale: 0.72
+        punchStreamIntensity: 1.25
+        punchAfterimageAlpha: 0.16
+        punchGroundPull: 1
+        chargingLoop: {fileID: 0}
+        fullChargeCue: {fileID: 0}
+        releaseCue: {fileID: 0}
+        feintCue: {fileID: 0}
+        interruptedCue: {fileID: 0}
+        audioVolume: 0.8
       minimumChargeTime: 0.18
       maximumChargeTime: 0.7
+      launchChargeThreshold: 0.65
+      insufficientLaunchReaction: 2
       fullChargeDamageMultiplier: 1.5
       fullChargeKnockbackMultiplier: 1.35
       autoReleaseAtFullCharge: 1
@@ -1591,7 +1755,7 @@ MonoBehaviour:
         poiseDamage: 1
         breaksSuperArmor: 0
         hitFeedback:
-          enableHitEffect: 0
+          enableHitEffect: 1
           hitEffectPrefab: {fileID: 0}
           hitEffectOffset: {x: 0, y: 0}
           mirrorHitEffectByDirection: 1
@@ -1616,6 +1780,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
+      graphPosition: {x: 986.66675, y: 209.33334}
       moveId: legacy-move-0-3
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -1628,13 +1793,70 @@ MonoBehaviour:
       targetReaction: 1
       useCustomKnockback: 0
       customKnockback: {x: 4, y: 1}
-      enableCharge: 0
+      enableCharge: 1
+      chargeHoldFrame: 1
+      chargeHoldNormalizedTime: 0.1582
       chargeAnimation: {fileID: 0}
-      minimumChargeTime: 0.18
-      maximumChargeTime: 0.7
-      fullChargeDamageMultiplier: 1.5
-      fullChargeKnockbackMultiplier: 1.35
-      autoReleaseAtFullCharge: 1
+      showChargeEffect: 1
+      chargeEffectPrefab: {fileID: 420001, guid: f76caac7ee5b4693a77578770f020618,
+        type: 3}
+      chargeEffectOffset: {x: -0.36, y: 0.66}
+      chargeEffectScale: 0.16
+      chargeEffectRotationSpeed: 0
+      chargeEffectPulseSpeed: 18
+      chargeEffectPulseAmount: 0.12
+      chargeEffectStartScale: 0.9
+      chargeEffectFullScale: 1.8
+      chargeEffectStartAlpha: 0.55
+      chargeEffectFullAlpha: 1
+      chargeEffectParticleIntensity: 1
+      chargePresentation:
+        style: 0
+        coreStartColor: {r: 0.22, g: 0.58, b: 1, a: 0.55}
+        coreFullColor: {r: 0.82, g: 0.95, b: 1, a: 1}
+        bodyGlowColor: {r: 0.18, g: 0.62, b: 1, a: 0.42}
+        coreStartScale: 0.12
+        coreFullScale: 0.32
+        finalFlashStart: 0.9
+        pulseSpeed: 18
+        pulseAmount: 0.12
+        rotationSpeed: 0
+        particleIntensity: 1
+        particleRadius: 0.9
+        particleSpeed: 2.2
+        bodyGlowMaxAlpha: 0.32
+        bodyGlowScale: 1.035
+        readyChargeThreshold: 0.7
+        readyChargeCue: {fileID: 0}
+        swordOuterColor: {r: 0.2, g: 1, b: 0.45, a: 0.42}
+        swordCoreColor: {r: 0.82, g: 1, b: 0.86, a: 0.9}
+        swordAngle: 0
+        swordLength: 1.35
+        swordWidth: 0.12
+        swordJitterStart: 0.55
+        swordJitterAmount: 0.03125
+        leftFootOffset: {x: -0.3, y: 0.03}
+        rightFootOffset: {x: 0.3, y: 0.03}
+        dustIntensity: 1
+        punchFieldRadius: 1.35
+        punchCoreStartScale: 0.18
+        punchCoreReadyScale: 0.72
+        punchStreamIntensity: 1.25
+        punchAfterimageAlpha: 0.16
+        punchGroundPull: 1
+        chargingLoop: {fileID: 0}
+        fullChargeCue: {fileID: 0}
+        releaseCue: {fileID: 0}
+        feintCue: {fileID: 0}
+        interruptedCue: {fileID: 0}
+        audioVolume: 0.8
+      minimumChargeTime: 0.28
+      maximumChargeTime: 1
+      launchChargeThreshold: 0.65
+      insufficientLaunchReaction: 2
+      fullChargeDamageMultiplier: 2
+      fullChargeKnockbackMultiplier: 1.6
+      autoReleaseAtFullCharge: 0
     transitions:
     - id: legacy-link-0-0
       fromInstanceId: legacy-instance-0-0
@@ -1642,24 +1864,27 @@ MonoBehaviour:
       input: 0
       condition: 0
       windowStart: 0.1
-      windowEnd: 0.28
+      windowEnd: 1
       holdThreshold: 0.15
+      requiresHit: 0
     - id: legacy-link-0-1
       fromInstanceId: legacy-instance-0-1
       toInstanceId: legacy-instance-0-2
       input: 0
-      condition: 0
-      windowStart: 0.1
-      windowEnd: 0.28
+      condition: 1
+      windowStart: 0
+      windowEnd: 0.7
       holdThreshold: 0.15
+      requiresHit: 0
     - id: legacy-link-0-2
-      fromInstanceId: legacy-instance-0-2
+      fromInstanceId: legacy-instance-0-1
       toInstanceId: legacy-instance-0-3
       input: 0
-      condition: 0
-      windowStart: 0.1
-      windowEnd: 0.28
-      holdThreshold: 0.15
+      condition: 2
+      windowStart: 0
+      windowEnd: 0.32
+      holdThreshold: 0.28
+      requiresHit: 1
   - name: "\u62F3\u51FB\u4E09\u8FDE"
     weaponType: 0
     entryInput: 0
@@ -1707,7 +1932,7 @@ MonoBehaviour:
         poiseDamage: 1
         breaksSuperArmor: 0
         hitFeedback:
-          enableHitEffect: 0
+          enableHitEffect: 1
           hitEffectPrefab: {fileID: 0}
           hitEffectOffset: {x: 0, y: 0}
           mirrorHitEffectByDirection: 1
@@ -1715,7 +1940,7 @@ MonoBehaviour:
           enableHitStop: 1
           useAttackTypeDefaultHitStop: 1
           hitStopDuration: 0.035
-          enableCameraFeedback: 0
+          enableCameraFeedback: 1
           cameraPower: 0.35
           enableHitSound: 0
           hitSound: {fileID: 0}
@@ -1723,7 +1948,7 @@ MonoBehaviour:
           notifyPlayerReaction: 1
         startup: 0.05
         activeTime: 0.08
-        recovery: 0.12
+        recovery: 0.32
         comboWindowStart: 0.1
         comboWindowEnd: 0.28
         damageMultiplier: 0.9
@@ -1732,6 +1957,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
+      graphPosition: {x: 35.66667, y: 80.5}
       moveId: legacy-move-1-0
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -1745,9 +1971,65 @@ MonoBehaviour:
       useCustomKnockback: 0
       customKnockback: {x: 4, y: 1}
       enableCharge: 0
+      chargeHoldFrame: 1
+      chargeHoldNormalizedTime: 0.35
       chargeAnimation: {fileID: 0}
+      showChargeEffect: 1
+      chargeEffectPrefab: {fileID: 0}
+      chargeEffectOffset: {x: 0.65, y: 0.15}
+      chargeEffectScale: 0.75
+      chargeEffectRotationSpeed: 55
+      chargeEffectPulseSpeed: 18
+      chargeEffectPulseAmount: 0.12
+      chargeEffectStartScale: 0.9
+      chargeEffectFullScale: 1.8
+      chargeEffectStartAlpha: 0.55
+      chargeEffectFullAlpha: 1
+      chargeEffectParticleIntensity: 1
+      chargePresentation:
+        style: 0
+        coreStartColor: {r: 0.22, g: 0.58, b: 1, a: 0.55}
+        coreFullColor: {r: 0.82, g: 0.95, b: 1, a: 1}
+        bodyGlowColor: {r: 0.18, g: 0.62, b: 1, a: 0.42}
+        coreStartScale: 0.12
+        coreFullScale: 0.32
+        finalFlashStart: 0.9
+        pulseSpeed: 18
+        pulseAmount: 0.12
+        rotationSpeed: 0
+        particleIntensity: 1
+        particleRadius: 0.9
+        particleSpeed: 2.2
+        bodyGlowMaxAlpha: 0.32
+        bodyGlowScale: 1.035
+        readyChargeThreshold: 0.7
+        readyChargeCue: {fileID: 0}
+        swordOuterColor: {r: 0.2, g: 1, b: 0.45, a: 0.42}
+        swordCoreColor: {r: 0.82, g: 1, b: 0.86, a: 0.9}
+        swordAngle: 0
+        swordLength: 1.35
+        swordWidth: 0.12
+        swordJitterStart: 0.55
+        swordJitterAmount: 0.03125
+        leftFootOffset: {x: -0.3, y: 0.03}
+        rightFootOffset: {x: 0.3, y: 0.03}
+        dustIntensity: 1
+        punchFieldRadius: 1.35
+        punchCoreStartScale: 0.18
+        punchCoreReadyScale: 0.72
+        punchStreamIntensity: 1.25
+        punchAfterimageAlpha: 0.16
+        punchGroundPull: 1
+        chargingLoop: {fileID: 0}
+        fullChargeCue: {fileID: 0}
+        releaseCue: {fileID: 0}
+        feintCue: {fileID: 0}
+        interruptedCue: {fileID: 0}
+        audioVolume: 0.8
       minimumChargeTime: 0.18
       maximumChargeTime: 0.7
+      launchChargeThreshold: 0.65
+      insufficientLaunchReaction: 2
       fullChargeDamageMultiplier: 1.5
       fullChargeKnockbackMultiplier: 1.35
       autoReleaseAtFullCharge: 1
@@ -1788,7 +2070,7 @@ MonoBehaviour:
         poiseDamage: 1
         breaksSuperArmor: 0
         hitFeedback:
-          enableHitEffect: 0
+          enableHitEffect: 1
           hitEffectPrefab: {fileID: 0}
           hitEffectOffset: {x: 0, y: 0}
           mirrorHitEffectByDirection: 1
@@ -1796,7 +2078,7 @@ MonoBehaviour:
           enableHitStop: 1
           useAttackTypeDefaultHitStop: 1
           hitStopDuration: 0.035
-          enableCameraFeedback: 0
+          enableCameraFeedback: 1
           cameraPower: 0.35
           enableHitSound: 0
           hitSound: {fileID: 0}
@@ -1804,7 +2086,7 @@ MonoBehaviour:
           notifyPlayerReaction: 1
         startup: 0.06
         activeTime: 0.08
-        recovery: 0.11
+        recovery: 0.32
         comboWindowStart: 0.1
         comboWindowEnd: 0.28
         damageMultiplier: 1
@@ -1813,6 +2095,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
+      graphPosition: {x: 336, y: 73.16666}
       moveId: legacy-move-1-1
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -1826,16 +2109,72 @@ MonoBehaviour:
       useCustomKnockback: 0
       customKnockback: {x: 4, y: 1}
       enableCharge: 0
+      chargeHoldFrame: 1
+      chargeHoldNormalizedTime: 0.35
       chargeAnimation: {fileID: 0}
+      showChargeEffect: 1
+      chargeEffectPrefab: {fileID: 0}
+      chargeEffectOffset: {x: 0.65, y: 0.15}
+      chargeEffectScale: 0.75
+      chargeEffectRotationSpeed: 55
+      chargeEffectPulseSpeed: 18
+      chargeEffectPulseAmount: 0.12
+      chargeEffectStartScale: 0.9
+      chargeEffectFullScale: 1.8
+      chargeEffectStartAlpha: 0.55
+      chargeEffectFullAlpha: 1
+      chargeEffectParticleIntensity: 1
+      chargePresentation:
+        style: 0
+        coreStartColor: {r: 0.22, g: 0.58, b: 1, a: 0.55}
+        coreFullColor: {r: 0.82, g: 0.95, b: 1, a: 1}
+        bodyGlowColor: {r: 0.18, g: 0.62, b: 1, a: 0.42}
+        coreStartScale: 0.12
+        coreFullScale: 0.32
+        finalFlashStart: 0.9
+        pulseSpeed: 18
+        pulseAmount: 0.12
+        rotationSpeed: 0
+        particleIntensity: 1
+        particleRadius: 0.9
+        particleSpeed: 2.2
+        bodyGlowMaxAlpha: 0.32
+        bodyGlowScale: 1.035
+        readyChargeThreshold: 0.7
+        readyChargeCue: {fileID: 0}
+        swordOuterColor: {r: 0.2, g: 1, b: 0.45, a: 0.42}
+        swordCoreColor: {r: 0.82, g: 1, b: 0.86, a: 0.9}
+        swordAngle: 0
+        swordLength: 1.35
+        swordWidth: 0.12
+        swordJitterStart: 0.55
+        swordJitterAmount: 0.03125
+        leftFootOffset: {x: -0.3, y: 0.03}
+        rightFootOffset: {x: 0.3, y: 0.03}
+        dustIntensity: 1
+        punchFieldRadius: 1.35
+        punchCoreStartScale: 0.18
+        punchCoreReadyScale: 0.72
+        punchStreamIntensity: 1.25
+        punchAfterimageAlpha: 0.16
+        punchGroundPull: 1
+        chargingLoop: {fileID: 0}
+        fullChargeCue: {fileID: 0}
+        releaseCue: {fileID: 0}
+        feintCue: {fileID: 0}
+        interruptedCue: {fileID: 0}
+        audioVolume: 0.8
       minimumChargeTime: 0.18
       maximumChargeTime: 0.7
+      launchChargeThreshold: 0.65
+      insufficientLaunchReaction: 2
       fullChargeDamageMultiplier: 1.5
       fullChargeKnockbackMultiplier: 1.35
       autoReleaseAtFullCharge: 1
     - id: legacy-instance-1-2
       name: "\u84C4\u529B\u91CD\u51FB\u7EC8\u7ED3"
       move:
-        name: "\u91CD\u62F3\u7EC8\u7ED3"
+        name: "\u84C4\u529B\u91CD\u51FB\u7EC8\u7ED3"
         moveCategory: 2
         comboCategory: 2
         input: 0
@@ -1864,21 +2203,21 @@ MonoBehaviour:
         enableTargetReaction: 1
         targetReaction: 3
         useCustomKnockback: 1
-        customKnockback: {x: 5.5, y: 3.2}
+        customKnockback: {x: 5.5, y: 7}
         interruptPower: 1
         poiseDamage: 1
         breaksSuperArmor: 0
         hitFeedback:
-          enableHitEffect: 0
+          enableHitEffect: 1
           hitEffectPrefab: {fileID: 0}
           hitEffectOffset: {x: 0, y: 0}
-          mirrorHitEffectByDirection: 1
+          mirrorHitEffectByDirection: 0
           hitEffectLifetime: 0.15
           enableHitStop: 1
           useAttackTypeDefaultHitStop: 1
           hitStopDuration: 0.035
           enableCameraFeedback: 1
-          cameraPower: 0.35
+          cameraPower: 1
           enableHitSound: 0
           hitSound: {fileID: 0}
           hitSoundVolume: 1
@@ -1894,6 +2233,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
+      graphPosition: {x: 739.6666, y: 31.666656}
       moveId: legacy-move-1-2
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -1907,16 +2247,73 @@ MonoBehaviour:
       useCustomKnockback: 0
       customKnockback: {x: 4, y: 1}
       enableCharge: 1
+      chargeHoldFrame: 1
+      chargeHoldNormalizedTime: 0.2178
       chargeAnimation: {fileID: 0}
-      minimumChargeTime: 0.15
-      maximumChargeTime: 0.7
-      fullChargeDamageMultiplier: 1.5
-      fullChargeKnockbackMultiplier: 1.35
-      autoReleaseAtFullCharge: 1
+      showChargeEffect: 1
+      chargeEffectPrefab: {fileID: 430001, guid: 59fe6a79392443e2b02567532bbf660f,
+        type: 3}
+      chargeEffectOffset: {x: -0.5, y: 1}
+      chargeEffectScale: 0.15
+      chargeEffectRotationSpeed: 54.29
+      chargeEffectPulseSpeed: 18
+      chargeEffectPulseAmount: 0.12
+      chargeEffectStartScale: 0.9
+      chargeEffectFullScale: 1.8
+      chargeEffectStartAlpha: 0.55
+      chargeEffectFullAlpha: 1
+      chargeEffectParticleIntensity: 1
+      chargePresentation:
+        style: 0
+        coreStartColor: {r: 0.22, g: 0.58, b: 1, a: 0.55}
+        coreFullColor: {r: 0.82, g: 0.95, b: 1, a: 1}
+        bodyGlowColor: {r: 0.18, g: 0.62, b: 1, a: 0.42}
+        coreStartScale: 0.12
+        coreFullScale: 0.32
+        finalFlashStart: 0.9
+        pulseSpeed: 18
+        pulseAmount: 0.12
+        rotationSpeed: 0
+        particleIntensity: 1
+        particleRadius: 0.9
+        particleSpeed: 2.2
+        bodyGlowMaxAlpha: 0.32
+        bodyGlowScale: 1.035
+        readyChargeThreshold: 0.7
+        readyChargeCue: {fileID: 0}
+        swordOuterColor: {r: 0.2, g: 1, b: 0.45, a: 0.42}
+        swordCoreColor: {r: 0.82, g: 1, b: 0.86, a: 0.9}
+        swordAngle: 0
+        swordLength: 1.35
+        swordWidth: 0.12
+        swordJitterStart: 0.55
+        swordJitterAmount: 0.03125
+        leftFootOffset: {x: -0.3, y: 0.03}
+        rightFootOffset: {x: 0.3, y: 0.03}
+        dustIntensity: 1
+        punchFieldRadius: 1.35
+        punchCoreStartScale: 0.18
+        punchCoreReadyScale: 0.72
+        punchStreamIntensity: 1.25
+        punchAfterimageAlpha: 0.16
+        punchGroundPull: 1
+        chargingLoop: {fileID: 0}
+        fullChargeCue: {fileID: 0}
+        releaseCue: {fileID: 0}
+        feintCue: {fileID: 0}
+        interruptedCue: {fileID: 0}
+        audioVolume: 0.8
+      minimumChargeTime: 0.28
+      maximumChargeTime: 1
+      launchChargeThreshold: 0.65
+      insufficientLaunchReaction: 2
+      fullChargeDamageMultiplier: 2
+      fullChargeKnockbackMultiplier: 1.6
+      autoReleaseAtFullCharge: 0
     - id: legacy-quick-finisher-Unarmed
       name: "\u5FEB\u901F\u7EC8\u7ED3"
       move:
-        name: "\u91CD\u62F3\u7EC8\u7ED3"
+        name: "\u5FEB\u901F\u7EC8\u7ED3"
         moveCategory: 2
         comboCategory: 2
         input: 0
@@ -1950,7 +2347,7 @@ MonoBehaviour:
         poiseDamage: 1
         breaksSuperArmor: 0
         hitFeedback:
-          enableHitEffect: 0
+          enableHitEffect: 1
           hitEffectPrefab: {fileID: 0}
           hitEffectOffset: {x: 0, y: 0}
           mirrorHitEffectByDirection: 1
@@ -1975,6 +2372,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
+      graphPosition: {x: 758.3334, y: 149.66666}
       moveId: legacy-move-1-2
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -1988,9 +2386,65 @@ MonoBehaviour:
       useCustomKnockback: 0
       customKnockback: {x: 4, y: 1}
       enableCharge: 0
+      chargeHoldFrame: 1
+      chargeHoldNormalizedTime: 0.35
       chargeAnimation: {fileID: 0}
+      showChargeEffect: 1
+      chargeEffectPrefab: {fileID: 0}
+      chargeEffectOffset: {x: 0.65, y: 0.15}
+      chargeEffectScale: 0.75
+      chargeEffectRotationSpeed: 55
+      chargeEffectPulseSpeed: 18
+      chargeEffectPulseAmount: 0.12
+      chargeEffectStartScale: 0.9
+      chargeEffectFullScale: 1.8
+      chargeEffectStartAlpha: 0.55
+      chargeEffectFullAlpha: 1
+      chargeEffectParticleIntensity: 1
+      chargePresentation:
+        style: 0
+        coreStartColor: {r: 0.22, g: 0.58, b: 1, a: 0.55}
+        coreFullColor: {r: 0.82, g: 0.95, b: 1, a: 1}
+        bodyGlowColor: {r: 0.18, g: 0.62, b: 1, a: 0.42}
+        coreStartScale: 0.12
+        coreFullScale: 0.32
+        finalFlashStart: 0.9
+        pulseSpeed: 18
+        pulseAmount: 0.12
+        rotationSpeed: 0
+        particleIntensity: 1
+        particleRadius: 0.9
+        particleSpeed: 2.2
+        bodyGlowMaxAlpha: 0.32
+        bodyGlowScale: 1.035
+        readyChargeThreshold: 0.7
+        readyChargeCue: {fileID: 0}
+        swordOuterColor: {r: 0.2, g: 1, b: 0.45, a: 0.42}
+        swordCoreColor: {r: 0.82, g: 1, b: 0.86, a: 0.9}
+        swordAngle: 0
+        swordLength: 1.35
+        swordWidth: 0.12
+        swordJitterStart: 0.55
+        swordJitterAmount: 0.03125
+        leftFootOffset: {x: -0.3, y: 0.03}
+        rightFootOffset: {x: 0.3, y: 0.03}
+        dustIntensity: 1
+        punchFieldRadius: 1.35
+        punchCoreStartScale: 0.18
+        punchCoreReadyScale: 0.72
+        punchStreamIntensity: 1.25
+        punchAfterimageAlpha: 0.16
+        punchGroundPull: 1
+        chargingLoop: {fileID: 0}
+        fullChargeCue: {fileID: 0}
+        releaseCue: {fileID: 0}
+        feintCue: {fileID: 0}
+        interruptedCue: {fileID: 0}
+        audioVolume: 0.8
       minimumChargeTime: 0.18
       maximumChargeTime: 0.7
+      launchChargeThreshold: 0.65
+      insufficientLaunchReaction: 2
       fullChargeDamageMultiplier: 1.5
       fullChargeKnockbackMultiplier: 1.35
       autoReleaseAtFullCharge: 1
@@ -2000,26 +2454,29 @@ MonoBehaviour:
       toInstanceId: legacy-instance-1-1
       input: 0
       condition: 0
-      windowStart: 0.1
-      windowEnd: 0.22
-      holdThreshold: 0.15
+      windowStart: 0
+      windowEnd: 0.45
+      holdThreshold: 0.28
+      requiresHit: 0
     - id: legacy-link-1-1
       fromInstanceId: legacy-instance-1-1
       toInstanceId: legacy-instance-1-2
       input: 0
       condition: 2
-      windowStart: 0.1
-      windowEnd: 0.22
-      holdThreshold: 0.15
+      windowStart: 0
+      windowEnd: 0.46
+      holdThreshold: 0.28
+      requiresHit: 1
     - id: legacy-tap-finisher-link-Unarmed
       fromInstanceId: legacy-instance-1-1
       toInstanceId: legacy-quick-finisher-Unarmed
       input: 0
       condition: 1
-      windowStart: 0.1
-      windowEnd: 0.22
-      holdThreshold: 0.15
-  moveComboSchemaVersion: 4
+      windowStart: 0
+      windowEnd: 0.46
+      holdThreshold: 0.28
+      requiresHit: 0
+  moveComboSchemaVersion: 6
 --- !u!114 &5090720824673183153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2106,7 +2563,7 @@ MonoBehaviour:
   - name: "\u9884\u7559"
     weaponType: 3
     available: 1
-  activeSlotIndex: 1
+  activeSlotIndex: 0
 --- !u!114 &246818073585722775
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2173,3 +2630,94 @@ MonoBehaviour:
   onPerfectDodge:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &89275410039288737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7253538297837963826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d04e699e3a1138f44a0fba6c85fb87a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  current: 0
+--- !u!114 &6472099761644701565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7253538297837963826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5b07034585d3ed46ab29082d87a8920, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  recoveryClip: {fileID: 0}
+  castDuration: 0.8
+  commitNormalizedTime: 0.65
+--- !u!1001 &8586523037403407614
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 4756217149488517540}
+    m_Modifications:
+    - target: {fileID: 420001, guid: f76caac7ee5b4693a77578770f020618, type: 3}
+      propertyPath: m_Name
+      value: GreenSwordChargeTelegraphVFX
+      objectReference: {fileID: 0}
+    - target: {fileID: 420002, guid: f76caac7ee5b4693a77578770f020618, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.36
+      objectReference: {fileID: 0}
+    - target: {fileID: 420002, guid: f76caac7ee5b4693a77578770f020618, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.66
+      objectReference: {fileID: 0}
+    - target: {fileID: 420002, guid: f76caac7ee5b4693a77578770f020618, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 420002, guid: f76caac7ee5b4693a77578770f020618, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 420002, guid: f76caac7ee5b4693a77578770f020618, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 420002, guid: f76caac7ee5b4693a77578770f020618, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 420002, guid: f76caac7ee5b4693a77578770f020618, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 420002, guid: f76caac7ee5b4693a77578770f020618, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 420002, guid: f76caac7ee5b4693a77578770f020618, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 420002, guid: f76caac7ee5b4693a77578770f020618, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f76caac7ee5b4693a77578770f020618, type: 3}
+--- !u!4 &8586523037403515996 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 420002, guid: f76caac7ee5b4693a77578770f020618,
+    type: 3}
+  m_PrefabInstance: {fileID: 8586523037403407614}
+  m_PrefabAsset: {fileID: 0}

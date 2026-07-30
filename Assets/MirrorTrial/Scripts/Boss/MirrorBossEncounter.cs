@@ -1,6 +1,8 @@
 ﻿using MirrorTrial.Level;
 using UnityEngine;
 
+using MirrorTrial.Feedback;
+
 namespace MirrorTrial.Boss
 {
     public sealed class MirrorBossEncounter : MonoBehaviour
@@ -17,17 +19,25 @@ namespace MirrorTrial.Boss
 
         void OnEnable()
         {
-            if (boss) boss.Defeated += OnBossDefeated;
+            if (!boss) return;
+            boss.Defeated += OnBossDefeated;
+            boss.PhaseChanged += OnBossPhaseChanged;
         }
 
         void OnDisable()
         {
-            if (boss) boss.Defeated -= OnBossDefeated;
+            if (boss)
+            {
+                boss.Defeated -= OnBossDefeated;
+                boss.PhaseChanged -= OnBossPhaseChanged;
+            }
+            ScreenFx.End(ScreenFxType.BossBattle, this);
         }
 
         public void BeginBossFight()
         {
             if (!boss) return;
+            ScreenFx.Begin(ScreenFxType.BossBattle, this);
             CameraDirector.Ensure().PlayBossIntro(boss.transform, () =>
             {
                 encounter?.StartEncounter();
@@ -35,8 +45,14 @@ namespace MirrorTrial.Boss
             });
         }
 
+        void OnBossPhaseChanged(MirrorBossController changedBoss, int phase)
+        {
+            ScreenFx.Play(ScreenFxType.BossPhasePulse, Mathf.Clamp01(0.65f + phase * 0.12f), source: this);
+        }
+
         void OnBossDefeated(MirrorBossController defeatedBoss)
         {
+            ScreenFx.End(ScreenFxType.BossBattle, this);
             Invoke(nameof(Clear), clearDelay);
         }
 

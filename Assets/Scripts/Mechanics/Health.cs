@@ -31,8 +31,19 @@ namespace Platformer.Mechanics
         /// </summary>
         public void Increment()
         {
-            currentHP = Mathf.Clamp(currentHP + 1, 0, maxHP);
+            Heal(1);
+        }
+
+        /// <summary>Restore up to <paramref name="amount"/> hit points and return the amount restored.</summary>
+        public int Heal(int amount)
+        {
+            if (amount <= 0 || currentHP <= 0 || currentHP >= maxHP)
+                return 0;
+
+            var previous = currentHP;
+            currentHP = Mathf.Clamp(currentHP + amount, 0, maxHP);
             Changed?.Invoke(currentHP, maxHP);
+            return currentHP - previous;
         }
 
         /// <summary>Restore this entity to full health (for example, after respawning).</summary>

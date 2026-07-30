@@ -81,6 +81,23 @@ namespace MirrorTrial.Boss.NodeCanvasIntegration
         }
     }
 
+    [Name("执行独立重斩")]
+    [Description("锁定开始时的朝向，播放可读蓄力和单次重斩；完成后进入重斩专属后摇。")]
+    public sealed class MirrorBossHeavySlashAction : ActionTask<MirrorBossActorV2>
+    {
+        protected override void OnExecute()
+        {
+            if (!agent.BTBeginHeavySlash()) EndAction(false);
+        }
+
+        protected override void OnUpdate()
+        {
+            if (agent.CurrentState == MirrorBossActorV2.State.Dead) return;
+            if (agent.CurrentState == MirrorBossActorV2.State.PhaseChange) { EndAction(false); return; }
+            if (agent.CurrentState == MirrorBossActorV2.State.Recovery) EndAction(true);
+        }
+    }
+
     [Name("攻击后硬直")]
     [Description("关闭攻击框并进入可反击窗口。三个阶段的随机时长都可以直接在 BT 节点里调整。")]
     public sealed class MirrorBossRecoveryAction : ActionTask<MirrorBossActorV2>
@@ -96,8 +113,13 @@ namespace MirrorTrial.Boss.NodeCanvasIntegration
         protected override void OnExecute()
         {
             agent.BTBeginRecovery();
-            var range = agent.Phase == 1 ? phaseOne : agent.Phase == 2 ? phaseTwo : phaseThree;
-            duration = Random.Range(Mathf.Min(range.x, range.y), Mathf.Max(range.x, range.y));
+            if (agent.LastAttackWasHeavySlash)
+                duration = Mathf.Max(0f, agent.HeavySlashRecovery);
+            else
+            {
+                var range = agent.Phase == 1 ? phaseOne : agent.Phase == 2 ? phaseTwo : phaseThree;
+                duration = Random.Range(Mathf.Min(range.x, range.y), Mathf.Max(range.x, range.y));
+            }
         }
 
         protected override void OnUpdate()

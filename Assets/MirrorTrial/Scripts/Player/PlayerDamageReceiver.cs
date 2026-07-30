@@ -34,6 +34,35 @@ namespace MirrorTrial.Player
 
         public bool IsInvincible => hurtInvincible || externalInvincibilityCount > 0;
         public event Action ExternalHitIgnored;
+        public static event Action PlayerRespawned;
+
+        public void KillAndRespawn()
+        {
+            if (respawnRoutine != null) return;
+
+            if (health && health.IsAlive)
+                health.Damage(health.CurrentHP);
+
+            BeginDeathAndRespawn();
+        }
+
+        void BeginDeathAndRespawn()
+        {
+            if (respawnRoutine != null) return;
+            if (hurtRoutine != null)
+            {
+                StopCoroutine(hurtRoutine);
+                hurtRoutine = null;
+            }
+            hurtInvincible = false;
+            if (interruptor) interruptor.CancelAll(PlayerActionCancelReason.Death);
+            if (bodyState) bodyState.ClearAllModifiers();
+            SetVisible(true);
+            animationDriver.ForceState(PlayerActionState.Dead);
+            input.InputEnabled = false;
+            motor.MovementLocked = true;
+            respawnRoutine = StartCoroutine(RespawnRoutine());
+        }
 
         void Awake()
         {
@@ -42,6 +71,7 @@ namespace MirrorTrial.Player
             motor = GetComponent<PlayerMotor>();
             animationDriver = GetComponent<PlayerAnimationDriver>();
             health = GetComponent<Health>();
+            if (health) health.Changed += OnHealthChanged;
             combat = GetComponent<PlayerCombat>();
             bodyState = GetComponent<PlayerBodyStateController>();
             interruptor = GetComponent<PlayerActionInterruptor>();
@@ -50,6 +80,20 @@ namespace MirrorTrial.Player
             if (!GetComponent<PlayerHealthBarUI>())
                 gameObject.AddComponent<PlayerHealthBarUI>();
             spriteRenderer = GetComponentInChildren<SpriteRenderer>(true);
+        }
+
+        void OnHealthChanged(int current, int maximum)
+        {
+            if (maximum <= 0 || current <= 0 || current > Mathf.CeilToInt(maximum * 0.3f))
+                ScreenFx.End(ScreenFxType.LowHealth, this);
+            else
+                ScreenFx.Begin(ScreenFxType.LowHealth, this);
+        }
+
+        void OnDestroy()
+        {
+            if (health) health.Changed -= OnHealthChanged;
+            ScreenFx.End(ScreenFxType.LowHealth, this);
         }
 
         public void SetExternalInvincible(float duration)
@@ -85,23 +129,11 @@ namespace MirrorTrial.Player
             if (resolution.ApplyDamage && health)
             {
                 health.Damage(payload.damage);
+                ScreenFx.Play(ScreenFxType.PlayerHit, 0.42f, 0.32f, payload.direction, this);
                 if (!health.IsAlive)
                 {
-                    if (hurtRoutine != null)
-                    {
-                        StopCoroutine(hurtRoutine);
-                        hurtRoutine = null;
-                    }
-                    if (interruptor)
-                        interruptor.CancelAll(PlayerActionCancelReason.Death);
-                    if (bodyState)
-                        bodyState.ClearAllModifiers();
-                    SetVisible(true);
-                    animationDriver.ForceState(PlayerActionState.Dead);
-                    input.InputEnabled = false;
-                    motor.MovementLocked = true;
-                    if (respawnRoutine == null)
-                        respawnRoutine = StartCoroutine(RespawnRoutine());
+                    ScreenFx.Play(ScreenFxType.Death, 0.55f, 0.55f, payload.direction, this);
+                    BeginDeathAndRespawn();
                     return;
                 }
             }
@@ -158,6 +190,7 @@ namespace MirrorTrial.Player
 
             if (respawnInvincibility > 0f)
                 SetExternalInvincible(respawnInvincibility);
+            PlayerRespawned?.Invoke();
             respawnRoutine = null;
         }
         IEnumerator HurtRoutine(DamagePayload payload, PlayerHitReaction reaction)
@@ -170,6 +203,8 @@ namespace MirrorTrial.Player
                 : hurtLockTime;
 
             hurtInvincible = true;
+            if (bodyState)
+                bodyState.SetBodyState(this, PlayerBodyState.Invincible);
             input.InputEnabled = false;
             motor.MovementLocked = true;
             animationDriver.ForceState(PlayerActionState.Hurt);
@@ -209,6 +244,8 @@ namespace MirrorTrial.Player
 
             SetVisible(true);
             hurtInvincible = false;
+            if (bodyState)
+                bodyState.ClearBodyState(this);
             hurtRoutine = null;
         }
 
@@ -284,6 +321,8 @@ namespace MirrorTrial.Player
                 hurtRoutine = null;
             }
             hurtInvincible = false;
+            if (bodyState)
+                bodyState.ClearBodyState(this);
             externalInvincibilityCount = 0;
             if (respawnRoutine != null)
             {

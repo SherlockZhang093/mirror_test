@@ -32,6 +32,13 @@ namespace MirrorTrial.Boss.NodeCanvasIntegration
         }
     }
 
+    [Name("条件：本轮使用重斩")]
+    [Description("在近战范围内按配置概率锁定本轮重斩决定；冷却中或上一招是重斩时不会通过。")]
+    public sealed class MirrorBossHeavySlashCondition : ConditionTask<MirrorBossActorV2>
+    {
+        protected override bool OnCheck() => agent && agent.BTShouldUseHeavySlash();
+    }
+
     [Name("执行死亡或受击动作")]
     [Description("死亡时保持该分支运行；受击硬直时停止移动并播放受击动画，硬直结束后让顶层 Selector 返回核心战斗。")]
     public sealed class MirrorBossAbnormalAction : ActionTask<MirrorBossActorV2>

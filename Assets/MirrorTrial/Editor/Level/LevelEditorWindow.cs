@@ -66,7 +66,12 @@ namespace MirrorTrial.Editor.Level
                 return;
             }
 
-            selectedTab = GUILayout.Toolbar(selectedTab, TabNames, GUILayout.Height(26));
+            var newTab = GUILayout.Toolbar(selectedTab, TabNames, GUILayout.Height(26));
+            if (newTab != selectedTab)
+            {
+                selectedTab = newTab;
+                SceneView.RepaintAll();
+            }
             EditorGUILayout.Space(8);
 
             EnsureManagerEditor();

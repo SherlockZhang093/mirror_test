@@ -13,7 +13,7 @@ namespace MirrorTrial.Boss.Editor
         const string TreePath = "Assets/MirrorTrial/Boss/MirrorBossAI_BT.asset";
         const string OldFsmPath = "Assets/MirrorTrial/Boss/MirrorBossAI_FSM.asset";
         const string PrefabPath = "Assets/MirrorTrial/Prefabs/Boss/MirrorBoss.prefab";
-        const string SessionKey = "MirrorTrial.MirrorBossBehaviourTreeSetup.v2";
+        const string SessionKey = "MirrorTrial.MirrorBossBehaviourTreeSetup.v3";
 
         static MirrorBossBehaviourTreeSetup() => EditorApplication.delayCall += InstallOnce;
         public static void RebuildFromMenu() => Build(true);
@@ -28,14 +28,14 @@ namespace MirrorTrial.Boss.Editor
         static void Build(bool force)
         {
             var tree = AssetDatabase.LoadAssetAtPath<BehaviourTree>(TreePath);
-            var needsRebuild = force || !tree || !tree.comments.Contains("结构版本：PrioritySelector-v2");
+            var needsRebuild = force || !tree || !tree.comments.Contains("PrioritySelector-v3-heavy-slash");
             if (needsRebuild)
             {
                 if (tree) AssetDatabase.DeleteAsset(TreePath);
                 tree = ScriptableObject.CreateInstance<BehaviourTree>();
                 tree.name = "镜中Boss_AI_中文行为树";
                 tree.comments =
-                    "结构版本：PrioritySelector-v2\n" +
+                    "结构版本：PrioritySelector-v3-heavy-slash\n" +
                     "顶层 Dynamic Selector 每帧重查优先级：异常状态 > 出场准备 > 核心战斗。\n" +
                     "核心战斗 Selector：攻击范围内执行剑招与硬直，否则持续追击玩家。\n" +
                     "Blackboard 可直接观察 isDead、isStunned、hasAppeared、DistanceToPlayer、AttackRange。";
@@ -76,7 +76,17 @@ namespace MirrorTrial.Boss.Editor
                 attackSequence.comments = "攻击分支：距离条件通过后，完整执行当前阶段剑招，再进入攻击后硬直。";
                 var rangeCondition = AddCondition<MirrorBossInAttackRangeCondition>(tree, new Vector2(850, 540),
                     "检查 Blackboard：DistanceToPlayer <= AttackRange。 ");
-                var comboAction = AddAction<MirrorBossComboAction>(tree, new Vector2(1080, 540),
+                var attackChoice = tree.AddNode<Selector>(new Vector2(1100, 540));
+                attackChoice.dynamic = false;
+                attackChoice.comments = "每轮只选择一次：重斩条件通过时执行独立重斩，否则执行普通阶段连招。";
+                var heavySequence = tree.AddNode<Sequencer>(new Vector2(980, 720));
+                heavySequence.dynamic = false;
+                heavySequence.comments = "重斩分支：25% 初始概率、5 秒冷却、禁止连续使用。";
+                var heavyCondition = AddCondition<MirrorBossHeavySlashCondition>(tree, new Vector2(900, 900),
+                    "锁定本轮重斩决定；冷却中或上一招为重斩时失败。");
+                var heavyAction = AddAction<MirrorBossHeavySlashAction>(tree, new Vector2(1080, 900),
+                    "锁定起手朝向，播放 0.8 秒蓄力和单次 ComboAttackD 重斩。");
+                var comboAction = AddAction<MirrorBossComboAction>(tree, new Vector2(1260, 720),
                     "执行当前阶段固定剑招；每一招按 Boss 动画编辑器设置的黄色前摇帧定格，结束后从该帧继续，攻击框严格按逐帧关键帧开关。 ");
                 var recoveryAction = AddAction<MirrorBossRecoveryAction>(tree, new Vector2(1320, 540),
                     "整套剑招完成后的移动冷却：可以缓慢追击，但攻击权限保持关闭；三个阶段的时间范围可以直接修改。 ");
@@ -95,8 +105,12 @@ namespace MirrorTrial.Boss.Editor
                 tree.ConnectNodes(combatSelector, attackSequence);
                 tree.ConnectNodes(combatSelector, approachAction);
                 tree.ConnectNodes(attackSequence, rangeCondition);
-                tree.ConnectNodes(attackSequence, comboAction);
+                tree.ConnectNodes(attackSequence, attackChoice);
                 tree.ConnectNodes(attackSequence, recoveryAction);
+                tree.ConnectNodes(attackChoice, heavySequence);
+                tree.ConnectNodes(attackChoice, comboAction);
+                tree.ConnectNodes(heavySequence, heavyCondition);
+                tree.ConnectNodes(heavySequence, heavyAction);
                 tree.SelfSerialize();
                 AssetDatabase.CreateAsset(tree, TreePath);
             }
@@ -105,12 +119,20 @@ namespace MirrorTrial.Boss.Editor
             if (!root) return;
             try
             {
+                // Remove retired V1 components before installing the V2 behaviour tree.
+                // MirrorBossHudV2 and MirrorBossInputIsolation both require the old actor,
+                // so they must be removed first or Unity can keep restoring it.
+                Remove<MirrorBossHudV2>(root);
+                Remove<MirrorBossInputIsolation>(root);
+                Remove<MirrorBossActor>(root);
                 Remove<MirrorBossFSMSynchronizer>(root);
                 Remove<NodeCanvas.StateMachines.FSMOwner>(root);
                 Remove<MirrorBossPhysicsAnimationFix>(root);
                 Remove<MirrorBossWalkAnimationOverride>(root);
                 foreach (var gate in root.GetComponentsInChildren<MirrorBossHitboxAnimationGate>(true))
                     Object.DestroyImmediate(gate);
+                foreach (var relay in root.GetComponentsInChildren<MirrorTrial.Combat.HitboxRelayV2>(true))
+                    Object.DestroyImmediate(relay);
 
                 var owner = root.GetComponent<BehaviourTreeOwner>() ?? root.AddComponent<BehaviourTreeOwner>();
                 owner.behaviour = tree;

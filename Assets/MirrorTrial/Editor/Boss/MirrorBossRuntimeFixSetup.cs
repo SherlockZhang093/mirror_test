@@ -5,17 +5,13 @@ using UnityEngine;
 
 namespace MirrorTrial.EditorTools
 {
-    [InitializeOnLoad]
+    // Legacy one-shot migration. The current Boss prefab owns its Hurtbox and
+    // collision setup directly and does not use HitboxRelayV2.
     static class MirrorBossRuntimeFixSetup
     {
         const string SessionKey = "MirrorTrial.MirrorBossRuntimeFixSetup.v1";
         const string PlayerPath = "Assets/MirrorTrial/Prefabs/Characters/Player_MirrorTrial.prefab";
         const string BossPath = "Assets/MirrorTrial/Prefabs/Boss/MirrorBoss.prefab";
-
-        static MirrorBossRuntimeFixSetup()
-        {
-            EditorApplication.delayCall += Apply;
-        }
 
         static void Apply()
         {

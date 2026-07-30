@@ -1,3 +1,5 @@
+using System.Collections;
+using MirrorTrial.Feedback;
 using MirrorTrial.Level;
 using MirrorTrial.Player;
 using UnityEngine;
@@ -10,8 +12,10 @@ namespace MirrorTrial.Boss
         [SerializeField] MirrorBossActorV2 bossPrefab;
         [SerializeField] MirrorBossSpawnPoint spawnPoint;
         [SerializeField] CombatEncounter encounter;
+        [SerializeField, Min(0f)] float clearDelay = 1.5f;
 
         BoxCollider2D area;
+        MirrorBossActorV2 activeBoss;
         bool started;
 
         void Awake()
@@ -49,9 +53,41 @@ namespace MirrorTrial.Boss
 
             started = true;
             var point = spawnPoint ? spawnPoint.transform : transform;
-            var boss = Instantiate(bossPrefab, point.position, point.rotation, transform);
-            boss.ConfigureArena(area.bounds.min.x, area.bounds.max.x);
-            CameraDirector.Ensure().PlayBossIntro(boss.transform, () => boss.Activate(player.transform));
+            activeBoss = Instantiate(bossPrefab, point.position, point.rotation, transform);
+            activeBoss.ConfigureArena(area.bounds.min.x, area.bounds.max.x);
+            activeBoss.Defeated += OnBossDefeated;
+            activeBoss.PhaseChanged += OnBossPhaseChanged;
+            ScreenFx.Begin(ScreenFxType.BossBattle, this);
+            CameraDirector.Ensure().PlayBossIntro(activeBoss.transform, () => activeBoss.Activate(player.transform));
+        }
+
+        void OnBossPhaseChanged(MirrorBossActorV2 changedBoss, int phase)
+        {
+            ScreenFx.Play(ScreenFxType.BossPhasePulse, Mathf.Clamp01(0.65f + phase * 0.12f), source: this);
+        }
+
+        void OnBossDefeated(MirrorBossActorV2 defeated)
+        {
+            defeated.Defeated -= OnBossDefeated;
+            defeated.PhaseChanged -= OnBossPhaseChanged;
+            ScreenFx.End(ScreenFxType.BossBattle, this);
+            StartCoroutine(ClearAfterDelay());
+        }
+
+        IEnumerator ClearAfterDelay()
+        {
+            yield return new WaitForSeconds(clearDelay);
+            if (encounter) encounter.ClearEncounter();
+        }
+
+        void OnDestroy()
+        {
+            if (activeBoss)
+            {
+                activeBoss.Defeated -= OnBossDefeated;
+                activeBoss.PhaseChanged -= OnBossPhaseChanged;
+            }
+            ScreenFx.End(ScreenFxType.BossBattle, this);
         }
 
 #if UNITY_EDITOR

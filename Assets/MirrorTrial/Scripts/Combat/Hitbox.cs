@@ -51,6 +51,8 @@ namespace MirrorTrial.Combat
 
             var contactPoint = ResolveContactPoint(other);
             hurtbox.ReceiveHit(payload);
+            if (payload.source)
+                payload.source.SendMessage("OnAttackConnected", payload, SendMessageOptions.DontRequireReceiver);
             PlayEffect(contactPoint);
 
             if (sharedFeedbackTriggered)
@@ -83,13 +85,15 @@ namespace MirrorTrial.Combat
         void PlayEffect(Vector2 contactPoint)
         {
             var feedback = payload.feedback;
-            if (!feedback.playEffect || !feedback.effectPrefab)
+            if (!feedback.playEffect)
                 return;
 
             var directionSign = payload.direction.x < 0f ? -1f : 1f;
             var offset = feedback.effectOffset;
             offset.x *= directionSign;
-            var effect = Instantiate(feedback.effectPrefab, contactPoint + offset, Quaternion.identity);
+            var effect = feedback.effectPrefab
+                ? Instantiate(feedback.effectPrefab, contactPoint + offset, Quaternion.identity)
+                : PixelCombatVfx.SpawnHit(contactPoint + offset);
             if (feedback.mirrorEffectByDirection)
             {
                 var scale = effect.transform.localScale;

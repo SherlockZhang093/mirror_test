@@ -11,6 +11,7 @@ namespace MirrorTrial.Abilities
         float speed;
         float range;
         Vector3 origin;
+        GameObject requiredTarget;
 
         public static BowArrowProjectile Create(Vector3 position)
         {
@@ -37,11 +38,18 @@ namespace MirrorTrial.Abilities
 
         public void Launch(DamagePayload nextPayload, Vector2 nextDirection, float nextSpeed, float nextRange)
         {
+            Launch(nextPayload, nextDirection, nextSpeed, nextRange, null);
+        }
+
+        public void Launch(DamagePayload nextPayload, Vector2 nextDirection, float nextSpeed, float nextRange,
+            GameObject onlyDamageTarget)
+        {
             payload = nextPayload;
             direction = nextDirection.normalized;
             speed = nextSpeed;
             range = nextRange;
             origin = transform.position;
+            requiredTarget = onlyDamageTarget;
             if (direction.x < 0f) transform.localScale = new Vector3(-1f, 1f, 1f);
         }
 
@@ -54,6 +62,8 @@ namespace MirrorTrial.Abilities
         void OnTriggerEnter2D(Collider2D other)
         {
             if (payload.source && other.gameObject == payload.source) return;
+            if (requiredTarget && other.gameObject != requiredTarget && !other.transform.IsChildOf(requiredTarget.transform))
+                return;
             var hurtbox = other.GetComponent<Hurtbox>();
             if (!hurtbox) return;
             hurtbox.ReceiveHit(payload);

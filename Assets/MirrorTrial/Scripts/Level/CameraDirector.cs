@@ -82,7 +82,15 @@ namespace MirrorTrial.Level
             confiner.SetBounds(minX, maxX);
         }
 
-        public void PlayHitFeedback(Vector2 direction, float power)
+        public void SetVisibleArea(Rect area)
+        {
+            if (!playerCamera) return;
+            var confiner = playerCamera.GetComponent<CinemachineHorizontalConfiner>();
+            if (!confiner) confiner = playerCamera.gameObject.AddComponent<CinemachineHorizontalConfiner>();
+            confiner.SetVisibleArea(area);
+        }
+
+        public void Shake(Vector2 direction, float power)
         {
             if (!impulseSource) return;
             var impulseDirection = direction.sqrMagnitude > 0f ? direction.normalized : Vector2.right;

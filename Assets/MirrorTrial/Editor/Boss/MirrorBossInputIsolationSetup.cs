@@ -5,13 +5,12 @@ using UnityEngine;
 
 namespace MirrorTrial.EditorTools
 {
-    [InitializeOnLoad]
+    // Legacy migration only. MirrorBossInputIsolation requires the retired
+    // MirrorBossActor and must not be added to the current V2 prefab.
     static class MirrorBossInputIsolationSetup
     {
         const string SessionKey = "MirrorTrial.MirrorBossInputIsolationSetup.v1";
         const string BossPrefabPath = "Assets/MirrorTrial/Prefabs/Boss/MirrorBoss.prefab";
-
-        static MirrorBossInputIsolationSetup() => EditorApplication.delayCall += Apply;
 
         static void Apply()
         {

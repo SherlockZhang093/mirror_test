@@ -41,7 +41,7 @@ namespace MirrorTrial.Combat
             bool requestCamera, float cameraPower, bool playSound, AudioClip sound, float soundVolume,
             bool notifyAttackerReaction)
         {
-            this.playEffect = playEffect && effectPrefab;
+            this.playEffect = playEffect;
             this.effectPrefab = effectPrefab;
             this.effectOffset = effectOffset;
             this.mirrorEffectByDirection = mirrorEffectByDirection;

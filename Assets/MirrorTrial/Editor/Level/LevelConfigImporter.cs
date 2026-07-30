@@ -57,6 +57,7 @@ namespace MirrorTrial.Editor.Level
             var runtimeRoot = GetOrCreateChild(manager.transform, "\u8fd0\u884c\u65f6");
 
             var mso = new SerializedObject(manager);
+            mso.FindProperty("levelConfig").objectReferenceValue = config;
             mso.FindProperty("levelId").stringValue = config.levelId;
             mso.FindProperty("levelDisplayName").stringValue = config.displayName;
             mso.FindProperty("playerPrefab").objectReferenceValue = ResolvePlayerPrefab(config);

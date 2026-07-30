@@ -6,6 +6,14 @@ using UnityEngine;
 
 namespace MirrorTrial.Player
 {
+    public enum PlayerChargeStage
+    {
+        None,
+        Charging,
+        LaunchReady,
+        Full
+    }
+
     public enum ComboInputCondition
     {
         [InspectorName("点击")] Press,
@@ -44,9 +52,26 @@ namespace MirrorTrial.Player
         public Vector2 customKnockback = new Vector2(4f, 1f);
 
         public bool enableCharge;
-        public AnimationClip chargeAnimation;
+        [Min(0)] public int chargeHoldFrame = 1;
+        [HideInInspector, Range(0f, 0.95f)] public float chargeHoldNormalizedTime = 0.35f;
+        [HideInInspector] public AnimationClip chargeAnimation;
+        public bool showChargeEffect = true;
+        public GameObject chargeEffectPrefab;
+        public Vector2 chargeEffectOffset = new Vector2(0.65f, 0.15f);
+        [Min(0.1f)] public float chargeEffectScale = 0.75f;
+        public float chargeEffectRotationSpeed = 55f;
+        [Min(0f)] public float chargeEffectPulseSpeed = 18f;
+        [Range(0f, 1f)] public float chargeEffectPulseAmount = 0.12f;
+        [Min(0.01f)] public float chargeEffectStartScale = 0.9f;
+        [Min(0.01f)] public float chargeEffectFullScale = 1.8f;
+        [Range(0f, 1f)] public float chargeEffectStartAlpha = 0.55f;
+        [Range(0f, 1f)] public float chargeEffectFullAlpha = 1f;
+        [Range(0f, 2f)] public float chargeEffectParticleIntensity = 1f;
+        public ChargeTelegraphSettings chargePresentation = new ChargeTelegraphSettings();
         [Min(0f)] public float minimumChargeTime = 0.18f;
         [Min(0.01f)] public float maximumChargeTime = 0.7f;
+        [Range(0f, 1f)] public float launchChargeThreshold = 0.65f;
+        public HitReactionType insufficientLaunchReaction = HitReactionType.HeavyHurt;
         [Min(1f)] public float fullChargeDamageMultiplier = 1.5f;
         [Min(1f)] public float fullChargeKnockbackMultiplier = 1.35f;
         public bool autoReleaseAtFullCharge = true;
@@ -63,6 +88,8 @@ namespace MirrorTrial.Player
         [Min(0f)] public float windowStart = 0.1f;
         [Min(0f)] public float windowEnd = 0.28f;
         [Min(0.01f)] public float holdThreshold = 0.15f;
+        [Tooltip("Only allows this transition after the source move hit a Hurtbox.")]
+        public bool requiresHit;
     }
 
     [Serializable]
@@ -83,6 +110,38 @@ namespace MirrorTrial.Player
         [SerializeField, HideInInspector] int moveComboSchemaVersion;
 
         public IList<PlayerComboGraph> ComboGraphs => comboGraphs;
+        string runtimeCurrentMoveId;
+        string runtimeCurrentMoveName;
+        string runtimeLastTransitionId;
+        float runtimeChargeSeconds;
+        float runtimeChargeNormalized;
+        float runtimeDamageMultiplier = 1f;
+        PlayerChargeStage runtimeChargeStage;
+        int actionVersion;
+        ChargeTelegraphPresentation activeChargePresentation;
+        bool ownsActiveChargePresentation;
+        string runtimePreviewStatus = "\u7b49\u5f85\u8f93\u5165";
+
+        public string RuntimeCurrentMoveId => runtimeCurrentMoveId;
+        public string RuntimeCurrentMoveName => runtimeCurrentMoveName;
+        public string RuntimeLastTransitionId => runtimeLastTransitionId;
+        public float RuntimeChargeSeconds => runtimeChargeSeconds;
+        public float RuntimeChargeNormalized => runtimeChargeNormalized;
+        public float RuntimeDamageMultiplier => runtimeDamageMultiplier;
+        public PlayerChargeStage RuntimeChargeStage => runtimeChargeStage;
+        public string RuntimePreviewStatus => runtimePreviewStatus;
+
+        public void ClearRuntimePreviewState()
+        {
+            runtimeCurrentMoveId = string.Empty;
+            runtimeCurrentMoveName = string.Empty;
+            runtimeLastTransitionId = string.Empty;
+            runtimeChargeSeconds = 0f;
+            runtimeChargeNormalized = 0f;
+            runtimeDamageMultiplier = 1f;
+            runtimeChargeStage = PlayerChargeStage.None;
+            runtimePreviewStatus = "\u7b49\u5f85\u8f93\u5165";
+        }
 
         sealed class TransitionRuntimeState
         {
@@ -123,30 +182,33 @@ namespace MirrorTrial.Player
 
         IEnumerator GraphComboRoutine(PlayerComboGraph graph)
         {
+            var version = ++actionVersion;
             var current = FindInstance(graph, graph.entryInstanceId);
             var incomingChargeTime = 0f;
             var incomingChargeInput = graph.entryInput;
             while (current != null)
             {
+                runtimeCurrentMoveId = current.id;
+                runtimeCurrentMoveName = current.name;
+                runtimePreviewStatus = current.enableCharge ? "\u84c4\u529b\u4e2d" : "\u64ad\u653e\u62db\u5f0f";
                 if (current.move == null)
                     break;
 
-                var chargeMultiplier = 1f;
-                if (current.enableCharge)
-                {
-                    var chargeResult = new ChargeResult();
-                    yield return StartCoroutine(ChargeRoutine(current, incomingChargeInput, incomingChargeTime, chargeResult));
-                    if (!chargeResult.completed)
-                        break;
-                    chargeMultiplier = chargeResult.normalized;
-                }
-
-                var resolved = ResolveMove(current.move, current, chargeMultiplier);
                 var selection = new SelectedTransition();
-                yield return StartCoroutine(GraphMoveRoutine(graph, current, resolved, selection));
+                yield return StartCoroutine(GraphMoveRoutine(
+                    graph,
+                    current,
+                    current.move,
+                    selection,
+                    incomingChargeInput,
+                    incomingChargeTime,
+                    version));
+                if (version != actionVersion)
+                    yield break;
                 if (selection.transition == null)
                     break;
 
+                runtimeLastTransitionId = selection.transition.id;
                 current = FindInstance(graph, selection.transition.toInstanceId);
                 incomingChargeTime = selection.heldDuration;
                 incomingChargeInput = selection.transition.input;
@@ -155,6 +217,8 @@ namespace MirrorTrial.Player
             DeactivateActiveHitbox();
             motor.MovementLocked = false;
             attackRoutine = null;
+            runtimeChargeStage = PlayerChargeStage.None;
+            runtimePreviewStatus = "\u8fde\u62db\u7ed3\u675f";
         }
 
         sealed class ChargeResult
@@ -163,38 +227,137 @@ namespace MirrorTrial.Player
             public float normalized;
         }
 
-        IEnumerator ChargeRoutine(PlayerComboMove instance, PlayerInputCommand command, float initialTime, ChargeResult result)
+        IEnumerator ChargeRoutine(PlayerComboMove instance, PlayerInputCommand command, float initialTime,
+            ChargeResult result, int version)
         {
             var minimum = Mathf.Max(0f, instance.minimumChargeTime);
             var maximum = Mathf.Max(minimum, instance.maximumChargeTime);
             var elapsed = Mathf.Clamp(initialTime, 0f, maximum);
-            motor.MovementLocked = true;
-            animationDriver.ForceState(PlayerActionState.Attack);
-            if (instance.chargeAnimation)
-                animationDriver.PlayActionClip(instance.chargeAnimation, maximum);
+            var visualReadyThreshold = maximum > 0f
+                ? Mathf.Clamp01((minimum + Mathf.Clamp01(instance.launchChargeThreshold) * (maximum - minimum)) / maximum)
+                : Mathf.Clamp01(instance.launchChargeThreshold);
+            if (instance.showChargeEffect)
+            {
+                var offset = instance.chargeEffectOffset;
+                var visual = GetComponentInChildren<SpriteRenderer>(true);
+                var presentationPrefab = instance.chargeEffectPrefab
+                    ? instance.chargeEffectPrefab.GetComponent<ChargeTelegraphPresentation>()
+                    : null;
+                if (presentationPrefab)
+                {
+                    var effectObject = Instantiate(instance.chargeEffectPrefab, transform);
+                    effectObject.transform.localPosition = Vector3.zero;
+                    activeChargePresentation = effectObject.GetComponent<ChargeTelegraphPresentation>();
+                    activeChargePresentation.Bind(visual);
+                    ownsActiveChargePresentation = true;
+                    activeChargePresentation.Begin(null, offset, motor.FacingRight, null, 0f, visualReadyThreshold);
+                }
+                else
+                {
+                    activeChargePresentation = ChargeTelegraphPresentation.Ensure(gameObject, visual);
+                    ownsActiveChargePresentation = false;
+                    var presentationSettings = instance.chargePresentation ?? new ChargeTelegraphSettings();
+                    presentationSettings.pulseSpeed = instance.chargeEffectPulseSpeed;
+                    presentationSettings.pulseAmount = instance.chargeEffectPulseAmount;
+                    presentationSettings.particleIntensity = instance.chargeEffectParticleIntensity;
+                    presentationSettings.rotationSpeed = instance.chargeEffectRotationSpeed;
+                    presentationSettings.coreStartScale = instance.chargeEffectScale * instance.chargeEffectStartScale;
+                    presentationSettings.coreFullScale = instance.chargeEffectScale * instance.chargeEffectFullScale;
+                    var customRenderer = instance.chargeEffectPrefab
+                        ? instance.chargeEffectPrefab.GetComponentInChildren<SpriteRenderer>(true)
+                        : null;
+                    activeChargePresentation.Begin(presentationSettings, offset, motor.FacingRight,
+                        customRenderer ? customRenderer.sprite : null, 0f, visualReadyThreshold);
+                }
+            }
 
-            while (input.IsHeld(command) && (elapsed < maximum || !instance.autoReleaseAtFullCharge))
+            runtimeChargeStage = PlayerChargeStage.Charging;
+            while (version == actionVersion && input.IsHeld(command) &&
+                   (elapsed < maximum || !instance.autoReleaseAtFullCharge))
             {
                 elapsed = Mathf.Min(maximum, elapsed + Time.deltaTime);
+                runtimeChargeSeconds = elapsed;
+                runtimeChargeNormalized = maximum <= minimum ? 1f : Mathf.Clamp01((elapsed - minimum) / (maximum - minimum));
+                runtimeDamageMultiplier = Mathf.Lerp(1f, Mathf.Max(1f, instance.fullChargeDamageMultiplier), runtimeChargeNormalized);
+                runtimeChargeStage = ResolveChargeStage(runtimeChargeNormalized, instance.launchChargeThreshold);
+                if (activeChargePresentation)
+                    activeChargePresentation.SetProgress(maximum > 0f ? elapsed / maximum : 1f, motor.FacingRight);
                 yield return null;
             }
 
-            if (instance.chargeAnimation)
-                animationDriver.StopActionClip();
-            animationDriver.ClearForcedState(PlayerActionState.Attack);
-            result.completed = elapsed >= minimum;
+            if (version != actionVersion)
+            {
+                result.completed = false;
+                yield break;
+            }
+
+            if (activeChargePresentation)
+            {
+                activeChargePresentation.SetProgress(maximum > 0f ? elapsed / maximum : 1f, motor.FacingRight);
+                activeChargePresentation.End(ChargeTelegraphEndReason.Released, motor.FacingRight);
+                if (ownsActiveChargePresentation)
+                    Destroy(activeChargePresentation.gameObject, 0.4f);
+                activeChargePresentation = null;
+                ownsActiveChargePresentation = false;
+            }
+
+            result.completed = true;
             result.normalized = maximum <= minimum
                 ? 1f
                 : Mathf.Clamp01((elapsed - minimum) / (maximum - minimum));
         }
 
-        IEnumerator GraphMoveRoutine(PlayerComboGraph graph, PlayerComboMove instance, PlayerComboStep move, SelectedTransition selection)
+        static PlayerChargeStage ResolveChargeStage(float normalized, float launchThreshold)
+        {
+            if (normalized >= 1f) return PlayerChargeStage.Full;
+            return normalized >= Mathf.Clamp01(launchThreshold)
+                ? PlayerChargeStage.LaunchReady
+                : PlayerChargeStage.Charging;
+        }
+
+        void CancelChargePresentation(ChargeTelegraphEndReason reason)
+        {
+            if (activeChargePresentation)
+            {
+                activeChargePresentation.End(reason, motor && motor.FacingRight);
+                if (ownsActiveChargePresentation)
+                    Destroy(activeChargePresentation.gameObject, 0.4f);
+                activeChargePresentation = null;
+                ownsActiveChargePresentation = false;
+            }
+            runtimeChargeSeconds = 0f;
+            runtimeChargeNormalized = 0f;
+            runtimeChargeStage = PlayerChargeStage.None;
+        }
+
+        IEnumerator GraphMoveRoutine(
+            PlayerComboGraph graph,
+            PlayerComboMove instance,
+            PlayerComboStep sourceMove,
+            SelectedTransition selection,
+            PlayerInputCommand chargeCommand,
+            float initialChargeTime,
+            int version)
         {
             var combatTuning = tuning.combat;
             var elapsed = 0f;
             var speed = Mathf.Max(0.05f, instance.animationSpeed);
-            var totalDuration = (Mathf.Max(0f, move.startup) + Mathf.Max(0f, move.activeTime) + Mathf.Max(0f, move.recovery)) / speed;
+            var move = ResolveMove(sourceMove, instance, 0f);
+            var totalDuration = (Mathf.Max(0f, sourceMove.startup) + Mathf.Max(0f, sourceMove.activeTime) + Mathf.Max(0f, sourceMove.recovery)) / speed;
+            var chargeFrameRate = sourceMove.animationClip
+                ? Mathf.Max(1f, sourceMove.animationClip.frameRate)
+                : Mathf.Max(1, sourceMove.animationFrameRate);
+            var chargeClipDuration = sourceMove.animationClip
+                ? Mathf.Max(0.0001f, sourceMove.animationClip.length)
+                : Mathf.Max(0.0001f, (Mathf.Max(1, sourceMove.animationFrameCount) - 1) / chargeFrameRate);
+            var maxChargeFrame = Mathf.Max(0, Mathf.FloorToInt(chargeClipDuration * chargeFrameRate));
+            var chargeFrame = Mathf.Clamp(instance.chargeHoldFrame, 0, maxChargeFrame);
+            var chargeHoldNormalized = Mathf.Clamp01((chargeFrame / chargeFrameRate) / chargeClipDuration);
+            var chargeHoldTime = totalDuration * chargeHoldNormalized;
+            var chargeHandled = !instance.enableCharge;
             var outgoing = BuildTransitionStates(graph, instance.id);
+            currentComboMoveHitConfirmed = false;
+            acceptingComboHitConfirm = true;
 
             if (move.lockMovement)
                 motor.MovementLocked = true;
@@ -206,17 +369,35 @@ namespace MirrorTrial.Player
 
             while (elapsed < totalDuration)
             {
+                if (!chargeHandled && elapsed >= chargeHoldTime)
+                {
+                    chargeHandled = true;
+                    animationDriver.SetActionClipPaused(true);
+                    runtimePreviewStatus = "蓄力定格";
+                    var chargeResult = new ChargeResult();
+                    yield return StartCoroutine(ChargeRoutine(instance, chargeCommand, initialChargeTime, chargeResult, version));
+                    if (!chargeResult.completed || version != actionVersion)
+                        yield break;
+                    animationDriver.SetActionClipPaused(false);
+                    move = ResolveMove(sourceMove, instance, chargeResult.normalized);
+                    runtimePreviewStatus = "释放重击";
+                }
+
                 var moveElapsed = elapsed * speed;
                 UpdateBodyState(move, moveElapsed);
                 ApplyHitboxFrame(move, combatTuning, moveElapsed);
-                if (selection.transition == null)
+                if (selection.transition == null && elapsed > 0f)
                     EvaluateTransitions(outgoing, moveElapsed, selection);
+                else if (selection.transition != null && selection.transition.condition == ComboInputCondition.Hold && input.IsHeld(selection.transition.input))
+                    selection.heldDuration += Time.deltaTime;
                 elapsed += Time.deltaTime;
                 yield return null;
             }
 
+            var decisionElapsed = totalDuration * speed;
             if (selection.transition == null)
-                FinalizePendingHold(outgoing, totalDuration * speed, selection);
+                ResolveBufferedTransition(outgoing, decisionElapsed, selection);
+            acceptingComboHitConfirm = false;
 
             DeactivateActiveHitbox();
             if (bodyStateController)
@@ -259,44 +440,64 @@ namespace MirrorTrial.Player
                     state.pressedAt = elapsed;
                     if (link.condition == ComboInputCondition.Press)
                     {
-                        selection.transition = link;
-                        return;
+                        if (TransitionRequirementsMet(link))
+                        {
+                            selection.transition = link;
+                            return;
+                        }
                     }
                 }
 
                 var heldFor = state.tracking ? Mathf.Max(0f, elapsed - state.pressedAt) : 0f;
-                if (link.condition == ComboInputCondition.Hold && state.tracking && input.IsHeld(link.input) && heldFor >= link.holdThreshold)
+                if (link.condition == ComboInputCondition.Tap && state.tracking && input.WasReleased(link.input))
                 {
-                    selection.transition = link;
-                    selection.heldDuration = heldFor;
-                    return;
-                }
-                if (link.condition == ComboInputCondition.Tap && state.tracking && input.WasReleased(link.input) && heldFor < link.holdThreshold)
-                {
-                    selection.transition = link;
-                    selection.heldDuration = heldFor;
-                    return;
+                    if (TransitionRequirementsMet(link))
+                    {
+                        selection.transition = link;
+                        selection.heldDuration = heldFor;
+                        return;
+                    }
                 }
                 if (link.condition == ComboInputCondition.Release && insideWindow && input.WasReleased(link.input))
                 {
-                    selection.transition = link;
-                    selection.heldDuration = heldFor;
-                    return;
+                    if (TransitionRequirementsMet(link))
+                    {
+                        selection.transition = link;
+                        selection.heldDuration = heldFor;
+                        return;
+                    }
                 }
             }
         }
 
-        void FinalizePendingHold(List<TransitionRuntimeState> states, float elapsed, SelectedTransition selection)
+        void ResolveBufferedTransition(List<TransitionRuntimeState> states, float elapsed, SelectedTransition selection)
         {
             for (var i = 0; i < states.Count; i++)
             {
                 var state = states[i];
-                if (state.transition.condition != ComboInputCondition.Hold || !state.tracking || !input.IsHeld(state.transition.input))
+                if (!state.tracking || state.transition.condition != ComboInputCondition.Hold ||
+                    !input.IsHeld(state.transition.input) || !TransitionRequirementsMet(state.transition))
                     continue;
                 selection.transition = state.transition;
                 selection.heldDuration = Mathf.Max(0f, elapsed - state.pressedAt);
                 return;
             }
+
+            for (var i = 0; i < states.Count; i++)
+            {
+                var state = states[i];
+                if (!state.tracking || state.transition.condition != ComboInputCondition.Tap ||
+                    input.IsHeld(state.transition.input) || !TransitionRequirementsMet(state.transition))
+                    continue;
+                selection.transition = state.transition;
+                selection.heldDuration = Mathf.Max(0f, elapsed - state.pressedAt);
+                return;
+            }
+        }
+
+        bool TransitionRequirementsMet(PlayerComboTransition transition)
+        {
+            return transition != null && (!transition.requiresHit || currentComboMoveHitConfirmed);
         }
 
         PlayerComboStep ResolveMove(PlayerComboStep source, PlayerComboMove instance, float chargeNormalized)
@@ -315,6 +516,13 @@ namespace MirrorTrial.Player
                 result.targetReaction = instance.targetReaction;
                 result.useCustomKnockback = instance.useCustomKnockback;
                 result.customKnockback = instance.customKnockback;
+            }
+            if (instance.enableCharge && result.targetReaction == HitReactionType.Launch &&
+                chargeNormalized < Mathf.Clamp01(instance.launchChargeThreshold))
+            {
+                result.targetReaction = instance.insufficientLaunchReaction == HitReactionType.Launch
+                    ? HitReactionType.HeavyHurt
+                    : instance.insufficientLaunchReaction;
             }
             return result;
         }
@@ -406,7 +614,29 @@ namespace MirrorTrial.Player
                 InitializeComboGraphPositions();
                 moveComboSchemaVersion = 5;
             }
+            if (moveComboSchemaVersion < 6)
+            {
+                RequireHitForChargeTransitions();
+                moveComboSchemaVersion = 6;
+            }
             EnsureMoveComboIds();
+        }
+
+        void RequireHitForChargeTransitions()
+        {
+            for (var graphIndex = 0; graphIndex < comboGraphs.Count; graphIndex++)
+            {
+                var graph = comboGraphs[graphIndex];
+                if (graph == null || graph.transitions == null) continue;
+                for (var transitionIndex = 0; transitionIndex < graph.transitions.Count; transitionIndex++)
+                {
+                    var transition = graph.transitions[transitionIndex];
+                    if (transition == null || transition.condition != ComboInputCondition.Hold) continue;
+                    var destination = FindInstance(graph, transition.toInstanceId);
+                    if (destination != null && destination.enableCharge)
+                        transition.requiresHit = true;
+                }
+            }
         }
 
         void MigrateLegacyCombosToGraphs()

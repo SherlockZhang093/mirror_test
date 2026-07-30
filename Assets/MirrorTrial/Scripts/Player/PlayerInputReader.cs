@@ -14,7 +14,8 @@ namespace MirrorTrial.Player
         WeaponSlot2,
         WeaponSlot3,
         WeaponSlot4,
-        Dodge
+        Dodge,
+        Recover
     }
 
     [Serializable]
@@ -53,6 +54,9 @@ namespace MirrorTrial.Player
         readonly Dictionary<PlayerInputCommand, bool> pressed = new Dictionary<PlayerInputCommand, bool>();
         readonly Dictionary<PlayerInputCommand, bool> released = new Dictionary<PlayerInputCommand, bool>();
         readonly Dictionary<PlayerInputCommand, bool> held = new Dictionary<PlayerInputCommand, bool>();
+        readonly HashSet<PlayerInputCommand> previewHeld = new HashSet<PlayerInputCommand>();
+        readonly HashSet<PlayerInputCommand> previewPressed = new HashSet<PlayerInputCommand>();
+        readonly HashSet<PlayerInputCommand> previewReleased = new HashSet<PlayerInputCommand>();
 
         public bool InputEnabled { get; set; } = true;
         public float MoveX { get; private set; }
@@ -66,6 +70,7 @@ namespace MirrorTrial.Player
         public bool MirrorBladePressed => WeaponSkillPressed;
         public bool EchoDashPressed => MobilitySkillPressed;
         public bool DodgePressed => WasPressed(PlayerInputCommand.Dodge);
+        public bool RecoverPressed => WasPressed(PlayerInputCommand.Recover);
 
         public IList<PlayerInputBinding> Bindings { get { return bindings; } }
 
@@ -122,8 +127,46 @@ namespace MirrorTrial.Player
                 released[binding.command] = isReleased;
                 held[binding.command] = isHeld;
             }
+            ApplyPreviewInput();
         }
 
+        public void PreviewTap(PlayerInputCommand command)
+        {
+            previewPressed.Add(command);
+            previewReleased.Add(command);
+            previewHeld.Remove(command);
+        }
+
+        public void PreviewPress(PlayerInputCommand command)
+        {
+            if (previewHeld.Add(command))
+                previewPressed.Add(command);
+            previewReleased.Remove(command);
+        }
+
+        public void PreviewRelease(PlayerInputCommand command)
+        {
+            if (previewHeld.Remove(command))
+                previewReleased.Add(command);
+        }
+
+        public void ClearPreviewInput()
+        {
+            foreach (var command in previewHeld)
+                previewReleased.Add(command);
+            previewHeld.Clear();
+            previewPressed.Clear();
+        }
+
+        void ApplyPreviewInput()
+        {
+            foreach (PlayerInputCommand command in Enum.GetValues(typeof(PlayerInputCommand)))
+            {
+                if (previewPressed.Remove(command)) pressed[command] = true;
+                if (previewReleased.Remove(command)) released[command] = true;
+                if (previewHeld.Contains(command)) held[command] = true;
+            }
+        }
         public bool WasPressed(PlayerInputCommand command)
         {
             bool value;
@@ -157,7 +200,7 @@ namespace MirrorTrial.Player
             if (bindingSchemaVersion < 2)
             {
                 bindings = CreateDefaultBindings();
-                bindingSchemaVersion = 4;
+                bindingSchemaVersion = 5;
                 return;
             }
             if (bindings == null)
@@ -191,7 +234,7 @@ namespace MirrorTrial.Player
                 if (!exists)
                     bindings.Add(defaults[i]);
             }
-            bindingSchemaVersion = 4;
+            bindingSchemaVersion = 5;
         }
 
         void RemoveBindingsCreatedByDodgePopupBug()
@@ -226,7 +269,8 @@ namespace MirrorTrial.Player
                 new PlayerInputBinding(PlayerInputCommand.WeaponSlot2, string.Empty, KeyCode.Alpha2),
                 new PlayerInputBinding(PlayerInputCommand.WeaponSlot3, string.Empty, KeyCode.Alpha3),
                 new PlayerInputBinding(PlayerInputCommand.WeaponSlot4, string.Empty, KeyCode.Alpha4),
-                new PlayerInputBinding(PlayerInputCommand.Dodge, string.Empty, KeyCode.LeftShift)
+                new PlayerInputBinding(PlayerInputCommand.Dodge, string.Empty, KeyCode.LeftShift),
+                new PlayerInputBinding(PlayerInputCommand.Recover, string.Empty, KeyCode.G)
             };
         }
     }

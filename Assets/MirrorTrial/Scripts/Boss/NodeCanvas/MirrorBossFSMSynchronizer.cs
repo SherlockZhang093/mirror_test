@@ -36,6 +36,7 @@ namespace MirrorTrial.Boss.NodeCanvasIntegration
                 case MirrorBossActorV2.State.Recovery: return "05 硬直：攻击结束后留给玩家反击时间";
                 case MirrorBossActorV2.State.PhaseChange: return "06 转阶段：变色并短暂防御";
                 case MirrorBossActorV2.State.Dead: return "07 死亡：停止战斗并沿用关卡结算流程";
+                case MirrorBossActorV2.State.Launch: return "08 击飞：暂停行为树直到落地恢复";
                 default: return state.ToString();
             }
         }

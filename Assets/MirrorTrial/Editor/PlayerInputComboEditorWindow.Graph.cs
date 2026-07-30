@@ -12,7 +12,7 @@ namespace MirrorTrial.Editor
         int selectedGraphIndex;
         int selectedGraphMoveIndex;
         bool moveCombatExpanded = true;
-        bool moveChargeExpanded;
+        bool moveChargeExpanded = true;
         bool moveFeedbackExpanded;
         Vector2 comboGraphScroll;
         bool connectionSettingsExpanded;
@@ -98,6 +98,7 @@ namespace MirrorTrial.Editor
             {
                 EditorGUILayout.LabelField("连招路线图", EditorStyles.boldLabel);
                 GUILayout.FlexibleSpace();
+                if (GUILayout.Button("\u81ea\u52a8\u6574\u7406", GUILayout.Width(72f))) { AutoArrangeCurrentGraph(); return; }
                 if (GUILayout.Button("添加招式", GUILayout.Width(82f))) { AddComboMove(false); return; }
                 using (new EditorGUI.DisabledScope(moves.arraySize == 0))
                     if (GUILayout.Button("复制所选", GUILayout.Width(72f))) { AddComboMove(true); return; }
@@ -160,7 +161,7 @@ namespace MirrorTrial.Editor
             if (connectingFromNodeIndex < 0 || connectingFromNodeIndex >= layouts.Count) return;
             var from = OffsetRect(layouts[connectingFromNodeIndex].rect, canvas.position);
             var start = new Vector3(from.xMax, from.center.y);
-            var end = Event.current.mousePosition;
+            var end = (Vector3)Event.current.mousePosition;
             Handles.BeginGUI();
             Handles.DrawBezier(start, end, start + Vector3.right * 70f, end + Vector3.left * 70f, new Color(0.3f, 0.9f, 1f), null, 3f);
             Handles.EndGUI();
@@ -222,8 +223,9 @@ namespace MirrorTrial.Editor
                 var controlB = end + Vector3.left * tangent;
                 var baseColor = GetConditionColor((ComboInputCondition)link.FindPropertyRelative("condition").enumValueIndex);
                 var selected = selectedTransitionIndex == i;
-                var color = selected ? new Color(1f, 0.88f, 0.2f) : baseColor;
-                Handles.DrawBezier(start, end, controlA, controlB, color, null, selected ? 5f : 3f);
+                var runtimeActive = IsRuntimePreviewTransition(link.FindPropertyRelative("id").stringValue);
+                var color = runtimeActive ? new Color(0.35f, 1f, 0.38f) : selected ? new Color(1f, 0.88f, 0.2f) : baseColor;
+                Handles.DrawBezier(start, end, controlA, controlB, color, null, runtimeActive || selected ? 5f : 3f);
                 Handles.color = color;
                 Handles.DrawAAConvexPolygon(end, end + new Vector3(-10f, -5f), end + new Vector3(-10f, 5f));
                 if (evt.type == EventType.MouseDown && evt.button == 0)
@@ -267,7 +269,9 @@ namespace MirrorTrial.Editor
                 var rect = OffsetRect(layout.rect, canvas.position);
                 var inputPort = new Rect(rect.x - 7f, rect.center.y - 7f, 14f, 14f);
                 var outputPort = new Rect(rect.xMax - 7f, rect.center.y - 7f, 14f, 14f);
-                var isEntry = node.FindPropertyRelative("id").stringValue == entryId;
+                var nodeId = node.FindPropertyRelative("id").stringValue;
+                var isEntry = nodeId == entryId;
+                var isRuntime = IsRuntimePreviewMove(nodeId);
                 var isSelected = layout.index == selectedGraphMoveIndex && selectedTransitionIndex < 0;
                 var charge = node.FindPropertyRelative("enableCharge").boolValue;
                 var heavy = move != null && move.FindPropertyRelative("attackType").enumValueIndex == 1;
@@ -281,7 +285,8 @@ namespace MirrorTrial.Editor
                 GUI.backgroundColor = old;
                 EditorGUI.DrawRect(inputPort, new Color(0.75f, 0.82f, 0.9f));
                 EditorGUI.DrawRect(outputPort, connectingFromNodeIndex == layout.index ? new Color(0.2f, 1f, 1f) : new Color(0.35f, 0.85f, 1f));
-                if (isSelected) DrawRectOutline(rect, new Color(0.25f, 0.85f, 1f), 3f);
+                if (isRuntime) DrawRectOutline(rect, new Color(0.35f, 1f, 0.38f), 4f);
+                else if (isSelected) DrawRectOutline(rect, new Color(0.25f, 0.85f, 1f), 3f);
             }
             HandleConnectionRelease(evt, canvas, layouts);
             if (evt.type == EventType.MouseUp && evt.button == 0) draggingNodeIndex = -1;
@@ -369,11 +374,10 @@ namespace MirrorTrial.Editor
         {
             var condition = (ComboInputCondition)link.FindPropertyRelative("condition").enumValueIndex;
             var text = condition == ComboInputCondition.Press ? "点击" : condition == ComboInputCondition.Tap ? "轻点" : condition == ComboInputCondition.Hold ? "按住" : "松开";
-            if (condition == ComboInputCondition.Hold || condition == ComboInputCondition.Tap)
-                text += " " + link.FindPropertyRelative("holdThreshold").floatValue.ToString("0.##") + "s";
             var command = (PlayerInputCommand)link.FindPropertyRelative("input").enumValueIndex;
             for (var i = 0; i < CommandValues.Length; i++) if (CommandValues[i] == command) { text += " " + CommandLabels[i]; break; }
-            return text + "\n" + link.FindPropertyRelative("windowStart").floatValue.ToString("0.##") + "–" + link.FindPropertyRelative("windowEnd").floatValue.ToString("0.##") + "s";
+            if (link.FindPropertyRelative("requiresHit").boolValue) text += " · 需命中";
+            return text + "\n" + link.FindPropertyRelative("windowStart").floatValue.ToString("0.##") + "-" + link.FindPropertyRelative("windowEnd").floatValue.ToString("0.##") + "s";
         }
 
         static Color GetConditionColor(ComboInputCondition condition)
@@ -403,32 +407,32 @@ namespace MirrorTrial.Editor
             EditorGUILayout.Space(8f);
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                GUILayout.Label("当前连接", EditorStyles.boldLabel);
+                GUILayout.Label("\u5f53\u524d\u8fde\u63a5", EditorStyles.boldLabel);
                 GUILayout.FlexibleSpace();
-                if (GUILayout.Button("删除连接", EditorStyles.toolbarButton, GUILayout.Width(72f))) { DeleteComboTransition(index); return; }
+                if (GUILayout.Button("\u5220\u9664\u8fde\u63a5", EditorStyles.toolbarButton, GUILayout.Width(72f))) { DeleteComboTransition(index); return; }
             }
-            var labels = BuildNameLabels(moves, "招式");
+            var labels = BuildNameLabels(moves, "\u62db\u5f0f");
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    DrawMoveIdPopup(link.FindPropertyRelative("fromInstanceId"), moves, labels, "从"थ);
+                    DrawMoveIdPopup(link.FindPropertyRelative("fromInstanceId"), moves, labels, "从");
                     GUILayout.Label("→", GUILayout.Width(18f));
                     DrawMoveIdPopup(link.FindPropertyRelative("toInstanceId"), moves, labels, "到");
                 }
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    DrawCommandPopup(link.FindPropertyRelative("input"), new GUIContent("输入"));
-                    EditorGUILayout.PropertyField(link.FindPropertyRelative("condition"), new GUIContent("方式"));
+                    DrawCommandPopup(link.FindPropertyRelative("input"), new GUIContent("\u8f93\u5165"));
+                    EditorGUILayout.PropertyField(link.FindPropertyRelative("condition"), new GUIContent("\u65b9\u5f0f"));
                 }
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    EditorGUILayout.PropertyField(link.FindPropertyRelative("windowStart"), new GUIContent("窗口开始"));
-                    EditorGUILayout.PropertyField(link.FindPropertyRelative("windowEnd"), new GUIContent("窗口结束"));
+                    EditorGUILayout.PropertyField(link.FindPropertyRelative("windowStart"), new GUIContent("\u7a97\u53e3\u5f00\u59cb"));
+                    EditorGUILayout.PropertyField(link.FindPropertyRelative("windowEnd"), new GUIContent("\u7a97\u53e3\u7ed3\u675f"));
                 }
                 var condition = (ComboInputCondition)link.FindPropertyRelative("condition").enumValueIndex;
-                if (condition == ComboInputCondition.Hold || condition == ComboInputCondition.Tap)
-                    EditorGUILayout.PropertyField(link.FindPropertyRelative("holdThreshold"), new GUIContent(condition == ComboInputCondition.Hold ? "按住判定" : "轻点最长时间"));
+                DrawTransitionDecisionHint(condition);
+                EditorGUILayout.PropertyField(link.FindPropertyRelative("requiresHit"), new GUIContent("需要前一招命中"));
             }
         }
 
@@ -476,7 +480,7 @@ namespace MirrorTrial.Editor
 
             moveCombatExpanded = EditorGUILayout.Foldout(moveCombatExpanded, "伤害与目标反应", true, EditorStyles.foldoutHeader);
             if (moveCombatExpanded) DrawMoveCombat(move);
-            moveChargeExpanded = EditorGUILayout.Foldout(moveChargeExpanded, "蓄力", true, EditorStyles.foldoutHeader);
+            moveChargeExpanded = EditorGUILayout.Foldout(moveChargeExpanded, "蓄力设置", true, EditorStyles.foldoutHeader);
             if (moveChargeExpanded) DrawMoveCharge(node);
             moveFeedbackExpanded = EditorGUILayout.Foldout(moveFeedbackExpanded, "命中反馈", true, EditorStyles.foldoutHeader);
             if (moveFeedbackExpanded) DrawHitFeedbackEditor(move);
@@ -516,24 +520,64 @@ namespace MirrorTrial.Editor
         {
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
+                EditorGUILayout.HelpBox("这里控制选中招式进入蓄力状态后的表现。连线上的‘按住判定’只负责决定是否进入这条蓄力分支。", MessageType.Info);
+
                 var enabled = node.FindPropertyRelative("enableCharge");
-                EditorGUILayout.PropertyField(enabled, new GUIContent("启用蓄力"));
-                if (!enabled.boolValue) return;
-                EditorGUILayout.PropertyField(node.FindPropertyRelative("chargeAnimation"), new GUIContent("蓄力动画"));
+                EditorGUILayout.PropertyField(enabled, new GUIContent("启用蓄力", "开启后，这个招式会等待玩家松开按键再出招。"));
+                if (!enabled.boolValue)
+                {
+                    EditorGUILayout.LabelField("当前招式会直接播放，不进行蓄力。", EditorStyles.miniLabel);
+                    return;
+                }
+
+                EditorGUILayout.Space(3f);
+                EditorGUILayout.LabelField("蓄力时间", EditorStyles.boldLabel);
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    EditorGUILayout.PropertyField(node.FindPropertyRelative("minimumChargeTime"), new GUIContent("最低蓄力"));
-                    EditorGUILayout.PropertyField(node.FindPropertyRelative("maximumChargeTime"), new GUIContent("满蓄力"));
+                    EditorGUILayout.PropertyField(node.FindPropertyRelative("minimumChargeTime"), new GUIContent("最低有效蓄力", "低于该时间时不会完成蓄力招式。通常与连线的按住判定保持一致。"));
+                    EditorGUILayout.PropertyField(node.FindPropertyRelative("maximumChargeTime"), new GUIContent("达到满蓄力", "伤害和击退增长到最大值所需的总按住时间。"));
                 }
+
+                EditorGUILayout.Space(3f);
+                EditorGUILayout.LabelField("击飞判定", EditorStyles.boldLabel);
+                EditorGUILayout.PropertyField(node.FindPropertyRelative("launchChargeThreshold"),
+                    new GUIContent("击飞就绪进度", "只有招式配置为“击飞”且蓄力进度达到此值时才会真正击飞。"));
+                EditorGUILayout.PropertyField(node.FindPropertyRelative("insufficientLaunchReaction"),
+                    new GUIContent("未达标受击", "击飞技未达到阈值时，敌人采用的受击反应。若误选击飞，运行时会回退为重受击。"));
+                EditorGUILayout.HelpBox("蓄力分为第一阶段（蓄力中）与第二阶段（击飞就绪）；满蓄力是第二阶段的最终状态。", MessageType.None);
+
+                EditorGUILayout.Space(3f);
+                EditorGUILayout.LabelField("蓄力收益", EditorStyles.boldLabel);
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    EditorGUILayout.PropertyField(node.FindPropertyRelative("fullChargeDamageMultiplier"), new GUIContent("满蓄力伤害"));
-                    EditorGUILayout.PropertyField(node.FindPropertyRelative("fullChargeKnockbackMultiplier"), new GUIContent("满蓄力击退"));
+                    EditorGUILayout.PropertyField(node.FindPropertyRelative("fullChargeDamageMultiplier"), new GUIContent("满蓄力伤害倍率"));
+                    EditorGUILayout.PropertyField(node.FindPropertyRelative("fullChargeKnockbackMultiplier"), new GUIContent("满蓄力击退倍率"));
                 }
-                EditorGUILayout.PropertyField(node.FindPropertyRelative("autoReleaseAtFullCharge"), new GUIContent("满蓄力自动释放"));
+
+                var autoRelease = node.FindPropertyRelative("autoReleaseAtFullCharge");
+                EditorGUILayout.PropertyField(autoRelease, new GUIContent("蓄满后自动出招", "关闭时，蓄满后会保持满蓄力，直到玩家松开按键。"));
+                EditorGUILayout.HelpBox(autoRelease.boolValue
+                    ? "当前释放方式：达到满蓄力后自动出招。"
+                    : "当前释放方式：可以一直按住；蓄满后保持，松开按键才出招。", MessageType.None);
+
+                EditorGUILayout.Space(3f);
+                EditorGUILayout.LabelField("蓄力表现", EditorStyles.boldLabel);
+EditorGUILayout.PropertyField(
+                    node.FindPropertyRelative("chargeHoldFrame"),
+                    new GUIContent("蓄力定格帧", "该动作播放到指定动画帧后暂停；松开按键后从这一帧继续播放。"));
+                EditorGUILayout.HelpBox("蓄力会定格当前招式自己的动画，不会切换到另一段蓄力动画。", MessageType.None);
+                var showEffect = node.FindPropertyRelative("showChargeEffect");
+                EditorGUILayout.PropertyField(showEffect, new GUIContent("显示蓄力特效"));
+                if (showEffect.boolValue)
+                {
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.PropertyField(node.FindPropertyRelative("chargeEffectPrefab"), new GUIContent("蓄力特效 Prefab", "颜色、光点、脉冲和音效统一在 Prefab 的 ChargeTelegraphPresentation 组件中调整。"));
+                    EditorGUILayout.PropertyField(node.FindPropertyRelative("chargeEffectOffset"), new GUIContent("特效位置偏移"));
+                    EditorGUILayout.HelpBox("这里只选择 Prefab 和调整挂点位置。特效外观请直接打开 Prefab 调整。", MessageType.Info);
+                    EditorGUI.indentLevel--;
+                }
             }
         }
-
         void DrawComboTransitions(SerializedProperty links, SerializedProperty moves)
         {
             using (new EditorGUILayout.HorizontalScope())
@@ -567,12 +611,19 @@ namespace MirrorTrial.Editor
                         EditorGUILayout.PropertyField(link.FindPropertyRelative("windowEnd"), new GUIContent("窗口结束"));
                     }
                     var condition = (ComboInputCondition)link.FindPropertyRelative("condition").enumValueIndex;
-                    if (condition == ComboInputCondition.Hold || condition == ComboInputCondition.Tap)
-                        EditorGUILayout.PropertyField(link.FindPropertyRelative("holdThreshold"), new GUIContent(condition == ComboInputCondition.Hold ? "按住判定" : "轻点最长时间"));
+                    DrawTransitionDecisionHint(condition);
+                    EditorGUILayout.PropertyField(link.FindPropertyRelative("requiresHit"), new GUIContent("需要前一招命中"));
                 }
             }
         }
 
+        static void DrawTransitionDecisionHint(ComboInputCondition condition)
+        {
+            if (condition == ComboInputCondition.Hold)
+                EditorGUILayout.HelpBox("源招式结束时按键仍处于按住状态，就进入蓄力招式。", MessageType.Info);
+            else if (condition == ComboInputCondition.Tap)
+                EditorGUILayout.HelpBox("源招式结束前已经松开按键，就进入快速招式。", MessageType.Info);
+        }
         SerializedProperty GetSelectedGraphMoveProperty()
         {
             var graphs = serializedCombat != null ? serializedCombat.FindProperty("comboGraphs") : null;
@@ -613,6 +664,7 @@ namespace MirrorTrial.Editor
         {
             serializedCombat.ApplyModifiedProperties();
             EditorUtility.SetDirty(combat);
+            SyncRuntimePreviewIfNeeded();
             serializedCombat = new SerializedObject(combat);
             serializedCombat.Update();
         }
@@ -620,6 +672,7 @@ namespace MirrorTrial.Editor
         void AddComboGraph()
         {
             CommitAndRefresh();
+            Undo.RecordObject(combat, "新建连招");
             combat.ComboGraphs.Add(new PlayerComboGraph { name = "新连招" });
             selectedGraphIndex = combat.ComboGraphs.Count - 1;
             selectedGraphMoveIndex = 0;
@@ -629,6 +682,7 @@ namespace MirrorTrial.Editor
         void DeleteComboGraph()
         {
             CommitAndRefresh();
+            Undo.RecordObject(combat, "删除连招");
             if (combat.ComboGraphs.Count > 0) combat.ComboGraphs.RemoveAt(Mathf.Clamp(selectedGraphIndex, 0, combat.ComboGraphs.Count - 1));
             selectedGraphIndex = Mathf.Max(0, selectedGraphIndex - 1);
             selectedGraphMoveIndex = 0;
@@ -637,41 +691,37 @@ namespace MirrorTrial.Editor
 
         void AddComboMove(bool duplicate)
         {
+            if (duplicate)
+            {
+                DuplicateComboMove(selectedGraphMoveIndex);
+                return;
+            }
             CommitAndRefresh();
             var graph = combat.ComboGraphs[selectedGraphIndex];
-            PlayerComboMove node;
-            if (duplicate && graph.instances.Count > 0)
-            {
-                var source = graph.instances[Mathf.Clamp(selectedGraphMoveIndex, 0, graph.instances.Count - 1)];
-                node = JsonUtility.FromJson<PlayerComboMove>(JsonUtility.ToJson(source));
-                node.id = Guid.NewGuid().ToString("N");
-                node.name += " 副本";
-            }
-            else
-            {
-                node = new PlayerComboMove { id = Guid.NewGuid().ToString("N"), name = "新招式", move = new PlayerComboStep { name = "新招式" } };
-            }
-            graph.instances.Add(node);
-            if (string.IsNullOrEmpty(graph.entryInstanceId)) graph.entryInstanceId = node.id;
-            selectedGraphMoveIndex = graph.instances.Count - 1;
-            RefreshAfterStructureChange();
+            var position = graph.instances.Count == 0
+                ? new Vector2(35f, 55f)
+                : graph.instances[Mathf.Clamp(selectedGraphMoveIndex, 0, graph.instances.Count - 1)].graphPosition + new Vector2(225f, 0f);
+            AddComboMoveAt(position);
         }
 
         void DeleteComboMove(int index)
         {
             CommitAndRefresh();
+            Undo.RecordObject(combat, "删除连招招式");
             var graph = combat.ComboGraphs[selectedGraphIndex];
             var id = graph.instances[index].id;
             graph.instances.RemoveAt(index);
             graph.transitions.RemoveAll(x => x.fromInstanceId == id || x.toInstanceId == id);
             if (graph.entryInstanceId == id) graph.entryInstanceId = graph.instances.Count > 0 ? graph.instances[0].id : string.Empty;
             selectedGraphMoveIndex = Mathf.Max(0, selectedGraphMoveIndex - 1);
+            selectedTransitionIndex = -1;
             RefreshAfterStructureChange();
         }
 
         void AddComboTransition()
         {
             CommitAndRefresh();
+            Undo.RecordObject(combat, "添加连招连接");
             var graph = combat.ComboGraphs[selectedGraphIndex];
             graph.transitions.Add(new PlayerComboTransition
             {
@@ -685,15 +735,129 @@ namespace MirrorTrial.Editor
         void DeleteComboTransition(int index)
         {
             CommitAndRefresh();
+            Undo.RecordObject(combat, "删除连招连接");
             combat.ComboGraphs[selectedGraphIndex].transitions.RemoveAt(index);
+            selectedTransitionIndex = -1;
+            RefreshAfterStructureChange();
+        }
+
+        void AddComboMoveAt(Vector2 position)
+        {
+            CommitAndRefresh();
+            Undo.RecordObject(combat, "新建连招招式");
+            var graph = combat.ComboGraphs[selectedGraphIndex];
+            var node = new PlayerComboMove
+            {
+                id = Guid.NewGuid().ToString("N"),
+                name = "新招式",
+                move = new PlayerComboStep { name = "新招式" },
+                graphPosition = new Vector2(Mathf.Max(12f, position.x), Mathf.Max(12f, position.y))
+            };
+            graph.instances.Add(node);
+            if (string.IsNullOrEmpty(graph.entryInstanceId)) graph.entryInstanceId = node.id;
+            selectedGraphMoveIndex = graph.instances.Count - 1;
+            selectedTransitionIndex = -1;
+            RefreshAfterStructureChange();
+        }
+
+        void DuplicateComboMove(int index)
+        {
+            CommitAndRefresh();
+            Undo.RecordObject(combat, "复制连招招式");
+            var graph = combat.ComboGraphs[selectedGraphIndex];
+            var source = graph.instances[Mathf.Clamp(index, 0, graph.instances.Count - 1)];
+            var node = JsonUtility.FromJson<PlayerComboMove>(JsonUtility.ToJson(source));
+            node.id = Guid.NewGuid().ToString("N");
+            node.name += " 副本";
+            node.graphPosition += new Vector2(35f, 85f);
+            graph.instances.Add(node);
+            selectedGraphMoveIndex = graph.instances.Count - 1;
+            selectedTransitionIndex = -1;
+            RefreshAfterStructureChange();
+        }
+
+        void SetEntryMove(int index)
+        {
+            CommitAndRefresh();
+            Undo.RecordObject(combat, "设置连招起手");
+            var graph = combat.ComboGraphs[selectedGraphIndex];
+            graph.entryInstanceId = graph.instances[Mathf.Clamp(index, 0, graph.instances.Count - 1)].id;
+            RefreshAfterStructureChange();
+        }
+
+        void CreateGraphConnection(int fromIndex, int toIndex)
+        {
+            CommitAndRefresh();
+            var graph = combat.ComboGraphs[selectedGraphIndex];
+            if (fromIndex < 0 || toIndex < 0 || fromIndex >= graph.instances.Count || toIndex >= graph.instances.Count || fromIndex == toIndex) return;
+            var fromId = graph.instances[fromIndex].id;
+            var toId = graph.instances[toIndex].id;
+            for (var i = 0; i < graph.transitions.Count; i++)
+            {
+                var existing = graph.transitions[i];
+                if (existing.fromInstanceId == fromId && existing.toInstanceId == toId && existing.condition == ComboInputCondition.Press)
+                    return;
+            }
+            Undo.RecordObject(combat, "创建连招连接");
+            graph.transitions.Add(new PlayerComboTransition
+            {
+                id = Guid.NewGuid().ToString("N"),
+                fromInstanceId = fromId,
+                toInstanceId = toId,
+                input = PlayerInputCommand.PrimaryAttack,
+                condition = ComboInputCondition.Press
+            });
+            selectedTransitionIndex = graph.transitions.Count - 1;
+            RefreshAfterStructureChange();
+        }
+
+        void AutoArrangeCurrentGraph()
+        {
+            CommitAndRefresh();
+            Undo.RecordObject(combat, "自动整理连招图");
+            var graph = combat.ComboGraphs[selectedGraphIndex];
+            var count = graph.instances.Count;
+            if (count == 0) return;
+            var indexById = new Dictionary<string, int>();
+            var depth = new int[count];
+            for (var i = 0; i < count; i++) { indexById[graph.instances[i].id] = i; depth[i] = -1; }
+            if (indexById.TryGetValue(graph.entryInstanceId, out var entry)) depth[entry] = 0; else depth[0] = 0;
+            for (var pass = 0; pass < count; pass++)
+            {
+                var changed = false;
+                for (var i = 0; i < graph.transitions.Count; i++)
+                {
+                    var link = graph.transitions[i];
+                    if (!indexById.TryGetValue(link.fromInstanceId, out var from) || !indexById.TryGetValue(link.toInstanceId, out var to) || depth[from] < 0) continue;
+                    var next = depth[from] + 1;
+                    if (depth[to] < next) { depth[to] = next; changed = true; }
+                }
+                if (!changed) break;
+            }
+            var maxDepth = 0;
+            for (var i = 0; i < count; i++) maxDepth = Mathf.Max(maxDepth, depth[i]);
+            for (var i = 0; i < count; i++) if (depth[i] < 0) depth[i] = ++maxDepth;
+            var rows = new Dictionary<int, int>();
+            for (var i = 0; i < count; i++) rows[depth[i]] = rows.TryGetValue(depth[i], out var rowCount) ? rowCount + 1 : 1;
+            var maxRows = 1;
+            foreach (var pair in rows) maxRows = Mathf.Max(maxRows, pair.Value);
+            var cursor = new Dictionary<int, int>();
+            for (var i = 0; i < count; i++)
+            {
+                var row = cursor.TryGetValue(depth[i], out var current) ? current : 0;
+                cursor[depth[i]] = row + 1;
+                graph.instances[i].graphPosition = new Vector2(35f + depth[i] * 225f, 28f + (row + (maxRows - rows[depth[i]]) * 0.5f) * 105f);
+            }
             RefreshAfterStructureChange();
         }
 
         void RefreshAfterStructureChange()
         {
             EditorUtility.SetDirty(combat);
+            SyncRuntimePreviewIfNeeded();
             serializedCombat = new SerializedObject(combat);
             GUIUtility.ExitGUI();
         }
     }
 }
+// Graph editor compile refresh

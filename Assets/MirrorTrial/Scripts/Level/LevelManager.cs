@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using MirrorTrial.Player;
 using UnityEngine;
 
 namespace MirrorTrial.Level
@@ -7,6 +8,7 @@ namespace MirrorTrial.Level
     public class LevelManager : MonoBehaviour
     {
         [Header("关卡信息")]
+        [ChineseLabel("关卡配置")] [SerializeField] LevelConfig levelConfig;
         [ChineseLabel("关卡ID")] [SerializeField] string levelId = "Level_Reality_01";
         [ChineseLabel("关卡显示名")] [SerializeField] string levelDisplayName = "第一关";
         [ChineseLabel("玩家出生点")] [SerializeField] Transform playerSpawn;
@@ -25,10 +27,12 @@ namespace MirrorTrial.Level
         [ChineseLabel("门")] [SerializeField] List<AreaGate> gates = new List<AreaGate>();
         [ChineseLabel("刷怪点")] [SerializeField] List<SpawnPoint> spawnPoints = new List<SpawnPoint>();
 
+        public LevelConfig Config => levelConfig;
         public string LevelId => levelId;
         public string LevelDisplayName => levelDisplayName;
         public Transform PlayerSpawn => playerSpawn;
         public GameObject PlayerPrefab => playerPrefab;
+        public PlayerHealthBarView HealthHudPrefab => levelConfig ? levelConfig.playerHealthHudPrefab : null;
         public Transform GeometryRoot => geometryRoot;
         public Transform GameplayRoot => gameplayRoot;
         public Transform RuntimeRoot => runtimeRoot;
@@ -42,9 +46,21 @@ namespace MirrorTrial.Level
 
         [ChineseLabel("启动时自动收集")] public bool AutoCollectOnAwake = true;
         [SerializeField] bool setupDefaultCameraFollow = true;
+        [Header("Camera View Limits")]
+        [SerializeField] bool limitCameraToVisibleArea;
+        [SerializeField] Rect cameraVisibleArea = new Rect(-5f, -7f, 20f, 12f);
+        [Header("Water")]
+        [SerializeField] LevelWaterSurface waterSurface;
+
+        public bool LimitCameraToVisibleArea => limitCameraToVisibleArea;
+        public Rect CameraVisibleArea => cameraVisibleArea;
+        public LevelWaterSurface WaterSurface => waterSurface;
 
         void Awake()
         {
+            if (HealthHudPrefab)
+                MirrorTrial.Player.PlayerHealthBarUI.SetLevelViewPrefab(HealthHudPrefab);
+
             EnsureRoots();
             if (AutoCollectOnAwake)
                 CollectAll();
@@ -97,6 +113,12 @@ namespace MirrorTrial.Level
             director.SetBrain(brain);
             director.SyncLens(Camera.main);
             director.SetPlayerTarget(target);
+
+            if (limitCameraToVisibleArea && cameraVisibleArea.width > 0f && cameraVisibleArea.height > 0f)
+            {
+                director.SetVisibleArea(cameraVisibleArea);
+                return;
+            }
 
             var bounds = ComputeSceneBounds();
             if (bounds.minX > float.MinValue &&
@@ -249,10 +271,17 @@ namespace MirrorTrial.Level
 
         void OnDrawGizmos()
         {
-            if (!playerSpawn) return;
-            Gizmos.color = Color.green;
-            Gizmos.DrawSphere(playerSpawn.position, 0.2f);
-            Gizmos.DrawLine(playerSpawn.position, playerSpawn.position + Vector3.up * 1f);
+            if (playerSpawn)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawSphere(playerSpawn.position, 0.2f);
+                Gizmos.DrawLine(playerSpawn.position, playerSpawn.position + Vector3.up * 1f);
+            }
+            if (limitCameraToVisibleArea)
+            {
+                Gizmos.color = new Color(0.25f, 0.85f, 1f, 0.9f);
+                Gizmos.DrawWireCube(cameraVisibleArea.center, cameraVisibleArea.size);
+            }
         }
     }
 }

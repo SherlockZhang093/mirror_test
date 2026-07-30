@@ -16,22 +16,9 @@ namespace MirrorTrial.Level
         [SerializeField, InspectorName("跟随纵向")] bool followY = true;
         [SerializeField, InspectorName("限制横向边界")] bool clampHorizontal = true;
         [SerializeField, InspectorName("相机 Z 轴位置")] float cameraZ = -10f;
-        [Header("命中镜头反馈")]
-        [SerializeField, Min(0f), InspectorName("轻命中推镜距离")] float lightKickDistance = 0.08f;
-        [SerializeField, Min(0f), InspectorName("重命中推镜距离")] float heavyKickDistance = 0.22f;
-        [SerializeField, Min(0f), InspectorName("推镜回正速度")] float kickReturnSpeed = 18f;
-        [SerializeField, Min(0f), InspectorName("震屏幅度")] float shakeAmplitudePerPower = 0.08f;
-        [SerializeField, Min(0f), InspectorName("震屏持续时间")] float shakeDurationPerPower = 0.08f;
-        [SerializeField, Min(0f), InspectorName("震屏频率")] float shakeFrequency = 38f;
-
         Vector3 velocity;
         Vector2 lookAhead;
         Vector2 lookAheadVelocity;
-        Vector2 kickOffset;
-        float shakeTimeRemaining;
-        float shakeDuration;
-        float shakeAmplitude;
-        float shakeSeed;
         Vector3 lastTargetPosition;
         Camera attachedCamera;
         bool hasHorizontalBounds;
@@ -81,8 +68,7 @@ namespace MirrorTrial.Level
             if (!target) return;
 
             UpdateLookAhead();
-            UpdateKickOffset();
-            var desired = GetDesiredPosition() + (Vector3)kickOffset + (Vector3)GetShakeOffset();
+            var desired = GetDesiredPosition();
             transform.position = smoothTime <= 0f
                 ? desired
                 : Vector3.SmoothDamp(transform.position, desired, ref velocity, smoothTime, Mathf.Infinity, Time.unscaledDeltaTime);
@@ -123,38 +109,6 @@ namespace MirrorTrial.Level
                 desiredLookAhead.x = Mathf.Sign(delta.x) * lookAheadDistance;
             lookAhead = Vector2.SmoothDamp(lookAhead, desiredLookAhead, ref lookAheadVelocity, lookAheadSmoothTime, Mathf.Infinity, Time.unscaledDeltaTime);
             lastTargetPosition = targetPosition;
-        }
-
-        void UpdateKickOffset()
-        {
-            kickOffset = Vector2.Lerp(kickOffset, Vector2.zero, 1f - Mathf.Exp(-kickReturnSpeed * Time.unscaledDeltaTime));
-        }
-
-        Vector2 GetShakeOffset()
-        {
-            if (shakeTimeRemaining <= 0f)
-                return Vector2.zero;
-
-            shakeTimeRemaining = Mathf.Max(0f, shakeTimeRemaining - Time.unscaledDeltaTime);
-            var t = shakeDuration > 0f ? shakeTimeRemaining / shakeDuration : 0f;
-            var noiseX = Mathf.PerlinNoise(shakeSeed, Time.unscaledTime * shakeFrequency) * 2f - 1f;
-            var noiseY = Mathf.PerlinNoise(shakeSeed + 17.37f, Time.unscaledTime * shakeFrequency) * 2f - 1f;
-            return new Vector2(noiseX, noiseY) * shakeAmplitude * t;
-        }
-
-        public void PlayHitFeedback(Vector2 direction, float power)
-        {
-            power = Mathf.Clamp01(power);
-            if (direction.sqrMagnitude <= 0f)
-                direction = Vector2.right;
-
-            var kick = Mathf.Lerp(lightKickDistance, heavyKickDistance, power);
-            kickOffset += direction.normalized * kick;
-
-            shakeDuration = shakeDurationPerPower * power;
-            shakeTimeRemaining = Mathf.Max(shakeTimeRemaining, shakeDuration);
-            shakeAmplitude = Mathf.Max(shakeAmplitude, shakeAmplitudePerPower * power);
-            shakeSeed = Random.value * 100f;
         }
 
         float ClampCameraCenterX(float desiredX)

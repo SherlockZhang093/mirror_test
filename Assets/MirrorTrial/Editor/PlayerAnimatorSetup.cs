@@ -11,6 +11,7 @@ namespace MirrorTrial.Editor
         const string AnimationFolder = "Assets/MirrorTrial/Animations";
         const string PlayerAnimationFolder = AnimationFolder + "/Player";
         const string ClipFolder = PlayerAnimationFolder + "/Clips";
+        const string SharedLaunchFolder = AnimationFolder + "/Enemies/SharedLaunch";
         const string ControllerPath = PlayerAnimationFolder + "/Player_MirrorTrial.controller";
         const string PlayerPrefabPath = "Assets/MirrorTrial/Prefabs/Characters/Player_MirrorTrial.prefab";
         const string SourceAnimationFolder = "Assets/DeadRevolver/PixelPrototypePlayerSprites/Art/Animations/";
@@ -124,10 +125,22 @@ namespace MirrorTrial.Editor
                     idleState = state;
             }
 
+            AddSharedLaunchState(stateMachine, "Launch");
+            AddSharedLaunchState(stateMachine, "LaunchGetUp");
+
             if (idleState != null)
                 stateMachine.defaultState = idleState;
 
             EditorUtility.SetDirty(controller);
+        }
+
+        static void AddSharedLaunchState(AnimatorStateMachine stateMachine, string stateName)
+        {
+            var clip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"{SharedLaunchFolder}/{stateName}.anim");
+            if (!clip) return;
+            var state = stateMachine.AddState(stateName);
+            state.motion = clip;
+            state.writeDefaultValues = false;
         }
 
         static AnimationClip GetOrCreateLocalClip(string stateName, string sourceFileName)

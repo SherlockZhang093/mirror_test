@@ -6,12 +6,18 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
+    path: Assets/MirrorTrial/Scenes/GameEntry.unity
+    guid: 00d6308207da48cd85f1eab582b7dc36
   - enabled: 1
-    path: Assets/MirrorTrial/Scenes/Level_Reality_01_temp.unity
-    guid: e83f3ca0e853c614a989ea40b6b88ea2
+    path: Assets/MirrorTrial/Scenes/Level_Reality_01.unity
+    guid: b1b8c691b557a3b49ab3b3a0f73eaec9
   - enabled: 1
     path: Assets/MirrorTrial/Scenes/Level_Mirror_01.unity
     guid: cfbf6622e84e54a4687980c16ae5e60e
+  - enabled: 1
+    path: Assets/MirrorTrial/Scenes/Level_Reality_02.unity
+    guid: 402649426c03e5140882e189f95d6766
+  - enabled: 1
+    path: Assets/MirrorTrial/Scenes/Level_Mirror_02.unity
+    guid: bb09f50dcdb9e3f45822321155785352
   m_configObjects: {}

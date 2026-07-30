@@ -4,8 +4,10 @@ namespace MirrorTrial.Level
 {
     public static class GameFlow
     {
-        public const string EntrySceneName = "SampleScene";
+        public const string EntrySceneName = "GameEntry";
         public const string FirstRealitySceneName = "Level_Reality_01";
+
+        public static bool TutorialRequested { get; private set; } = true;
 
         static readonly string[] RealityScenes =
         {
@@ -14,6 +16,12 @@ namespace MirrorTrial.Level
 
         public static void StartNewGame()
         {
+            StartNewGame(true);
+        }
+
+        public static void StartNewGame(bool playTutorial)
+        {
+            TutorialRequested = playTutorial;
             MirrorTransitionBridge.Ensure().ResetForNewGame();
             SceneManager.LoadScene(FirstRealitySceneName, LoadSceneMode.Single);
         }

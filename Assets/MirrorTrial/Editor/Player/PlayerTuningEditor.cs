@@ -69,6 +69,7 @@ namespace MirrorTrial.Editor.Player
             Field(movement, "acceleration", "地面加速度");
             Field(movement, "deceleration", "地面减速度");
             Field(movement, "airAcceleration", "空中加速度");
+            Field(movement, "airDeceleration", "空中减速度");
             Field(movement, "jumpSpeed", "跳跃速度");
             Field(movement, "baseGravityModifier", "上升重力倍率");
             Field(movement, "fallGravityMultiplier", "下落重力倍率");

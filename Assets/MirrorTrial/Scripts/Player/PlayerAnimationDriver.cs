@@ -90,6 +90,9 @@ namespace MirrorTrial.Player
         PlayerWeaponController weapons;
         PlayerActionState playingState = PlayerActionState.None;
         PlayableGraph actionGraph;
+        AnimationClipPlayable actionPlayable;
+        double actionPlayableSpeed = 1d;
+        float animatorSpeedBeforePause = 1f;
         bool actionClipPlaying;
 
         public Animator Animator => animator;
@@ -145,12 +148,32 @@ namespace MirrorTrial.Player
             StopActionClip();
             actionGraph = PlayableGraph.Create("Player Direct Action Clip");
             var output = AnimationPlayableOutput.Create(actionGraph, "Action", animator);
-            var playable = AnimationClipPlayable.Create(actionGraph, clip);
-            playable.SetApplyFootIK(false);
-            playable.SetSpeed(targetDuration > 0f ? clip.length / targetDuration : 1f);
-            output.SetSourcePlayable(playable);
+            actionPlayable = AnimationClipPlayable.Create(actionGraph, clip);
+            actionPlayable.SetApplyFootIK(false);
+            actionPlayableSpeed = targetDuration > 0f ? clip.length / targetDuration : 1f;
+            actionPlayable.SetSpeed(actionPlayableSpeed);
+            output.SetSourcePlayable(actionPlayable);
             actionGraph.Play();
             actionClipPlaying = true;
+        }
+
+        public void SetActionClipPaused(bool paused)
+        {
+            if (actionGraph.IsValid() && actionPlayable.IsValid())
+            {
+                actionPlayable.SetSpeed(paused ? 0d : actionPlayableSpeed);
+                return;
+            }
+
+            if (!animator)
+                return;
+            if (paused)
+            {
+                animatorSpeedBeforePause = animator.speed;
+                animator.speed = 0f;
+            }
+            else
+                animator.speed = animatorSpeedBeforePause;
         }
 
         public void StopActionClip()
@@ -159,6 +182,8 @@ namespace MirrorTrial.Player
             if (wasPlaying)
                 actionGraph.Destroy();
             actionClipPlaying = false;
+            actionPlayable = default;
+            actionPlayableSpeed = 1d;
             playingState = PlayerActionState.None;
             if (wasPlaying && animator)
             {
@@ -166,7 +191,6 @@ namespace MirrorTrial.Player
                 animator.Update(0f);
             }
         }
-
         public void ForceState(PlayerActionState state)
         {
             if (stateMachine != null)

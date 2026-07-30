@@ -63,8 +63,9 @@ namespace MirrorTrial.Editor.Level
         {
             config.levelId = manager.LevelId;
             config.displayName = manager.LevelDisplayName;
-            config.playerSpawn = manager.PlayerSpawn ? manager.PlayerSpawn.position : Vector2.zero;
+            config.playerSpawn = manager.PlayerSpawn ? (Vector2)manager.PlayerSpawn.position : Vector2.zero;
             config.playerPrefab = manager.PlayerPrefab;
+            config.playerHealthHudPrefab = manager.HealthHudPrefab;
 
             config.geometry.Clear();
             config.segments.Clear();

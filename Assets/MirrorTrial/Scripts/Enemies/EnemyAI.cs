@@ -36,15 +36,16 @@ namespace MirrorTrial.Enemies
             [InspectorName("追击")] Chase,
             [InspectorName("攻击")] Attack,
             [InspectorName("受击")] Hurt,
-            [InspectorName("死亡")] Dead
+            [InspectorName("死亡")] Dead,
+            [InspectorName("击飞")] Launch
         }
-
         public State CurrentState { get; private set; } = State.Idle;
         public EnemyAIProfile Profile => profile;
         public Vector2 FacingDirection { get; private set; } = Vector2.right;
 
         int currentHitPoints;
         float stateTimer;
+        [SerializeField] bool passiveTestTarget;
         float attackCooldownTimer;
         float hurtTimer;
         bool attackLanded;
@@ -55,6 +56,7 @@ namespace MirrorTrial.Enemies
         Collider2D bodyCollider;
         SpriteRenderer spriteRenderer;
         EnemyDamageVisual damageVisual;
+        EnemyLaunchController2D launchController;
         Transform player;
         Vector2 patrolOrigin;
         float patrolTargetX;
@@ -129,6 +131,12 @@ namespace MirrorTrial.Enemies
             bodyCollider = GetComponent<Collider2D>();
             spriteRenderer = GetComponentInChildren<SpriteRenderer>(true);
             body.gravityScale = 1f;
+            launchController = GetComponent<EnemyLaunchController2D>();
+            if (!launchController) launchController = gameObject.AddComponent<EnemyLaunchController2D>();
+            launchController.Configure(profile ? profile.launchSettings : null);
+            if (!GetComponent<EnemyLaunchAnimationPresenter>()) gameObject.AddComponent<EnemyLaunchAnimationPresenter>();
+            if (!GetComponent<EnemyLaunchVfxPresenter>()) gameObject.AddComponent<EnemyLaunchVfxPresenter>();
+            launchController.LaunchCompleted += OnLaunchCompleted;
             damageVisual = GetComponent<EnemyDamageVisual>();
             if (!damageVisual) damageVisual = gameObject.AddComponent<EnemyDamageVisual>();
             body.freezeRotation = true;
@@ -173,6 +181,20 @@ namespace MirrorTrial.Enemies
             }
 
             if (CurrentState == State.Dead) return;
+            if (CurrentState == State.Launch)
+            {
+                UpdateVisualFacing();
+                return;
+            }
+
+            if (passiveTestTarget && CurrentState != State.Hurt)
+            {
+                if (CurrentState != State.Idle)
+                    TransitionTo(State.Idle);
+                SetVelocityX(0f);
+                UpdateVisualFacing();
+                return;
+            }
 
             switch (CurrentState)
             {
@@ -503,7 +525,7 @@ namespace MirrorTrial.Enemies
 
         void OnDamagePayloadReceived(DamagePayload payload)
         {
-            if (CurrentState == State.Dead || pendingDeath) return;
+            if (CurrentState == State.Dead) return;
 
             var beforeDamage = currentHitPoints;
             currentHitPoints = Mathf.Max(0, currentHitPoints - payload.damage);
@@ -511,6 +533,24 @@ namespace MirrorTrial.Enemies
                 damageVisual.PlayDamage(beforeDamage - currentHitPoints, MaxHitPoints);
 
             pendingDeath = currentHitPoints <= 0;
+            if (pendingDeath)
+            {
+                Die();
+                return;
+            }
+
+            // The active launch sequence owns movement and reaction presentation. Hits still
+            // deal damage, but cannot restart launch, redirect it, or interrupt get-up armor.
+            if (launchController && launchController.IsLaunching)
+                return;
+
+            if (payload.reaction == HitReactionType.Launch)
+            {
+                TransitionTo(State.Launch);
+                launchController.Configure(profile ? profile.launchSettings : null);
+                launchController.BeginLaunch(payload.knockback);
+                return;
+            }
             if (payload.reaction == HitReactionType.None)
             {
                 if (pendingDeath) Die();
@@ -530,6 +570,18 @@ namespace MirrorTrial.Enemies
                     body.velocity = new Vector2(body.velocity.x, Mathf.Max(0f, body.velocity.y));
                 body.AddForce(payload.knockback, ForceMode2D.Impulse);
             }
+        }
+
+        void OnLaunchCompleted()
+        {
+            if (CurrentState != State.Launch) return;
+            if (pendingDeath) Die();
+            else TransitionTo(State.Idle);
+        }
+
+        void OnDestroy()
+        {
+            if (launchController) launchController.LaunchCompleted -= OnLaunchCompleted;
         }
 
         void Die()

@@ -5,13 +5,11 @@ using UnityEngine;
 
 namespace MirrorTrial.EditorTools
 {
-    [InitializeOnLoad]
+    // Legacy one-shot migration. The BehaviourTree setup removes this component.
     static class MirrorBossPhysicsAnimationSetup
     {
         const string SessionKey = "MirrorTrial.MirrorBossPhysicsAnimationSetup.v1";
         const string BossPath = "Assets/MirrorTrial/Prefabs/Boss/MirrorBoss.prefab";
-
-        static MirrorBossPhysicsAnimationSetup() => EditorApplication.delayCall += Apply;
 
         static void Apply()
         {

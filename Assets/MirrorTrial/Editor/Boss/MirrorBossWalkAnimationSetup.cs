@@ -5,13 +5,11 @@ using UnityEngine;
 
 namespace MirrorTrial.EditorTools
 {
-    [InitializeOnLoad]
+    // Legacy one-shot migration. Movement animation is driven by MirrorBossActorV2.
     static class MirrorBossWalkAnimationSetup
     {
         const string SessionKey = "MirrorTrial.MirrorBossWalkAnimationSetup.v1";
         const string BossPath = "Assets/MirrorTrial/Prefabs/Boss/MirrorBoss.prefab";
-
-        static MirrorBossWalkAnimationSetup() => EditorApplication.delayCall += Apply;
 
         static void Apply()
         {

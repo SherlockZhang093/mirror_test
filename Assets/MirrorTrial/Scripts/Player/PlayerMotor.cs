@@ -96,7 +96,7 @@ namespace MirrorTrial.Player
             var targetSpeed = moveX * tuning.movement.moveSpeed;
             var acceleration = Mathf.Abs(targetSpeed) > 0.01f
                 ? (IsGrounded ? tuning.movement.acceleration : tuning.movement.airAcceleration)
-                : tuning.movement.deceleration;
+                : (IsGrounded ? tuning.movement.deceleration : tuning.movement.airDeceleration);
 
             currentMoveSpeed = Mathf.MoveTowards(
                 currentMoveSpeed,

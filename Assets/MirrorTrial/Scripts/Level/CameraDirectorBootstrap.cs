@@ -55,8 +55,18 @@ namespace MirrorTrial.Level
             director.SetPlayerTarget(player.transform);
 
             var level = FindObjectOfType<LevelManager>();
-            if (level && level.TryGetSceneHorizontalBounds(out var minX, out var maxX))
+            if (!level) return;
+
+            if (level.LimitCameraToVisibleArea &&
+                level.CameraVisibleArea.width > 0f &&
+                level.CameraVisibleArea.height > 0f)
+            {
+                director.SetVisibleArea(level.CameraVisibleArea);
+            }
+            else if (level.TryGetSceneHorizontalBounds(out var minX, out var maxX))
+            {
                 director.SetHorizontalBounds(minX, maxX);
+            }
 
         }
     }

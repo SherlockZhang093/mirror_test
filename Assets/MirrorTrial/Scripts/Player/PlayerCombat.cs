@@ -128,6 +128,8 @@ namespace MirrorTrial.Player
         Coroutine attackRoutine;
         Hitbox activeHitbox;
         bool queuedNextComboStep;
+        bool acceptingComboHitConfirm;
+        bool currentComboMoveHitConfirmed;
         bool guarding;
         Coroutine guardImpactRoutine;
 
@@ -392,6 +394,12 @@ namespace MirrorTrial.Player
             motor.ApplyForcedVelocity(-payload.direction * speed, duration);
         }
 
+        void OnAttackConnected(DamagePayload payload)
+        {
+            if (acceptingComboHitConfirm && payload.source == gameObject)
+                currentComboMoveHitConfirmed = true;
+        }
+
         void UpdateBodyState(PlayerComboStep step, float elapsed)
         {
             if (!bodyStateController)
@@ -489,6 +497,10 @@ namespace MirrorTrial.Player
 
         public void CancelCurrentAction(PlayerActionCancelReason reason)
         {
+            actionVersion++;
+            CancelChargePresentation(reason == PlayerActionCancelReason.Hit
+                ? ChargeTelegraphEndReason.Interrupted
+                : ChargeTelegraphEndReason.Cancelled);
             if (attackRoutine != null)
             {
                 StopCoroutine(attackRoutine);
@@ -501,6 +513,8 @@ namespace MirrorTrial.Player
             }
 
             queuedNextComboStep = false;
+            acceptingComboHitConfirm = false;
+            currentComboMoveHitConfirmed = false;
             guarding = false;
             if (bodyStateController)
                 bodyStateController.ClearBodyState(this);

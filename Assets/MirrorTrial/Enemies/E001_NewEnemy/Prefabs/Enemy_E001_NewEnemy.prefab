@@ -192,6 +192,13 @@ MonoBehaviour:
   profile: {fileID: 11400000, guid: 4a2a44bbf5d2d5c41b32c9f28bb06cea, type: 2}
   overrideMaxHitPoints: -1
   overrideMoveSpeed: -1
+  overrideDetectionSize: {x: -1, y: -1}
+  patrolLeftOffset: -2
+  patrolRightOffset: 2
+  attackEffectPrefab: {fileID: 0}
+  attackEffectPoint: {fileID: 0}
+  attackEffectLifetime: 1
+  mirrorAttackEffectByFacing: 1
   showDebugGizmos: 1
 --- !u!95 &8100100100100100101
 Animator:

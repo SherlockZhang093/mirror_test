@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a7ed614c0a99e245b008fa9294f6960, type: 3}
+  m_Name: EnemyLaunchPresentation_PhysicalV1
+  m_EditorClassIdentifier: 
+  launchAnimation: Launch
+  getUpAnimation: LaunchGetUp
+  takeoffPrefab: {fileID: 5115308821450477099, guid: 90a74a15bef718b4da1bb9786b19522d,
+    type: 3}
+  airbornePrefab: {fileID: 4467060447372694967, guid: adf5272194cc8ae40a56acccb1d35e45,
+    type: 3}
+  landingPrefab: {fileID: 931694689763239066, guid: 171d0a3c8e8940143b339d9c2ca4cc82,
+    type: 3}
+  slidePrefab: {fileID: 9003382137516315507, guid: 88a9f970e3e12b740af002d9cc68c3be,
+    type: 3}

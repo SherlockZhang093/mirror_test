@@ -75,6 +75,11 @@ namespace MirrorTrial.Editor.Enemies
             FloatField(profileObject, "deathBlinkInterval", "死亡闪烁间隔");
 
             EditorGUILayout.Space(8);
+            EditorGUILayout.LabelField("击飞表现", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox("技能传入击飞后必定生效。这里仅配置起飞、空中、下落和落地动画，不调整技能的击飞力度。", MessageType.Info);
+            EditorGUILayout.PropertyField(profileObject.FindProperty("launchSettings"), new GUIContent("击飞动画与落地表现"), true);
+
+            EditorGUILayout.Space(8);
             EditorGUILayout.LabelField("移动限制", EditorStyles.boldLabel);
             FloatField(profileObject, "ledgeCheckDistance", "悬崖检测距离");
             FloatField(profileObject, "wallCheckDistance", "墙壁检测距离");

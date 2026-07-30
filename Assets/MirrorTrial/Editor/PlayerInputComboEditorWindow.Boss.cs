@@ -17,6 +17,8 @@ namespace MirrorTrial.Editor
         GameObject bossPreview;
         Animator bossPreviewAnimator;
         Transform bossPreviewHitbox;
+        GameObject bossWindupEffectPreview;
+        ChargeTelegraphPresentation bossWindupEffectPresentation;
         int bossPhase;
         int bossStepIndex;
         bool bossFacingLeft;
@@ -39,6 +41,8 @@ namespace MirrorTrial.Editor
                 EditorGUILayout.HelpBox("未找到 MirrorBossSimpleProfile。", MessageType.Warning);
                 return;
             }
+
+            DrawBossFeintSettings();
 
             bossPhase = GUILayout.Toolbar(bossPhase, new[] { "阶段 1", "阶段 2", "阶段 3" });
             var combo = GetBossCombo();
@@ -97,6 +101,13 @@ namespace MirrorTrial.Editor
                 step.advanceSpeed = EditorGUILayout.FloatField("攻击推进速度", step.advanceSpeed);
                 step.knockback = EditorGUILayout.Vector2Field("击退", step.knockback);
                 step.hitStop = EditorGUILayout.FloatField("顿帧", step.hitStop);
+                EditorGUILayout.Space(3f);
+                EditorGUILayout.LabelField("前摇表现与假动作", EditorStyles.miniBoldLabel);
+                step.allowFeint = EditorGUILayout.Toggle("允许假动作", step.allowFeint);
+                if (step.allowFeint)
+                    step.feintChanceOverride = EditorGUILayout.Slider(
+                        new GUIContent("本招概率覆盖", "-1 使用当前阶段概率；0~1 覆盖该招式概率。"),
+                        step.feintChanceOverride, -1f, 1f);
             }
 
             EditorGUILayout.HelpBox("Scene 视图：红/蓝框是当前帧攻击框。拖中心移动，拖四角缩放；修改会写入当前帧 Key。橙色时间格表示该帧攻击框开启。", MessageType.Info);
@@ -104,6 +115,28 @@ namespace MirrorTrial.Editor
             {
                 EditorUtility.SetDirty(bossProfile);
                 SceneView.RepaintAll();
+            }
+        }
+
+        void DrawBossFeintSettings()
+        {
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField("Boss 假动作规则", EditorStyles.boldLabel);
+                Undo.RecordObject(bossProfile, "编辑 Boss 假动作规则");
+                bossProfile.phaseOneFeintChance = EditorGUILayout.Slider("阶段 1 假动作概率", bossProfile.phaseOneFeintChance, 0f, 1f);
+                bossProfile.phaseTwoFeintChance = EditorGUILayout.Slider("阶段 2 假动作概率", bossProfile.phaseTwoFeintChance, 0f, 1f);
+                bossProfile.phaseThreeFeintChance = EditorGUILayout.Slider("阶段 3 假动作概率", bossProfile.phaseThreeFeintChance, 0f, 1f);
+                bossProfile.maxFeintsPerCombo = Mathf.Max(1, EditorGUILayout.IntField("每套连招最多假动作", bossProfile.maxFeintsPerCombo));
+                bossProfile.feintHoldDuration = Mathf.Max(0.05f, EditorGUILayout.FloatField("假动作蓄力停留", bossProfile.feintHoldDuration));
+                bossProfile.feintResetDuration = Mathf.Max(0.05f, EditorGUILayout.FloatField("卸力后重新出招间隔", bossProfile.feintResetDuration));
+                var serializedProfile = new SerializedObject(bossProfile);
+                serializedProfile.Update();
+                EditorGUILayout.PropertyField(serializedProfile.FindProperty("windupEffectPrefab"),
+                    new GUIContent("默认前摇特效 Prefab", "某个阶段没有单独指定特效时，使用这个默认 Prefab。"));
+                serializedProfile.ApplyModifiedProperties();
+                EditorGUILayout.HelpBox("颜色、光点、脉冲和音效请直接在该 Prefab 的 ChargeTelegraphPresentation 组件中调整。", MessageType.None);
+                EditorGUILayout.HelpBox("假动作后，同一招将重新蓄力并强制真实释放。每个招式还可以单独禁用或覆盖概率。", MessageType.Info);
             }
         }
 
@@ -118,7 +151,7 @@ namespace MirrorTrial.Editor
                 var exact = FindBossKey(step, frame);
                 PlayerAttackHitboxKey evaluated;
                 var enabled = EvaluateBossKey(step, frame, out evaluated) && evaluated.enabled;
-                var windup = step.windupFrame == frame && step.windupHoldDuration > 0f;
+                var windup = step.windupFrame == frame && GetBossPhaseWindupHoldDuration() > 0f;
                 GUI.backgroundColor = frame == currentFrame ? new Color(0.25f, 0.9f, 0.55f) :
                     windup ? new Color(1f, 0.82f, 0.12f) :
                     enabled ? new Color(1f, 0.58f, 0.16f) : new Color(0.48f, 0.48f, 0.48f);
@@ -144,7 +177,7 @@ namespace MirrorTrial.Editor
                     {
                         Undo.RecordObject(bossProfile, "设置 Boss 前摇帧");
                         step.windupFrame = currentFrame;
-                        if (step.windupHoldDuration <= 0f) step.windupHoldDuration = 0.5f;
+                        if (GetBossPhaseWindupHoldDuration() <= 0f) SetBossPhaseWindupHoldDuration(0.5f);
                         bossPreviewWindupConsumed = false;
                         bossPreviewWindupHoldUntil = 0d;
                     }
@@ -153,22 +186,58 @@ namespace MirrorTrial.Editor
                     {
                         Undo.RecordObject(bossProfile, "取消 Boss 前摇帧");
                         step.windupFrame = -1;
-                        step.windupHoldDuration = 0f;
                     }
                     EditorGUI.EndDisabledGroup();
                 }
 
                 EditorGUI.BeginChangeCheck();
                 var nextWindupFrame = EditorGUILayout.IntSlider("前摇定格帧", step.windupFrame, -1, Mathf.Max(0, step.animationFrameCount - 1));
-                var nextHoldDuration = Mathf.Max(0f, EditorGUILayout.FloatField("定格时间（秒）", step.windupHoldDuration));
+                var nextHoldDuration = Mathf.Max(0f, EditorGUILayout.FloatField($"阶段 {bossPhase + 1} 前摇定格时间（秒）", GetBossPhaseWindupHoldDuration()));
+                var currentPhaseWindupPrefab = GetBossPhaseWindupPrefab();
+                var nextWindupPrefab = (GameObject)EditorGUILayout.ObjectField(
+                    new GUIContent($"阶段 {bossPhase + 1} 前摇特效 Prefab", "只影响当前阶段。留空时使用 Profile 顶部的默认前摇特效。"),
+                    currentPhaseWindupPrefab, typeof(GameObject), false);
+                var nextEffectOffset = EditorGUILayout.Vector2Field(
+                    new GUIContent("前摇特效位置 Offset", "相对 Boss 根节点的局部坐标；X 控制左右，Y 控制上下，转向时 X 会自动镜像。"),
+                    step.windupEffectOffset);
+                var nextEffectAngle = EditorGUILayout.FloatField(
+                    new GUIContent("前摇特效角度", "以度为单位；正数逆时针，负数顺时针，Boss 转向时会自动镜像。"),
+                    step.windupEffectAngle);
                 if (EditorGUI.EndChangeCheck())
                 {
                     Undo.RecordObject(bossProfile, "编辑 Boss 定帧前摇");
                     step.windupFrame = nextWindupFrame;
-                    step.windupHoldDuration = nextHoldDuration;
+                    SetBossPhaseWindupHoldDuration(nextHoldDuration);
+                    var prefabChanged = currentPhaseWindupPrefab != nextWindupPrefab;
+                    SetBossPhaseWindupPrefab(nextWindupPrefab);
+                    step.windupEffectOffset = nextEffectOffset;
+                    step.windupEffectAngle = nextEffectAngle;
                     bossPreviewWindupConsumed = false;
                     bossPreviewWindupHoldUntil = 0d;
+                    if (prefabChanged)
+                        StopBossWindupEffectPreview();
                 }
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUI.BeginDisabledGroup(!GetEffectiveBossPhaseWindupPrefab() || !bossPreview);
+                    if (GUILayout.Button(bossWindupEffectPreview ? "停止预览前摇特效" : "直接预览前摇特效", GUILayout.Height(24f)))
+                    {
+                        if (bossWindupEffectPreview) StopBossWindupEffectPreview();
+                        else ShowBossWindupEffectPreview(step);
+                    }
+                    EditorGUI.EndDisabledGroup();
+                    if (GUILayout.Button("聚焦预览角色", GUILayout.Width(110f), GUILayout.Height(24f)))
+                        FocusBossPreview();
+                }
+                if (!GetEffectiveBossPhaseWindupPrefab())
+                    EditorGUILayout.HelpBox("请先选择当前阶段或 Profile 默认的前摇特效 Prefab。", MessageType.Warning);
+                else if (!bossPreview)
+                    EditorGUILayout.HelpBox("请先点击顶部“创建/重建预览角色”。", MessageType.Info);
+
+                if (bossWindupEffectPresentation)
+                    bossWindupEffectPresentation.EditorSetPreview(true, 0.9f, !bossFacingLeft,
+                        step.windupEffectOffset, step.windupEffectAngle);
 
                 var firstActiveFrame = int.MaxValue;
                 for (var frame = 0; frame < step.animationFrameCount; frame++)
@@ -181,10 +250,11 @@ namespace MirrorTrial.Editor
                     }
                 }
 
-                if (step.windupFrame >= 0 && step.windupHoldDuration > 0f && step.windupFrame >= firstActiveFrame)
+                var phaseWindupDuration = GetBossPhaseWindupHoldDuration();
+                if (step.windupFrame >= 0 && phaseWindupDuration > 0f && step.windupFrame >= firstActiveFrame)
                     EditorGUILayout.HelpBox("前摇帧必须早于第一个攻击框开启帧。", MessageType.Error);
-                else if (step.windupFrame >= 0 && step.windupHoldDuration > 0f)
-                    EditorGUILayout.HelpBox($"动画播放到第 {step.windupFrame} 帧后冻结 {step.windupHoldDuration:0.##} 秒，再从该帧继续。", MessageType.Info);
+                else if (step.windupFrame >= 0 && phaseWindupDuration > 0f)
+                    EditorGUILayout.HelpBox($"动画播放到第 {step.windupFrame} 帧后冻结 {phaseWindupDuration:0.##} 秒，再从该帧继续。", MessageType.Info);
             }
         }
         void DrawBossCurrentKeyEditor(MirrorBossComboStepV2 step)
@@ -254,10 +324,93 @@ namespace MirrorTrial.Editor
 
         void DisposeBossPreview()
         {
+            StopBossWindupEffectPreview();
             if (bossPreview) DestroyImmediate(bossPreview);
             bossPreview = null;
             bossPreviewAnimator = null;
             bossPreviewHitbox = null;
+        }
+
+        void ShowBossWindupEffectPreview(MirrorBossComboStepV2 step)
+        {
+            StopBossWindupEffectPreview();
+            var windupPrefab = GetEffectiveBossPhaseWindupPrefab();
+            if (!bossPreview || !bossProfile || !windupPrefab || step == null) return;
+
+            var clip = GetBossClip(step.animationState);
+            if (clip && step.windupFrame >= 0)
+            {
+                currentFrame = Mathf.Clamp(step.windupFrame, 0, Mathf.Max(0, step.animationFrameCount - 1));
+                animationPlaying = false;
+                SampleBossFrame(clip);
+            }
+
+            bossWindupEffectPreview = PrefabUtility.InstantiatePrefab(windupPrefab) as GameObject;
+            if (!bossWindupEffectPreview) return;
+            bossWindupEffectPreview.name = "Boss_WindupEffectPreview";
+            bossWindupEffectPreview.hideFlags = HideFlags.HideAndDontSave;
+            bossWindupEffectPreview.transform.SetParent(bossPreview.transform, false);
+            bossWindupEffectPreview.transform.localPosition = Vector3.zero;
+            bossWindupEffectPresentation = bossWindupEffectPreview.GetComponent<ChargeTelegraphPresentation>();
+            if (!bossWindupEffectPresentation)
+            {
+                ShowNotification(new GUIContent("选择的 Prefab 没有 ChargeTelegraphPresentation 组件。"));
+                StopBossWindupEffectPreview();
+                return;
+            }
+
+            var visual = bossPreview.GetComponentInChildren<SpriteRenderer>(true);
+            bossWindupEffectPresentation.Bind(visual);
+            bossWindupEffectPresentation.EditorSetPreview(true, 0.9f, !bossFacingLeft,
+                step.windupEffectOffset, step.windupEffectAngle);
+            FocusBossPreview();
+            SceneView.RepaintAll();
+        }
+
+        void StopBossWindupEffectPreview()
+        {
+            if (bossWindupEffectPresentation)
+                bossWindupEffectPresentation.EditorSetPreview(false, 0f, !bossFacingLeft);
+            if (bossWindupEffectPreview)
+                DestroyImmediate(bossWindupEffectPreview);
+            bossWindupEffectPresentation = null;
+            bossWindupEffectPreview = null;
+            SceneView.RepaintAll();
+        }
+
+        GameObject GetBossPhaseWindupPrefab()
+        {
+            if (!bossProfile) return null;
+            return bossPhase == 0 ? bossProfile.phaseOneWindupEffectPrefab
+                : bossPhase == 1 ? bossProfile.phaseTwoWindupEffectPrefab
+                : bossProfile.phaseThreeWindupEffectPrefab;
+        }
+
+        GameObject GetEffectiveBossPhaseWindupPrefab()
+        {
+            return bossProfile ? bossProfile.GetWindupEffectPrefab(bossPhase + 1) : null;
+        }
+
+        void SetBossPhaseWindupPrefab(GameObject prefab)
+        {
+            if (!bossProfile) return;
+            if (bossPhase == 0) bossProfile.phaseOneWindupEffectPrefab = prefab;
+            else if (bossPhase == 1) bossProfile.phaseTwoWindupEffectPrefab = prefab;
+            else bossProfile.phaseThreeWindupEffectPrefab = prefab;
+        }
+
+        float GetBossPhaseWindupHoldDuration()
+        {
+            return bossProfile ? bossProfile.GetWindupHoldDuration(bossPhase + 1) : 0f;
+        }
+
+        void SetBossPhaseWindupHoldDuration(float duration)
+        {
+            if (!bossProfile) return;
+            duration = Mathf.Max(0f, duration);
+            if (bossPhase == 0) bossProfile.phaseOneWindupHoldDuration = duration;
+            else if (bossPhase == 1) bossProfile.phaseTwoWindupHoldDuration = duration;
+            else bossProfile.phaseThreeWindupHoldDuration = duration;
         }
 
         void TickBossAnimationPreview()
@@ -268,11 +421,12 @@ namespace MirrorTrial.Editor
             if (!clip) { animationPlaying = false; return; }
 
             var now = EditorApplication.timeSinceStartup;
-            if (!bossPreviewWindupConsumed && step.windupFrame >= 0 && step.windupHoldDuration > 0f &&
+            var phaseWindupDuration = GetBossPhaseWindupHoldDuration();
+            if (!bossPreviewWindupConsumed && step.windupFrame >= 0 && phaseWindupDuration > 0f &&
                 currentFrame >= step.windupFrame)
             {
                 if (bossPreviewWindupHoldUntil <= 0d)
-                    bossPreviewWindupHoldUntil = now + step.windupHoldDuration;
+                    bossPreviewWindupHoldUntil = now + phaseWindupDuration;
                 if (now < bossPreviewWindupHoldUntil)
                 {
                     SampleBossFrame(clip);

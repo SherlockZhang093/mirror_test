@@ -6,17 +6,13 @@ using UnityEngine;
 
 namespace MirrorTrial.Boss.Editor
 {
-    [InitializeOnLoad]
+    // Legacy FSM observer setup. The active Boss uses the BehaviourTree setup.
     public static class MirrorBossNodeCanvasSetup
     {
         const string GraphPath = "Assets/MirrorTrial/Boss/MirrorBossAI_FSM.asset";
         const string PrefabPath = "Assets/MirrorTrial/Prefabs/Boss/MirrorBoss.prefab";
         const string VersionKey = "MirrorTrial.MirrorBossNodeCanvasSetup.v2";
 
-        static MirrorBossNodeCanvasSetup()
-        {
-            EditorApplication.delayCall += InstallOnce;
-        }
         public static void RebuildFromMenu()
         {
             BuildOrUpdate(true);

@@ -6,15 +6,20 @@ namespace MirrorTrial.Level
     [ExecuteAlways]
     public sealed class CinemachineHorizontalConfiner : CinemachineExtension
     {
-        [SerializeField] float minimumX;
-        [SerializeField] float maximumX;
+        [SerializeField] Rect visibleArea;
         [SerializeField] bool hasBounds;
+
+        public void SetVisibleArea(Rect area)
+        {
+            visibleArea = Rect.MinMaxRect(
+                Mathf.Min(area.xMin, area.xMax), Mathf.Min(area.yMin, area.yMax),
+                Mathf.Max(area.xMin, area.xMax), Mathf.Max(area.yMin, area.yMax));
+            hasBounds = true;
+        }
 
         public void SetBounds(float minX, float maxX)
         {
-            minimumX = Mathf.Min(minX, maxX);
-            maximumX = Mathf.Max(minX, maxX);
-            hasBounds = true;
+            SetVisibleArea(Rect.MinMaxRect(minX, -10000f, maxX, 10000f));
         }
 
         public void ClearBounds()
@@ -30,17 +35,17 @@ namespace MirrorTrial.Level
         {
             if (!hasBounds || stage != CinemachineCore.Stage.Body) return;
 
-            var halfWidth = state.Lens.Orthographic
-                ? state.Lens.OrthographicSize * state.Lens.Aspect
-                : 0f;
-            var minCenter = minimumX + halfWidth;
-            var maxCenter = maximumX - halfWidth;
-            var currentX = state.CorrectedPosition.x;
-            var desiredX = minCenter <= maxCenter
-                ? Mathf.Clamp(currentX, minCenter, maxCenter)
-                : (minimumX + maximumX) * 0.5f;
-
-            state.PositionCorrection += new Vector3(desiredX - currentX, 0f, 0f);
+            if (!state.Lens.Orthographic) return;
+            var halfHeight = state.Lens.OrthographicSize;
+            var halfWidth = halfHeight * state.Lens.Aspect;
+            var minCenterX = visibleArea.xMin + halfWidth;
+            var maxCenterX = visibleArea.xMax - halfWidth;
+            var minCenterY = visibleArea.yMin + halfHeight;
+            var maxCenterY = visibleArea.yMax - halfHeight;
+            var current = state.CorrectedPosition;
+            var desiredX = minCenterX <= maxCenterX ? Mathf.Clamp(current.x, minCenterX, maxCenterX) : visibleArea.center.x;
+            var desiredY = minCenterY <= maxCenterY ? Mathf.Clamp(current.y, minCenterY, maxCenterY) : visibleArea.center.y;
+            state.PositionCorrection += new Vector3(desiredX - current.x, desiredY - current.y, 0f);
         }
     }
 }

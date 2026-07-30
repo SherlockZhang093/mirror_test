@@ -5,7 +5,7 @@ namespace MirrorTrial.Level
     [CreateAssetMenu(menuName = "Mirror Trial/Camera Tuning", fileName = "CameraTuning")]
     public sealed class CameraTuning : ScriptableObject
     {
-        [Header("Hit Shake")]
+        [Header("Camera Shake")]
         public float lightHitStrength = 0.07f;
         public float heavyHitStrength = 0.3f;
         public float impulseGain = 0.7f;

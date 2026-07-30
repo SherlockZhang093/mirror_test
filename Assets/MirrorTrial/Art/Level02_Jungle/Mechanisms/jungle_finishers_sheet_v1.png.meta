@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -95,7 +95,217 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: jungle_finishers_sheet_v1_0
+      rect:
+        serializedVersion: 2
+        x: 1123
+        y: 569
+        width: 394
+        height: 393
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e0f3ba457c42e1340bc0ebe4bfad9b31
+      internalID: -236187822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_finishers_sheet_v1_1
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 508
+        width: 310
+        height: 484
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd7c86c28d1395f4491e5ede9213d2a5
+      internalID: -126856423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_finishers_sheet_v1_2
+      rect:
+        serializedVersion: 2
+        x: 387
+        y: 525
+        width: 313
+        height: 465
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 93cc57d8796ba5a40a90b6d2ea727165
+      internalID: 1662387532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_finishers_sheet_v1_9
+      rect:
+        serializedVersion: 2
+        x: 700
+        y: 568
+        width: 416
+        height: 316
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a1d3bc7ff33a3244f82def92dd7644b3
+      internalID: -303797485
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_finishers_sheet_v1_14
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 0
+        width: 384
+        height: 507
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f37a659cfb1e044785f1b5b9fa735f1
+      internalID: -821810971
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_finishers_sheet_v1_17
+      rect:
+        serializedVersion: 2
+        x: 1100
+        y: 47
+        width: 416
+        height: 405
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b21cd31f3305bc44aa1bafd9173318bc
+      internalID: 49409791
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_finishers_sheet_v1_20
+      rect:
+        serializedVersion: 2
+        x: 810
+        y: 68
+        width: 229
+        height: 375
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e35b6b5956f78a9489cb3ea6a4d87d36
+      internalID: -962847559
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_finishers_sheet_v1_21
+      rect:
+        serializedVersion: 2
+        x: 979
+        y: 410
+        width: 4
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9e7315732abfc1c42b4a4fb4ad9da368
+      internalID: 1867207999
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_finishers_sheet_v1_22
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 42
+        width: 296
+        height: 409
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c72a09a38dba1924c8dab7e9971c5e46
+      internalID: 475147793
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_finishers_sheet_v1_23
+      rect:
+        serializedVersion: 2
+        x: 1100
+        y: 122
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 990a84129b062874d947616f4d782340
+      internalID: 166869833
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -106,7 +316,32 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      jungle_finishers_sheet_v1_0: -236187822
+      jungle_finishers_sheet_v1_1: -126856423
+      jungle_finishers_sheet_v1_10: -808067518
+      jungle_finishers_sheet_v1_11: -871918269
+      jungle_finishers_sheet_v1_12: 1712276398
+      jungle_finishers_sheet_v1_13: 1822939251
+      jungle_finishers_sheet_v1_14: -821810971
+      jungle_finishers_sheet_v1_15: 308007941
+      jungle_finishers_sheet_v1_16: 869128035
+      jungle_finishers_sheet_v1_17: 49409791
+      jungle_finishers_sheet_v1_18: 1162447238
+      jungle_finishers_sheet_v1_19: 653073614
+      jungle_finishers_sheet_v1_2: 1662387532
+      jungle_finishers_sheet_v1_20: -962847559
+      jungle_finishers_sheet_v1_21: 1867207999
+      jungle_finishers_sheet_v1_22: 475147793
+      jungle_finishers_sheet_v1_23: 166869833
+      jungle_finishers_sheet_v1_24: 1024994385
+      jungle_finishers_sheet_v1_3: -1776807353
+      jungle_finishers_sheet_v1_4: -206386370
+      jungle_finishers_sheet_v1_5: 225952437
+      jungle_finishers_sheet_v1_6: 930624567
+      jungle_finishers_sheet_v1_7: -2081116895
+      jungle_finishers_sheet_v1_8: 1170388979
+      jungle_finishers_sheet_v1_9: -303797485
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

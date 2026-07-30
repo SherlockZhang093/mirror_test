@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -95,7 +95,448 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_0
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 716
+        width: 294
+        height: 162
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b67dd5b6331db5744a05202cb3ad4f89
+      internalID: 1023330003
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_1
+      rect:
+        serializedVersion: 2
+        x: 385
+        y: 713
+        width: 289
+        height: 328
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 115ccff2233db69428a0eb826e19102c
+      internalID: -1954337205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_2
+      rect:
+        serializedVersion: 2
+        x: 748
+        y: 701
+        width: 241
+        height: 342
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ffde48c20a9d6d54ab2393e0c060f2a5
+      internalID: 1170862757
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_3
+      rect:
+        serializedVersion: 2
+        x: 1034
+        y: 705
+        width: 395
+        height: 302
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b003baa12403ef8479d687a005881569
+      internalID: -1641134410
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_4
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 398
+        width: 137
+        height: 267
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49bde4ed798aaf54b9deb76ba0d39a15
+      internalID: 1580379382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_5
+      rect:
+        serializedVersion: 2
+        x: 1100
+        y: 410
+        width: 299
+        height: 207
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 544ab38d27a441643a300a29f9fd8154
+      internalID: -1481751045
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_6
+      rect:
+        serializedVersion: 2
+        x: 1231
+        y: 608
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8bee4a0da7cd4d340b04ee01ce5eb75a
+      internalID: 1284497262
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_7
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 403
+        width: 298
+        height: 195
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d55fc46479d9f4f4082daa46bbdba9ac
+      internalID: 91752933
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_8
+      rect:
+        serializedVersion: 2
+        x: 711
+        y: 408
+        width: 346
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d9ea632e1d02b742a094c7efed877c0
+      internalID: -1046538465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_9
+      rect:
+        serializedVersion: 2
+        x: 420
+        y: 272
+        width: 12
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b2b5970221b9d146bdd6af1de4146ab
+      internalID: 1464740863
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_10
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 60
+        width: 250
+        height: 295
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc5e05454f12fd44398ec22c750791c3
+      internalID: 74374965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_11
+      rect:
+        serializedVersion: 2
+        x: 438
+        y: 274
+        width: 19
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 122b3eeff5483a842b05faf88fa273f6
+      internalID: 152900064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_12
+      rect:
+        serializedVersion: 2
+        x: 775
+        y: 79
+        width: 200
+        height: 208
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e61642365eb996a499753104390fb41e
+      internalID: 1627747557
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_13
+      rect:
+        serializedVersion: 2
+        x: 1075
+        y: 47
+        width: 305
+        height: 285
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5eaaeaec6ccac1a4ab08d4833564b5b1
+      internalID: -1416216226
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_14
+      rect:
+        serializedVersion: 2
+        x: 419
+        y: 252
+        width: 12
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d95ae1ea748fec84cb01fa980c16d6a3
+      internalID: 1068264210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_15
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 190
+        width: 16
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f10f83566a194241a8fee55031042b0
+      internalID: 554528190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_16
+      rect:
+        serializedVersion: 2
+        x: 87
+        y: 159
+        width: 288
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0bb74e33f8a1be846802381c731b1fb7
+      internalID: 939743046
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_17
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 185
+        width: 31
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1e5b74284e9d9214a842da077352717b
+      internalID: -883519292
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_18
+      rect:
+        serializedVersion: 2
+        x: 76
+        y: 168
+        width: 35
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2108f3e7b84241745a62654e606510b5
+      internalID: 1294962478
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_19
+      rect:
+        serializedVersion: 2
+        x: 426
+        y: 132
+        width: 19
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1f52a351085c479429f0b193660d67dc
+      internalID: -771820695
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jungle_fx_sheet_v1_20
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 109
+        width: 6
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd9d6b1037ecd4d43818f3c7195021e4
+      internalID: 2116248833
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -106,7 +547,28 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      jungle_fx_sheet_v1_0: 1023330003
+      jungle_fx_sheet_v1_1: -1954337205
+      jungle_fx_sheet_v1_10: 74374965
+      jungle_fx_sheet_v1_11: 152900064
+      jungle_fx_sheet_v1_12: 1627747557
+      jungle_fx_sheet_v1_13: -1416216226
+      jungle_fx_sheet_v1_14: 1068264210
+      jungle_fx_sheet_v1_15: 554528190
+      jungle_fx_sheet_v1_16: 939743046
+      jungle_fx_sheet_v1_17: -883519292
+      jungle_fx_sheet_v1_18: 1294962478
+      jungle_fx_sheet_v1_19: -771820695
+      jungle_fx_sheet_v1_2: 1170862757
+      jungle_fx_sheet_v1_20: 2116248833
+      jungle_fx_sheet_v1_3: -1641134410
+      jungle_fx_sheet_v1_4: 1580379382
+      jungle_fx_sheet_v1_5: -1481751045
+      jungle_fx_sheet_v1_6: 1284497262
+      jungle_fx_sheet_v1_7: 91752933
+      jungle_fx_sheet_v1_8: -1046538465
+      jungle_fx_sheet_v1_9: 1464740863
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

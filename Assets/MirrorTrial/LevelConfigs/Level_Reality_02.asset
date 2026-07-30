@@ -17,6 +17,8 @@ MonoBehaviour:
   isMirrorLevel: 0
   playerPrefab: {fileID: 7253538297837963826, guid: 0eb9dd5878ab6d849b4720b03e304987,
     type: 3}
+  playerHealthHudPrefab: {fileID: 100005, guid: 7bd01ea1a96d3524387525d67f48f02d,
+    type: 3}
   enemyPrefab: {fileID: 0}
   defaultSprite: {fileID: 0}
   playerSpawn: {x: 0, y: 0, z: 0}

@@ -3,26 +3,51 @@ using UnityEngine;
 
 namespace MirrorTrial.Player
 {
-    [RequireComponent(typeof(Health))]
+    [RequireComponent(typeof(Health), typeof(PlayerHealthReserve), typeof(PlayerRecoveryAbility))]
     public sealed class PlayerHealthBarUI : MonoBehaviour
     {
         const string DefaultResourcePath = "UI/PlayerHealthBarUI";
+
+        static PlayerHealthBarView levelViewPrefab;
 
         [SerializeField] PlayerHealthBarView viewPrefab;
         [SerializeField] string resourcePath = DefaultResourcePath;
 
         Health health;
+        PlayerHealthReserve reserve;
+        PlayerRecoveryAbility recovery;
         PlayerHealthBarView view;
+        PlayerHealthBarView instantiatedPrefab;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetLevelViewPrefab()
+        {
+            levelViewPrefab = null;
+        }
+
+        public static void SetLevelViewPrefab(PlayerHealthBarView prefab)
+        {
+            if (!prefab || levelViewPrefab == prefab)
+                return;
+
+            levelViewPrefab = prefab;
+            var instances = FindObjectsOfType<PlayerHealthBarUI>(true);
+            foreach (var instance in instances)
+                instance.ApplyLevelViewPrefab();
+        }
 
         void Awake()
         {
             health = GetComponent<Health>();
+            reserve = GetComponent<PlayerHealthReserve>();
+            recovery = GetComponent<PlayerRecoveryAbility>();
             CreateView();
         }
 
         void Start()
         {
             Refresh(health.CurrentHP, health.maxHP);
+            RefreshReserve();
         }
 
         void OnEnable()
@@ -32,12 +57,28 @@ namespace MirrorTrial.Player
                 health.Changed += Refresh;
                 Refresh(health.CurrentHP, health.maxHP);
             }
+
+            if (reserve != null)
+            {
+                reserve.Changed += OnReserveChanged;
+                RefreshReserve();
+            }
+
+            if (recovery != null)
+            {
+                recovery.CastStateChanged += OnCastStateChanged;
+                RefreshReserve();
+            }
         }
 
         void OnDisable()
         {
             if (health != null)
                 health.Changed -= Refresh;
+            if (reserve != null)
+                reserve.Changed -= OnReserveChanged;
+            if (recovery != null)
+                recovery.CastStateChanged -= OnCastStateChanged;
         }
 
         void OnDestroy()
@@ -51,7 +92,7 @@ namespace MirrorTrial.Player
             if (view != null)
                 return;
 
-            var prefab = viewPrefab;
+            var prefab = levelViewPrefab ? levelViewPrefab : viewPrefab;
             if (prefab == null)
             {
                 var prefabObject = Resources.Load<GameObject>(string.IsNullOrEmpty(resourcePath) ? DefaultResourcePath : resourcePath);
@@ -66,7 +107,31 @@ namespace MirrorTrial.Player
             }
 
             view = Instantiate(prefab, transform, false);
+            instantiatedPrefab = prefab;
             view.name = prefab.name;
+        }
+
+        void ApplyLevelViewPrefab()
+        {
+            if (!levelViewPrefab || instantiatedPrefab == levelViewPrefab)
+                return;
+
+            if (view != null)
+            {
+                view.gameObject.SetActive(false);
+                Destroy(view.gameObject);
+            }
+
+            view = null;
+            instantiatedPrefab = null;
+            CreateView();
+
+            if (view == null)
+                return;
+
+            if (health != null)
+                view.SetHealth(health.CurrentHP, health.maxHP);
+            RefreshReserve();
         }
 
         void Refresh(int currentHP, int maxHP)
@@ -76,6 +141,33 @@ namespace MirrorTrial.Player
 
             if (view != null)
                 view.SetHealth(currentHP, maxHP);
+        }
+
+        void OnReserveChanged(int current, int capacity)
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log(
+                $"[HealthResourceTrace][UI接收] 储备刷新={current}/{capacity}, " +
+                $"View={(view ? view.name : "<null>")}",
+                this);
+#endif
+            if (view == null) CreateView();
+            if (view != null)
+                view.SetReserve(current, capacity, recovery != null && recovery.IsCasting);
+        }
+
+        void OnCastStateChanged(bool isCasting)
+        {
+            RefreshReserve();
+        }
+
+        void RefreshReserve()
+        {
+            if (view == null) CreateView();
+            if (view != null)
+                view.SetReserve(reserve != null ? reserve.Current : 0,
+                    reserve != null ? reserve.Capacity : 0,
+                    recovery != null && recovery.IsCasting);
         }
     }
 }

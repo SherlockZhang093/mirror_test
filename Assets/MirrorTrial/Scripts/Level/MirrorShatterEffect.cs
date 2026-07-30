@@ -34,6 +34,7 @@ namespace MirrorTrial.Level
 
         [Header("Shard Source")]
         [SerializeField] Sprite[] shardSprites = new Sprite[0];
+        [SerializeField] Color shardTint = Color.white;
         [SerializeField] int shardCount = 46;
         [SerializeField] Vector2 spawnArea = new Vector2(8.5f, 11f);
         [SerializeField] Vector2 spawnCenterOffset;
@@ -243,6 +244,7 @@ namespace MirrorTrial.Level
 
             var renderer = go.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;
+            renderer.color = shardTint;
             CopySorting(intactRenderer ? intactRenderer : frameRenderer, renderer);
 
             float normalizedX = UnityEngine.Random.Range(-0.5f, 0.5f);

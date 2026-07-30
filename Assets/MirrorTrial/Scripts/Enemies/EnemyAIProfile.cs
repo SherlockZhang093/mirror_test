@@ -59,6 +59,10 @@ namespace MirrorTrial.Enemies
         [ChineseLabel("死亡闪烁间隔")] [Tooltip("每次显示或隐藏持续多少秒。")]
         public float deathBlinkInterval = 0.08f;
 
+        [Header("击飞表现")]
+        [ChineseLabel("击飞动画与落地表现")]
+        public EnemyLaunchSettings launchSettings = new EnemyLaunchSettings();
+
         [Header("移动限制")]
         [ChineseLabel("悬崖检测距离")] [Tooltip("向前检测地面的距离；设为 0 可关闭。")]
         public float ledgeCheckDistance = 0.5f;

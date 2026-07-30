@@ -167,6 +167,7 @@ namespace MirrorTrial.Editor
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
             AssemblyReloadEvents.beforeAssemblyReload += StopAnimationPreview;
             EditorApplication.quitting += StopAnimationPreview;
+            EnableRuntimePreviewBridge();
             if (Selection.activeGameObject)
                 SetTarget(Selection.activeGameObject);
         }
@@ -178,6 +179,7 @@ namespace MirrorTrial.Editor
             EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
             AssemblyReloadEvents.beforeAssemblyReload -= StopAnimationPreview;
             EditorApplication.quitting -= StopAnimationPreview;
+            DisableRuntimePreviewBridge();
             StopAnimationPreview();
             DisposeBossPreview();
         }
@@ -186,6 +188,7 @@ namespace MirrorTrial.Editor
         {
             if (state == PlayModeStateChange.ExitingEditMode || state == PlayModeStateChange.EnteredPlayMode)
                 StopAnimationPreview();
+            HandleRuntimePreviewPlayModeChange(state);
         }
 
         void OnSelectionChange()
@@ -196,6 +199,13 @@ namespace MirrorTrial.Editor
 
         void SetTarget(GameObject target)
         {
+            if (EditorApplication.isPlaying && target && !PrefabUtility.IsPartOfPrefabAsset(target))
+            {
+                var runtimeComponent = target.GetComponent<PlayerCombat>();
+                var sourceComponent = runtimeComponent ? PrefabUtility.GetCorrespondingObjectFromOriginalSource(runtimeComponent) : null;
+                if (sourceComponent)
+                    target = sourceComponent.gameObject;
+            }
             StopAnimationPreview();
             input = target ? target.GetComponent<PlayerInputReader>() : null;
             combat = target ? target.GetComponent<PlayerCombat>() : null;
@@ -264,6 +274,7 @@ namespace MirrorTrial.Editor
             serializedTuning.Update();
             if (serializedBow != null) serializedBow.Update();
             if (serializedAbilities != null) serializedAbilities.Update();
+            DrawRuntimePreviewPanel();
             scroll = EditorGUILayout.BeginScrollView(scroll);
             DrawMoveComboWorkspace();
             EditorGUILayout.EndScrollView();
@@ -271,7 +282,10 @@ namespace MirrorTrial.Editor
             if (serializedInput.ApplyModifiedProperties())
                 EditorUtility.SetDirty(input);
             if (serializedCombat.ApplyModifiedProperties())
+            {
                 EditorUtility.SetDirty(combat);
+                SyncRuntimePreviewIfNeeded();
+            }
             if (serializedWeapons.ApplyModifiedProperties())
                 EditorUtility.SetDirty(weapons);
             if (serializedTuning.ApplyModifiedProperties())
@@ -924,17 +938,32 @@ namespace MirrorTrial.Editor
 
         void SampleAnimationFrame(AnimationClip clip, int frame, int frameRate)
         {
-            if (Application.isPlaying || !combat || !clip)
+            if (!combat || !clip)
                 return;
-            if (EditorUtility.IsPersistent(combat.gameObject))
+            if (Application.isPlaying)
             {
                 animationPlaying = false;
-                ShowNotification(new GUIContent("\u4e3a\u4e86\u907f\u514d\u6c61\u67d3 Prefab\uff0c\u8bf7\u5728\u573a\u666f\u4e2d\u9009\u62e9\u73a9\u5bb6\u5b9e\u4f8b\u540e\u9884\u89c8"));
+                ShowNotification(new GUIContent("\u8fd0\u884c\u4e2d\u8bf7\u4f7f\u7528\u4e0a\u65b9\u7684\u5b9e\u673a\u9884\u89c8\uff1b\u9010\u5e27\u52a8\u4f5c\u9884\u89c8\u9700\u8981\u5148\u9000\u51fa\u8fd0\u884c\u6a21\u5f0f"));
                 return;
+            }
+            if (EditorUtility.IsPersistent(combat.gameObject))
+            {
+                var sceneCombat = FindScenePreviewCombat(combat);
+                if (!sceneCombat)
+                {
+                    animationPlaying = false;
+                    ShowNotification(new GUIContent("\u573a\u666f\u4e2d\u6ca1\u6709\u8fd9\u4e2a Player Prefab \u7684\u5b9e\u4f8b\uff0c\u65e0\u6cd5\u9884\u89c8\u52a8\u4f5c"));
+                    return;
+                }
+                SetTarget(sceneCombat.gameObject);
             }
             var animator = GetEditorAnimator();
             if (!animator)
+            {
+                animationPlaying = false;
+                ShowNotification(new GUIContent("\u5f53\u524d Player \u6ca1\u6709\u53ef\u7528\u4e8e\u9884\u89c8\u7684 Animator"));
                 return;
+            }
             if (!AnimationMode.InAnimationMode())
                 AnimationMode.StartAnimationMode();
             var time = Mathf.Min(clip.length, Mathf.Max(0, frame) / (float)Mathf.Max(1, frameRate));
@@ -942,6 +971,24 @@ namespace MirrorTrial.Editor
             AnimationMode.SampleAnimationClip(animator.gameObject, clip, time);
             AnimationMode.EndSampling();
             SceneView.RepaintAll();
+        }
+
+        static PlayerCombat FindScenePreviewCombat(PlayerCombat prefabCombat)
+        {
+            if (!prefabCombat)
+                return null;
+            var candidates = Resources.FindObjectsOfTypeAll<PlayerCombat>();
+            for (var i = 0; i < candidates.Length; i++)
+            {
+                var candidate = candidates[i];
+                if (!candidate || EditorUtility.IsPersistent(candidate.gameObject) ||
+                    !candidate.gameObject.scene.IsValid() || !candidate.gameObject.scene.isLoaded)
+                    continue;
+                var source = PrefabUtility.GetCorrespondingObjectFromOriginalSource(candidate);
+                if (source == prefabCombat)
+                    return candidate;
+            }
+            return null;
         }
 
         void StopAnimationPreview()

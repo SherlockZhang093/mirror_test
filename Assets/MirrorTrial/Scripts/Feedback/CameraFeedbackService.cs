@@ -1,5 +1,4 @@
 using MirrorTrial.Combat;
-using MirrorTrial.Level;
 using UnityEngine;
 
 namespace MirrorTrial.Feedback
@@ -13,7 +12,7 @@ namespace MirrorTrial.Feedback
 
         public static void RequestHit(Vector2 direction, float power)
         {
-            CameraDirector.Ensure().PlayHitFeedback(direction, Mathf.Clamp01(power));
+            CameraShakeService.Shake(direction, power);
         }
 
         static float EstimatePower(DamagePayload payload)

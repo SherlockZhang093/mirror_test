@@ -26,6 +26,10 @@ MonoBehaviour:
   attackCooldown: 2
   attackRange: 5.5
   attackDamage: 1
+  interruptPower: 1
+  poiseDamage: 1
+  playerHitReaction: 1
+  breaksSuperArmor: 0
   damageDelay: 0.22
   projectilePrefab: {fileID: 7301010000000000001, guid: 0f101e10100000000000000000000002,
     type: 3}
@@ -36,6 +40,15 @@ MonoBehaviour:
   deathFadeDelay: 0.3
   deathBlinkCount: 2
   deathBlinkInterval: 0.08
+  launchSettings:
+    getUpDuration: 0.6
+    groundProbeDistance: 0.08
+    hitCompressDuration: 0.045
+    takeoffDuration: 0.08
+    landingSlideSpeed: 2.2
+    landingSlideDuration: 0.12
+    knockdownDuration: 0.28
+    presentation: {fileID: 11400000, guid: 6533e9468fb67114cb5905876c630119, type: 2}
   ledgeCheckDistance: 0.5
   wallCheckDistance: 0.3
   canTurnAtLedge: 1

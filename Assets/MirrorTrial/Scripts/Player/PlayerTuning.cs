@@ -18,6 +18,7 @@ namespace MirrorTrial.Player
             public float acceleration = 30f;
             public float deceleration = 20f;
             public float airAcceleration = 30f;
+            public float airDeceleration = 3f;
             public float jumpSpeed = 7.5f;
             public float baseGravityModifier = 1f;
             public float fallGravityMultiplier = 1.15f;

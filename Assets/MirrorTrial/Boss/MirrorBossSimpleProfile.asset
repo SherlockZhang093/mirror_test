@@ -25,6 +25,151 @@ MonoBehaviour:
   phaseOneRecovery: {x: 3, y: 3.4}
   phaseTwoRecovery: {x: 2.6, y: 3}
   phaseThreeRecovery: {x: 2.2, y: 2.6}
+  phaseOneFeintChance: 0
+  phaseTwoFeintChance: 0.3
+  phaseThreeFeintChance: 0.45
+  feintHoldDuration: 0.18
+  feintResetDuration: 0.24
+  maxFeintsPerCombo: 1
+  windupEffectPrefab: {fileID: 420001, guid: f76caac7ee5b4693a77578770f020618, type: 3}
+  phaseOneWindupEffectPrefab: {fileID: 410001, guid: e5a992aef4054333a24bbc61feaedc38,
+    type: 3}
+  phaseTwoWindupEffectPrefab: {fileID: 420001, guid: f76caac7ee5b4693a77578770f020618,
+    type: 3}
+  phaseThreeWindupEffectPrefab: {fileID: 420001, guid: f76caac7ee5b4693a77578770f020618,
+    type: 3}
+  phaseOneWindupHoldDuration: 0.65
+  phaseTwoWindupHoldDuration: 0.5
+  phaseThreeWindupHoldDuration: 0.38
+  windupPresentation:
+    style: 0
+    coreStartColor: {r: 0.22, g: 0.58, b: 1, a: 0.55}
+    coreFullColor: {r: 0.82, g: 0.95, b: 1, a: 1}
+    bodyGlowColor: {r: 0.18, g: 0.62, b: 1, a: 0.42}
+    coreStartScale: 0.12
+    coreFullScale: 0.32
+    finalFlashStart: 0.9
+    pulseSpeed: 18
+    pulseAmount: 0.12
+    rotationSpeed: 0
+    particleIntensity: 1
+    particleRadius: 0.9
+    particleSpeed: 2.2
+    bodyGlowMaxAlpha: 0.32
+    bodyGlowScale: 1.035
+    readyChargeThreshold: 0.7
+    readyChargeCue: {fileID: 0}
+    swordOuterColor: {r: 0.2, g: 1, b: 0.45, a: 0.42}
+    swordCoreColor: {r: 0.82, g: 1, b: 0.86, a: 0.9}
+    swordAngle: 0
+    swordLength: 1.35
+    swordWidth: 0.12
+    swordJitterStart: 0.55
+    swordJitterAmount: 0.03125
+    leftFootOffset: {x: -0.3, y: 0.03}
+    rightFootOffset: {x: 0.3, y: 0.03}
+    dustIntensity: 1
+    punchFieldRadius: 1.35
+    punchCoreStartScale: 0.18
+    punchCoreReadyScale: 0.72
+    punchStreamIntensity: 1.25
+    punchAfterimageAlpha: 0.16
+    punchGroundPull: 1
+    chargingLoop: {fileID: 0}
+    fullChargeCue: {fileID: 0}
+    releaseCue: {fileID: 0}
+    feintCue: {fileID: 0}
+    interruptedCue: {fileID: 0}
+    audioVolume: 0.8
+  launchSettings:
+    getUpDuration: 0.6
+    groundProbeDistance: 0.08
+    hitCompressDuration: 0.045
+    takeoffDuration: 0.08
+    landingSlideSpeed: 2.2
+    landingSlideDuration: 0.12
+    knockdownDuration: 0.28
+    presentation: {fileID: 11400000, guid: 6533e9468fb67114cb5905876c630119, type: 2}
+  enableRangedTeleportKit: 0
+  bowDrawDuration: 0.8
+  bowShotInterval: 0.35
+  bowVolleyRecovery: 1.25
+  bowReloadRecovery: 1.8
+  volleysBeforeReload: 2
+  phaseOneArrowCount: 1
+  phaseTwoArrowCount: 2
+  phaseThreeArrowCount: 3
+  bowDamage: 1
+  bowArrowSpeed: 12
+  bowArrowRange: 18
+  bowKnockback: {x: 1.2, y: 0.25}
+  bowSpawnOffset: {x: 0.65, y: 0.9}
+  teleportCooldown: 6
+  teleportWindup: 0.38
+  teleportHiddenDuration: 0.14
+  teleportAppearRecovery: 0.3
+  teleportFlankDistance: 2.1
+  teleportArenaPadding: 1
+  closeEscapeDistance: 2.2
+  phaseOneTeleportAttackChance: 0.2
+  phaseTwoTeleportAttackChance: 0.32
+  phaseThreeTeleportAttackChance: 0.45
+  minionPrefab: {fileID: 0}
+  summonCooldown: 11
+  summonWindup: 1.25
+  summonRecovery: 0.45
+  summonDecisionChance: 0.3
+  phaseOneMaxMinions: 1
+  phaseTwoMaxMinions: 2
+  phaseThreeMaxMinions: 2
+  totalSummonLimit: 4
+  minionSpawnHorizontalOffset: 2.5
+  closeDefenseRecovery: 1
+  heavySlashChance: 0.25
+  heavySlashCooldown: 5
+  heavySlashRecovery: 1.1
+  heavySlash:
+    animationState: ComboAttackD
+    activeStart: 0.36
+    activeEnd: 0.6
+    playbackSpeed: 0.85
+    gapAfter: 0
+    damage: 1
+    hitboxOffset: {x: 0.95, y: 0}
+    hitboxSize: {x: 1.55, y: 1.15}
+    knockback: {x: 7, y: 3}
+    hitStop: 0.1
+    interruptPower: 3
+    poiseDamage: 4
+    playerHitReaction: 4
+    breaksSuperArmor: 1
+    advanceSpeed: 0
+    windupFrame: 2
+    windupHoldDuration: 0.8
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 0
+    feintChanceOverride: -1
+    animationFrameRate: 12
+    animationFrameCount: 12
+    mirrorHitboxByFacing: 1
+    hitboxKeysMigratedToClip: 0
+    hitboxKeys:
+    - frame: 0
+      enabled: 0
+      offset: {x: 0.95, y: 0}
+      size: {x: 1.55, y: 1.15}
+      interpolation: 0
+    - frame: 4
+      enabled: 1
+      offset: {x: 0.95, y: 0}
+      size: {x: 1.55, y: 1.15}
+      interpolation: 1
+    - frame: 7
+      enabled: 0
+      offset: {x: 0.95, y: 0}
+      size: {x: 1.55, y: 1.15}
+      interpolation: 0
   phaseOneCombo:
   - animationState: ComboAttackA
     activeStart: 0.3
@@ -43,6 +188,10 @@ MonoBehaviour:
     advanceSpeed: 1.2
     windupFrame: 1
     windupHoldDuration: 0.65
+    windupEffectOffset: {x: -0.12, y: 1.57}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
     animationFrameRate: 12
     animationFrameCount: 7
     mirrorHitboxByFacing: 1
@@ -85,6 +234,10 @@ MonoBehaviour:
     advanceSpeed: 1.2
     windupFrame: -1
     windupHoldDuration: 0
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
     animationFrameRate: 12
     animationFrameCount: 6
     mirrorHitboxByFacing: 1
@@ -123,6 +276,10 @@ MonoBehaviour:
     advanceSpeed: 1.2
     windupFrame: 1
     windupHoldDuration: 0.5
+    windupEffectOffset: {x: -0.51, y: 1.22}
+    windupEffectAngle: -42.22
+    allowFeint: 1
+    feintChanceOverride: -1
     animationFrameRate: 12
     animationFrameCount: 7
     mirrorHitboxByFacing: 1
@@ -160,6 +317,10 @@ MonoBehaviour:
     advanceSpeed: 1.2
     windupFrame: -1
     windupHoldDuration: 0
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
     animationFrameRate: 12
     animationFrameCount: 6
     mirrorHitboxByFacing: 1
@@ -197,6 +358,10 @@ MonoBehaviour:
     advanceSpeed: 1.2
     windupFrame: -1
     windupHoldDuration: 0
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
     animationFrameRate: 12
     animationFrameCount: 8
     mirrorHitboxByFacing: 1
@@ -235,6 +400,10 @@ MonoBehaviour:
     advanceSpeed: 1.2
     windupFrame: 1
     windupHoldDuration: 0.38
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
     animationFrameRate: 12
     animationFrameCount: 7
     mirrorHitboxByFacing: 1
@@ -272,6 +441,10 @@ MonoBehaviour:
     advanceSpeed: 1.2
     windupFrame: -1
     windupHoldDuration: 0
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
     animationFrameRate: 12
     animationFrameCount: 6
     mirrorHitboxByFacing: 1
@@ -314,6 +487,10 @@ MonoBehaviour:
     advanceSpeed: 1.2
     windupFrame: -1
     windupHoldDuration: 0
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
     animationFrameRate: 12
     animationFrameCount: 6
     mirrorHitboxByFacing: 1
@@ -351,6 +528,10 @@ MonoBehaviour:
     advanceSpeed: 1.2
     windupFrame: -1
     windupHoldDuration: 0
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
     animationFrameRate: 12
     animationFrameCount: 8
     mirrorHitboxByFacing: 1

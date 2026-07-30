@@ -6,7 +6,7 @@ namespace MirrorTrial.Combat
     [Serializable]
     public sealed class SkillHitFeedbackSettings
     {
-        public bool enableHitEffect;
+        public bool enableHitEffect = true;
         public GameObject hitEffectPrefab;
         public Vector2 hitEffectOffset;
         public bool mirrorHitEffectByDirection = true;

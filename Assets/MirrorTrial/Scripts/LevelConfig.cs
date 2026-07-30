@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using MirrorTrial.Enemies;
+using MirrorTrial.Player;
 using UnityEngine;
 
 namespace MirrorTrial.Level
@@ -14,6 +15,8 @@ namespace MirrorTrial.Level
 
         [Header("引用预制体")]
         [ChineseLabel("玩家预制体")] public GameObject playerPrefab;
+        [ChineseLabel("玩家生命UI")] [Tooltip("进入该关卡时使用的生命值与生命储备界面")]
+        public PlayerHealthBarView playerHealthHudPrefab;
         [ChineseLabel("默认敌人预制体")] public GameObject enemyPrefab;
         [ChineseLabel("默认地形精灵")] public Sprite defaultSprite;
 
