@@ -22,6 +22,10 @@ namespace MirrorTrial.Enemies
         [SerializeField] float patrolLeftOffset = -2f;
         [SerializeField] float patrolRightOffset = 2f;
 
+        [Header("移动类型")]
+        [ChineseLabel("飞行单位")] [Tooltip("保持当前空中高度，不受重力和悬崖检测影响。")]
+        [SerializeField] bool isFlying;
+
         [Header("攻击特效")]
         [ChineseLabel("攻击特效预制体")] [SerializeField] GameObject attackEffectPrefab;
         [ChineseLabel("武器或手部挂点")] [SerializeField] Transform attackEffectPoint;
@@ -58,6 +62,7 @@ namespace MirrorTrial.Enemies
         EnemyDamageVisual damageVisual;
         EnemyLaunchController2D launchController;
         Transform player;
+        Collider2D ignoredPlayerCollider;
         Vector2 patrolOrigin;
         float patrolTargetX;
         float patrolWaitTimer;
@@ -130,7 +135,7 @@ namespace MirrorTrial.Enemies
             body = GetComponent<Rigidbody2D>();
             bodyCollider = GetComponent<Collider2D>();
             spriteRenderer = GetComponentInChildren<SpriteRenderer>(true);
-            body.gravityScale = 1f;
+            body.gravityScale = isFlying ? 0f : 1f;
             launchController = GetComponent<EnemyLaunchController2D>();
             if (!launchController) launchController = gameObject.AddComponent<EnemyLaunchController2D>();
             launchController.Configure(profile ? profile.launchSettings : null);
@@ -158,7 +163,7 @@ namespace MirrorTrial.Enemies
             ResetPatrolTarget();
 
             var reader = FindObjectOfType<MirrorTrial.Player.PlayerInputReader>();
-            if (reader) player = reader.transform;
+            if (reader) SetPlayer(reader);
         }
 
         void Update()
@@ -169,7 +174,7 @@ namespace MirrorTrial.Enemies
             if (player == null || !player.gameObject.activeInHierarchy)
             {
                 var reader = FindObjectOfType<MirrorTrial.Player.PlayerInputReader>();
-                if (reader) player = reader.transform;
+                if (reader) SetPlayer(reader);
             }
 
             if (CurrentState == State.Hurt && hurtTimer <= 0f)
@@ -185,6 +190,13 @@ namespace MirrorTrial.Enemies
             {
                 UpdateVisualFacing();
                 return;
+            }
+
+            if (isFlying)
+            {
+                var velocity = body.velocity;
+                velocity.y = 0f;
+                body.velocity = velocity;
             }
 
             if (passiveTestTarget && CurrentState != State.Hurt)
@@ -210,6 +222,21 @@ namespace MirrorTrial.Enemies
             }
 
             UpdateVisualFacing();
+        }
+
+        void SetPlayer(MirrorTrial.Player.PlayerInputReader reader)
+        {
+            player = reader.transform;
+
+            var playerCollider = reader.GetComponent<Collider2D>();
+            if (ignoredPlayerCollider == playerCollider) return;
+
+            if (bodyCollider && ignoredPlayerCollider)
+                Physics2D.IgnoreCollision(bodyCollider, ignoredPlayerCollider, false);
+
+            ignoredPlayerCollider = playerCollider;
+            if (bodyCollider && ignoredPlayerCollider)
+                Physics2D.IgnoreCollision(bodyCollider, ignoredPlayerCollider, true);
         }
 
         void FixedUpdate()
@@ -254,7 +281,7 @@ namespace MirrorTrial.Enemies
 
             var direction = Mathf.Sign(delta);
             var blocked = profile && profile.wallCheckDistance > 0f && WallInDirection(direction);
-            var ledge = profile && profile.ledgeCheckDistance > 0f && !GroundAhead(direction);
+            var ledge = !isFlying && profile && profile.ledgeCheckDistance > 0f && !GroundAhead(direction);
             if (blocked || ledge)
             {
                 SetVelocityX(0f);
@@ -423,7 +450,7 @@ namespace MirrorTrial.Enemies
             float speed = MoveSpeed;
 
             bool blocked = profile && profile.wallCheckDistance > 0f && WallInDirection(moveDir);
-            bool ledge = profile && profile.ledgeCheckDistance > 0f && !GroundAhead(moveDir);
+            bool ledge = !isFlying && profile && profile.ledgeCheckDistance > 0f && !GroundAhead(moveDir);
 
             if (blocked || (ledge && !profile.canTurnAtLedge))
             {
@@ -516,6 +543,7 @@ namespace MirrorTrial.Enemies
                 case State.Attack:
                     stateTimer = profile ? profile.attackWindup : 0.35f;
                     if (profile && profile.lockMovementWhileAttacking) SetVelocityX(0f);
+                    MirrorTrial.Player.PlayerAudioFeedback.PlayEnemyAttack();
                     break;
                 case State.Hurt:
                     SetVelocityX(0f);
@@ -538,6 +566,7 @@ namespace MirrorTrial.Enemies
                 Die();
                 return;
             }
+            MirrorTrial.Player.PlayerAudioFeedback.PlayEnemyHurt();
 
             // The active launch sequence owns movement and reaction presentation. Hits still
             // deal damage, but cannot restart launch, redirect it, or interrupt get-up armor.
@@ -547,6 +576,7 @@ namespace MirrorTrial.Enemies
             if (payload.reaction == HitReactionType.Launch)
             {
                 TransitionTo(State.Launch);
+                if (isFlying) body.gravityScale = 1f;
                 launchController.Configure(profile ? profile.launchSettings : null);
                 launchController.BeginLaunch(payload.knockback);
                 return;
@@ -576,19 +606,38 @@ namespace MirrorTrial.Enemies
         {
             if (CurrentState != State.Launch) return;
             if (pendingDeath) Die();
-            else TransitionTo(State.Idle);
+            else
+            {
+                if (isFlying)
+                {
+                    body.gravityScale = 0f;
+                    body.position = new Vector2(body.position.x, patrolOrigin.y);
+                    body.velocity = Vector2.zero;
+                }
+                TransitionTo(State.Idle);
+            }
         }
 
         void OnDestroy()
         {
             if (launchController) launchController.LaunchCompleted -= OnLaunchCompleted;
+            if (bodyCollider && ignoredPlayerCollider)
+                Physics2D.IgnoreCollision(bodyCollider, ignoredPlayerCollider, false);
         }
 
         void Die()
         {
             pendingDeath = false;
             CurrentState = State.Dead;
-            SetVelocityX(0f);
+            MirrorTrial.Player.PlayerAudioFeedback.PlayEnemyDeath();
+            if (launchController && launchController.IsLaunching)
+                launchController.CancelLaunch();
+            if (body)
+            {
+                body.velocity = Vector2.zero;
+                body.angularVelocity = 0f;
+                body.simulated = false;
+            }
             if (bodyCollider) bodyCollider.enabled = false;
             var hurtbox = GetComponent<Hurtbox>();
             if (hurtbox) hurtbox.enabled = false;

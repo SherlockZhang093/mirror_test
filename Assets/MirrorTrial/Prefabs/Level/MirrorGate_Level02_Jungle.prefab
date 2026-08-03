@@ -480,8 +480,8 @@ MonoBehaviour:
   burstDelayAfterHitStop: 0.02
   recommendedEnterDelay: 0.8
   audioSource: {fileID: 0}
-  hitClip: {fileID: 0}
-  shatterClip: {fileID: 0}
+  hitClip: {fileID: 8300000, guid: f1a127b769d46714bbfecb401dac76b5, type: 3}
+  shatterClip: {fileID: 8300000, guid: c5c43f02e3c7b2948ba324802ff5147b, type: 3}
   hitParticlePrefab: {fileID: 0}
   shatterParticlePrefab: {fileID: 0}
 --- !u!114 &2529962813003028491

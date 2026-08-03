@@ -9,12 +9,14 @@ namespace MirrorTrial.HealthResources
         [SerializeField] HealthResourceNode node;
         [SerializeField] Light2D glowLight;
         [SerializeField] SpriteRenderer[] motes;
+        [SerializeField] ParticleSystem[] sparkleParticles;
         [SerializeField, Min(0f)] float baseIntensity = 0.58f;
         [SerializeField, Min(0.1f)] float pulseSpeed = 1.6f;
         [SerializeField, Min(0f)] float moteDrift = 0.08f;
 
         Vector3[] moteOrigins;
         float visibleStrength = 1f;
+        bool particlesStopped;
 
         void Awake()
         {
@@ -22,6 +24,8 @@ namespace MirrorTrial.HealthResources
             if (!glowLight) glowLight = GetComponent<Light2D>();
             if (motes == null || motes.Length == 0)
                 motes = GetComponentsInChildren<SpriteRenderer>(true);
+            if (sparkleParticles == null || sparkleParticles.Length == 0)
+                sparkleParticles = GetComponentsInChildren<ParticleSystem>(true);
             moteOrigins = new Vector3[motes.Length];
             for (var i = 0; i < motes.Length; i++)
                 if (motes[i]) moteOrigins[i] = motes[i].transform.localPosition;
@@ -36,6 +40,21 @@ namespace MirrorTrial.HealthResources
             visibleStrength = Mathf.MoveTowards(visibleStrength, targetStrength, Time.deltaTime * 4f);
             var pulse = 0.86f + Mathf.Sin(Time.time * pulseSpeed) * 0.14f;
             if (glowLight) glowLight.intensity = baseIntensity * visibleStrength * pulse;
+
+            var shouldStopParticles = node && node.IsDestroyed;
+            if (shouldStopParticles != particlesStopped)
+            {
+                particlesStopped = shouldStopParticles;
+                for (var i = 0; i < sparkleParticles.Length; i++)
+                {
+                    var particles = sparkleParticles[i];
+                    if (!particles) continue;
+                    if (particlesStopped)
+                        particles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+                    else if (!particles.isPlaying)
+                        particles.Play(true);
+                }
+            }
 
             for (var i = 0; i < motes.Length; i++)
             {

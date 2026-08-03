@@ -355,6 +355,7 @@ namespace MirrorTrial.Player
             var chargeHoldNormalized = Mathf.Clamp01((chargeFrame / chargeFrameRate) / chargeClipDuration);
             var chargeHoldTime = totalDuration * chargeHoldNormalized;
             var chargeHandled = !instance.enableCharge;
+            var attackCuePlayed = false;
             var outgoing = BuildTransitionStates(graph, instance.id);
             currentComboMoveHitConfirmed = false;
             acceptingComboHitConfirm = true;
@@ -384,6 +385,11 @@ namespace MirrorTrial.Player
                 }
 
                 var moveElapsed = elapsed * speed;
+                if (!attackCuePlayed && moveElapsed >= Mathf.Max(0f, move.startup))
+                {
+                    attackCuePlayed = true;
+                    AttackActivated?.Invoke(move.moveCategory, move.attackType);
+                }
                 UpdateBodyState(move, moveElapsed);
                 ApplyHitboxFrame(move, combatTuning, moveElapsed);
                 if (selection.transition == null && elapsed > 0f)

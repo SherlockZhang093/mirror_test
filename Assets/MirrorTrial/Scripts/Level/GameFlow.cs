@@ -6,12 +6,14 @@ namespace MirrorTrial.Level
     {
         public const string EntrySceneName = "GameEntry";
         public const string FirstRealitySceneName = "Level_Reality_01";
+        public const string SecondRealitySceneName = "Level_Reality_02";
 
         public static bool TutorialRequested { get; private set; } = true;
 
         static readonly string[] RealityScenes =
         {
-            FirstRealitySceneName
+            FirstRealitySceneName,
+            SecondRealitySceneName
         };
 
         public static void StartNewGame()

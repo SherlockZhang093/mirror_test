@@ -3,7 +3,7 @@ Shader "MirrorTrial/UI/ScreenFxOverlay"
     Properties
     {
         [PerRendererData] _MainTex ("Texture", 2D) = "white" {}
-        _BossColor ("Boss Color", Color) = (0.008, 0.012, 0.022, 1)
+        _BossColor ("Boss Color", Color) = (0, 0, 0, 1)
         _DamageColor ("Damage Color", Color) = (0.48, 0.005, 0.008, 1)
         _BossIntensity ("Boss Intensity", Range(0,1)) = 0
         _DamageIntensity ("Damage Intensity", Range(0,1)) = 0

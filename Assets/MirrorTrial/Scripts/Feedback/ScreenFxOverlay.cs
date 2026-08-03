@@ -16,7 +16,28 @@ namespace MirrorTrial.Feedback
         static readonly int DamageColor = Shader.PropertyToID("_DamageColor");
 
         [SerializeField] RawImage mask;
+
+        [Header("Boss Battle Effect")]
+        [Tooltip("Color of the screen-edge effect during a boss battle.")]
+        [SerializeField] Color bossColor = Color.black;
+        [Tooltip("Maximum opacity/intensity of the boss edge effect.")]
+        [SerializeField, Range(0f, 1f)] float bossStrength = 0.72f;
+        [Tooltip("Seconds for the boss effect to reach full strength.")]
+        [SerializeField, Min(0.01f)] float bossFadeIn = 0.18f;
+        [Tooltip("Seconds for the boss effect to disappear after the fight.")]
+        [SerializeField, Min(0.01f)] float bossFadeOut = 1.35f;
+        [Tooltip("Base number of black-edge flashes per second.")]
+        [SerializeField, Min(0.1f)] float bossFlickerFrequency = 0.8f;
+        [Tooltip("Difference between the dimmest and brightest part of each flash.")]
+        [SerializeField, Range(0f, 0.9f)] float bossFlickerAmount = 0.58f;
+
         Material runtimeMaterial;
+
+        public float BossStrength => bossStrength;
+        public float BossFadeIn => bossFadeIn;
+        public float BossFadeOut => bossFadeOut;
+        public float BossFlickerFrequency => bossFlickerFrequency;
+        public float BossFlickerAmount => bossFlickerAmount;
 
         public void Initialize()
         {
@@ -52,7 +73,7 @@ namespace MirrorTrial.Feedback
         }
 
         public void Apply(float boss, float damage, float lowHealth, float phase, float time,
-            Vector2 direction, Color bossColor, Color damageColor)
+            Vector2 direction, Color damageColor)
         {
             if (!runtimeMaterial) return;
             runtimeMaterial.SetFloat(BossIntensity, boss);

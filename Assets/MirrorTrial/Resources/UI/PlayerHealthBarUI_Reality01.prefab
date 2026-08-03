@@ -29,7 +29,7 @@ RectTransform:
   m_GameObject: {fileID: 100000}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6448294383530455669}
@@ -130,7 +130,22 @@ MonoBehaviour:
   normalFill: {fileID: 21300000, guid: aa43a0eef7b2a2949ad3b5e3fc6c2af8, type: 3}
   lowFill: {fileID: 21300000, guid: aa43a0eef7b2a2949ad3b5e3fc6c2af8, type: 3}
   hitFlashDuration: 0.08
-  lowHealthThreshold: 1
+  hitFlashColor: {r: 1, g: 0.92, b: 0.82, a: 1}
+  hitDamageColor: {r: 0.92, g: 0.22, b: 0.16, a: 0.95}
+  damageTrailColor: {r: 0.35, g: 0.04, b: 0.03, a: 0.78}
+  damageTrailHold: 0.07
+  damageTrailFade: 0.22
+  normalShakeDistance: 4
+  heavyShakeDistance: 7
+  heavyDamageRatio: 0.4
+  shakeDuration: 0.15
+  lowHealthRatio: 0.3
+  lowHealthTint: {r: 0.85, g: 0.15, b: 0.12, a: 1}
+  lowHealthTintStrength: 0.28
+  lowHealthMinAlpha: 0.62
+  lowHealthPulsePeriod: 1.05
+  deathAlpha: 0.5
+  deathFadeDuration: 0.18
   reserveFill: {fileID: 3772698140535577160}
   reserveGroup: {fileID: 2271847732135291171}
   recoverKeyText: {fileID: 175178555223782186}
@@ -195,7 +210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.32, g: 0.4, b: 0.43, a: 1}
+  m_Color: {r: 0.18, g: 0.72, b: 0.92, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -270,7 +285,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.32, g: 0.4, b: 0.43, a: 1}
+  m_Color: {r: 0.18, g: 0.72, b: 0.92, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1481,7 +1496,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.32, g: 0.4, b: 0.43, a: 1}
+  m_Color: {r: 0.18, g: 0.72, b: 0.92, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1911,7 +1926,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.32, g: 0.4, b: 0.43, a: 1}
+  m_Color: {r: 0.18, g: 0.72, b: 0.92, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2250,7 +2265,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.32, g: 0.4, b: 0.43, a: 1}
+  m_Color: {r: 0.18, g: 0.72, b: 0.92, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

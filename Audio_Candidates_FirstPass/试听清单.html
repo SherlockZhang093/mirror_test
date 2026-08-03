@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>《镜界试炼》音效候选试听</title>
+  <style>
+    :root { color-scheme: dark; --bg:#07121c; --panel:#0d2230; --line:#21475b; --cyan:#59d7ed; --text:#e7f5f8; --muted:#91abb5; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:linear-gradient(180deg,#07121c,#0a1822 45%,#07121c); color:var(--text); font-family:"Microsoft YaHei",system-ui,sans-serif; }
+    header { position:sticky; top:0; z-index:5; padding:18px max(20px,5vw); background:rgba(7,18,28,.94); border-bottom:1px solid var(--line); backdrop-filter:blur(12px); }
+    h1 { margin:0 0 7px; font-size:24px; }
+    header p { margin:0; color:var(--muted); }
+    .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+    button,input { font:inherit; }
+    button { border:1px solid var(--line); border-radius:8px; padding:8px 13px; color:var(--text); background:#123145; cursor:pointer; }
+    button:hover { border-color:var(--cyan); }
+    #search { min-width:260px; padding:9px 12px; color:var(--text); background:#091923; border:1px solid var(--line); border-radius:8px; }
+    #progress { color:var(--cyan); align-self:center; }
+    main { width:min(1180px,92vw); margin:22px auto 60px; display:grid; gap:14px; }
+    section { border:1px solid var(--line); border-radius:12px; background:rgba(13,34,48,.9); overflow:hidden; }
+    section h2 { margin:0; padding:13px 16px; font-size:17px; background:#102b3b; border-bottom:1px solid var(--line); }
+    .options { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); }
+    label { display:grid; gap:9px; padding:14px; border-right:1px solid var(--line); cursor:pointer; }
+    label:last-child { border-right:0; }
+    label:has(input:checked) { background:rgba(89,215,237,.11); box-shadow:inset 0 0 0 1px var(--cyan); }
+    .pick { display:flex; align-items:center; gap:8px; font-weight:700; }
+    audio { width:100%; height:34px; }
+    .filename { color:var(--muted); font-size:12px; overflow-wrap:anywhere; }
+    .notice { margin:0; padding:12px 16px; color:#ffd998; background:#2b2517; border-bottom:1px solid #5e4d20; }
+    textarea { position:fixed; left:-9999px; }
+    @media (max-width:760px) { .options { grid-template-columns:1fr; } label { border-right:0; border-bottom:1px solid var(--line); } label:last-child { border-bottom:0; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>《镜界试炼》音效候选试听</h1>
+    <p>36 类 × 3 个候选。播放新音效时会自动暂停上一条；点选 A/B/C 后会自动保存。</p>
+    <div class="toolbar">
+      <input id="search" placeholder="搜索：挥剑、Boss、环境……">
+      <button id="export">复制选择结果</button>
+      <button id="clear">清空选择</button>
+      <span id="progress"></span>
+    </div>
+  </header>
+  <main id="catalog"></main>
+  <textarea id="result"></textarea>
+  <script>
+    const data = [
+      ["01_UI_选择确认",["A_清晰选择.wav","B_短促按钮.wav","C_确定动作.wav"]],
+      ["02_UI_取消返回",["A_取消.wav","B_关闭菜单.wav","C_关闭技能窗.wav"]],
+      ["03_UI_完成过关",["A_胜利完成.wav","B_完成提示.wav","C_升级提示.wav"]],
+      ["04_Player_沙地脚步",["A_沙地单步.wav","B_沙地行走.wav","C_沙石脚步.wav"]],
+      ["05_Player_石地脚步",["A_硬地行走.wav","B_硬地单步.wav","C_石子脚步.wav"]],
+      ["06_Player_跳跃",["A_轻跳.wav","B_跳跃带衣摆.wav","C_快速腾空.wav"]],
+      ["07_Player_落地",["A_武术落地.wav","B_较重落地.wav","C_人物落地.wav"]],
+      ["08_Player_闪避",["A_短呼啸.wav","B_高频掠过.wav","C_相位气流.wav"]],
+      ["09_Combat_轻剑挥动",["A_轻剑挥动.wav","B_清脆剑风.wav","C_舞剑.wav"]],
+      ["10_Combat_重剑挥动",["A_重剑一.wav","B_重剑二.wav","C_沉重武器.wav"]],
+      ["11_Combat_剑击肉体",["A_锐利入肉.wav","B_刀剑砍中.wav","C_劈砍肉体.wav"]],
+      ["12_Combat_格挡碰撞",["A_剑与剑.wav","B_刀刃弹开.wav","C_剑击铁器.wav"]],
+      ["13_Combat_徒手挥拳",["A_快速出拳.wav","B_短促出拳.wav","C_力量拳风.wav"]],
+      ["14_Combat_徒手命中",["A_空拳命中.wav","B_拳头命中.wav","C_重拳命中.wav"]],
+      ["15_Bow_拉弦",["A_拉弓短.wav","B_拉弓中.wav","C_拉弓紧绷.wav"]],
+      ["16_Bow_发射",["A_箭发射一.wav","B_箭发射二.wav","C_箭发射三.wav"]],
+      ["17_Bow_箭命中",["A_箭命中一.wav","B_箭命中二.wav","C_箭命中三.wav"]],
+      ["18_Player_受伤",["A_短促受伤.wav","B_克制受伤.wav","C_受伤变化.wav"]],
+      ["19_Player_死亡",["A_死亡短声.wav","B_短喊倒地.wav","C_中剑倒地.wav"]],
+      ["20_Enemy_攻击",["A_幽影攻击一.wav","B_幽影攻击二.wav","C_幽影攻击三.wav"]],
+      ["21_Enemy_受伤",["A_幽影受伤一.wav","B_幽影受伤二.wav","C_幽影受伤三.wav"]],
+      ["22_Enemy_死亡",["A_幽灵消亡.wav","B_人形怪死亡.wav","C_石怪崩落.wav"]],
+      ["23_Boss_蓄力",["A_诡异蓄力.wav","B_魔法蓄力.wav","C_雷电蓄积.wav"]],
+      ["24_Magic_镜刃剑气",["A_金属剑气.wav","B_挥舞剑气.wav","C_飞剑回旋.wav"]],
+      ["25_Magic_传送",["A_时空转移.wav","B_魔法传送.wav","C_转移释放.wav"]],
+      ["26_Magic_召唤",["A_气流召唤.wav","B_黑魔法召唤.wav","C_野兽召唤.wav"]],
+      ["27_Mirror_受击裂纹",["A_高频击中.wav","B_明亮金属.wav","C_高频碎裂.wav"]],
+      ["28_Mirror_彻底破碎",["A_玻璃爆裂.wav","B_玻璃气流.wav","C_玻璃连续碎裂.wav"]],
+      ["29_机关_滑轮运转",["A_木质小机关.wav","B_小型机械.wav","C_老式机械.wav"]],
+      ["30_机关_绳索断裂_近似",["A_纤维撕裂.wav","B_树枝折断.wav","C_木材折断.wav"]],
+      ["31_机关_平台落地",["A_重物落地.wav","B_石头落地.wav","C_巨石落地.wav"]],
+      ["32_Resource_拾取",["A_拾取宝石.wav","B_拾取药草.wav","C_拾取水.wav"]],
+      ["33_Resource_治疗",["A_治愈光.wav","B_补血光.wav","C_柔和回复.wav"]],
+      ["34_Ambience_遗迹",["A_废墟.wav","B_古堡内部.wav","C_空旷阴暗.wav"]],
+      ["35_Ambience_镜世界",["A_金属低频空间.wav","B_低频空旷诡异.wav","C_诡异金属环境.wav"]],
+      ["36_Ambience_雨林水域",["A_雨林蛙虫.wav","B_丛林鸟虫.wav","C_小湖旁.wav"]]
+    ];
+    const key = "mirror-trial-sfx-picks-v1";
+    let picks = JSON.parse(localStorage.getItem(key) || "{}");
+    const root = document.getElementById("catalog");
+    const safe = value => value.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    function render(filter="") {
+      root.innerHTML = "";
+      data.filter(([category]) => category.toLowerCase().includes(filter.toLowerCase())).forEach(([category,files]) => {
+        const section = document.createElement("section");
+        if (category.includes("绳索断裂")) section.innerHTML = `<p class="notice">素材库没有真正的绳索断裂声，本组是近似替代。</p>`;
+        section.innerHTML += `<h2>${safe(category.replaceAll("_"," · "))}</h2><div class="options">${files.map((file,index) => {
+          const choice = String.fromCharCode(65+index);
+          const checked = picks[category] === choice ? "checked" : "";
+          const src = encodeURI(`${category}/${file}`);
+          return `<label><span class="pick"><input type="radio" name="${safe(category)}" value="${choice}" ${checked}>候选 ${choice}</span><audio controls preload="metadata" src="${src}"></audio><span class="filename">${safe(file)}</span></label>`;
+        }).join("")}</div>`;
+        section.querySelectorAll("input").forEach(input => input.addEventListener("change", () => {
+          picks[category] = input.value; localStorage.setItem(key,JSON.stringify(picks)); updateProgress();
+        }));
+        section.querySelectorAll("audio").forEach(player => player.addEventListener("play", () => {
+          document.querySelectorAll("audio").forEach(other => { if (other !== player) other.pause(); });
+        }));
+        root.appendChild(section);
+      });
+      updateProgress();
+    }
+    function updateProgress() { document.getElementById("progress").textContent = `已选择 ${Object.keys(picks).length} / ${data.length} 类`; }
+    document.getElementById("search").addEventListener("input", e => render(e.target.value));
+    document.getElementById("clear").addEventListener("click", () => { if(confirm("确定清空全部选择吗？")){ picks={}; localStorage.removeItem(key); render(document.getElementById("search").value); } });
+    document.getElementById("export").addEventListener("click", async () => {
+      const text = data.map(([category]) => `${category}: ${picks[category] || "未选择"}`).join("\n");
+      try { await navigator.clipboard.writeText(text); alert("选择结果已复制。直接粘贴给 Codex 即可。"); }
+      catch { const box=document.getElementById("result"); box.value=text; box.style.position="fixed"; box.style.left="20px"; box.style.bottom="20px"; box.style.width="min(700px,90vw)"; box.style.height="50vh"; box.select(); alert("浏览器阻止了自动复制，结果已显示并选中，请按 Ctrl+C。"); }
+    });
+    render();
+  </script>
+</body>
+</html>

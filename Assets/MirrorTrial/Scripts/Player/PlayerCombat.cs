@@ -135,6 +135,8 @@ namespace MirrorTrial.Player
 
         public bool IsAttacking { get { return attackRoutine != null || guarding; } }
         public bool IsGuarding { get { return guarding; } }
+        public event Action<PlayerMoveCategory, SkillAttackType> AttackActivated;
+        public event Action Blocked;
         public int ActiveComboSetIndex { get { return activeComboSetIndex; } set { activeComboSetIndex = Mathf.Clamp(value, 0, Mathf.Max(0, comboSets.Count - 1)); } }
         public IList<PlayerComboSet> ComboSets { get { return comboSets; } }
         public IList<PlayerComboStep> Combo { get { return ActiveCombo; } }
@@ -259,6 +261,7 @@ namespace MirrorTrial.Player
             if (guardImpactRoutine != null)
                 StopCoroutine(guardImpactRoutine);
             guardImpactRoutine = StartCoroutine(GuardImpactRoutine());
+            Blocked?.Invoke();
             return true;
         }
 
@@ -311,6 +314,7 @@ namespace MirrorTrial.Player
             var combat = tuning.combat;
             var elapsed = 0f;
             var totalDuration = Mathf.Max(0f, step.startup) + Mathf.Max(0f, step.activeTime) + Mathf.Max(0f, step.recovery);
+            var attackCuePlayed = false;
 
             if (step.lockMovement)
                 motor.MovementLocked = true;
@@ -322,6 +326,12 @@ namespace MirrorTrial.Player
 
             while (elapsed < totalDuration)
             {
+                if (!attackCuePlayed && elapsed >= Mathf.Max(0f, step.startup))
+                {
+                    attackCuePlayed = true;
+                    AttackActivated?.Invoke(step.moveCategory, step.attackType);
+                }
+
                 UpdateBodyState(step, elapsed);
                 ApplyHitboxFrame(step, combat, elapsed);
 

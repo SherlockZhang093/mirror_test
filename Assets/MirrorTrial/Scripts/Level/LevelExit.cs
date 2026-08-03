@@ -1,4 +1,5 @@
 using MirrorTrial.Player;
+using MirrorTrial.Audio;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -26,6 +27,10 @@ namespace MirrorTrial.Level
                 return;
 
             loading = true;
+            if (GlobalAudioFeedback.IsAvailable)
+                GlobalAudioFeedback.PlayComplete();
+            else
+                PlayerAudioFeedback.PlayComplete();
             SceneManager.LoadScene(nextSceneName, LoadSceneMode.Single);
         }
     }

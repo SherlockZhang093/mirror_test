@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b1c3a10db5f01548b31579608aacd58, type: 3}
   m_Name: MirrorBossProfile
   m_EditorClassIdentifier: 
-  displayName: "\u955C\u4E2D\u884C\u5211\u8005"
+  displayName: "\u6301\u5251\u7684\u5012\u5F71"
   maxHitPoints: 30
   moveSpeed: 2.8
   acceleration: 18

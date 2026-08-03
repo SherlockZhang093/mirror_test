@@ -29,7 +29,13 @@ namespace MirrorTrial.Enemies
             bool shouldWalk = state == EnemyAI.State.Chase || state == EnemyAI.State.Idle;
             animator.SetBool(IsMovingHash, shouldWalk);
 
-            if (state == EnemyAI.State.Attack && previousState != EnemyAI.State.Attack)
+            if (state == EnemyAI.State.Dead && previousState != EnemyAI.State.Dead)
+            {
+                animator.speed = 1f;
+                animator.Play(AttackedStateHash, 0, 0f);
+                animator.Update(0f);
+            }
+            else if (state == EnemyAI.State.Attack && previousState != EnemyAI.State.Attack)
             {
                 animator.SetTrigger(AttackHash);
                 animator.CrossFade(AttackStateHash, 0.04f);

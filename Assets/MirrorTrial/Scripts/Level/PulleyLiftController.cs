@@ -1,5 +1,6 @@
 using MirrorTrial.Combat;
 using MirrorTrial.Feedback;
+using MirrorTrial.Audio;
 using MirrorTrial.Player;
 using UnityEngine;
 using UnityEngine.Events;
@@ -49,6 +50,7 @@ namespace MirrorTrial.Level
         [Header("Feedback")]
         [SerializeField] ParticleSystem breakParticles;
         [SerializeField] AudioSource audioSource;
+        [SerializeField] AudioClip movingSound;
         [SerializeField] AudioClip ropeBreakSound;
         [SerializeField] AudioClip landedSound;
         [SerializeField, Range(0f, 1f)] float soundVolume = 1f;
@@ -155,6 +157,7 @@ namespace MirrorTrial.Level
             if (breakParticles)
                 breakParticles.Play();
             PlayOneShot(ropeBreakSound);
+            PlayOneShot(movingSound);
             onTriggered?.Invoke();
         }
 
@@ -268,10 +271,19 @@ namespace MirrorTrial.Level
         {
             if (!clip)
                 return;
+            var palette = GameAudioPalette.LoadDefault();
+            var audioVolume = 1f;
+            if (palette)
+            {
+                if (clip == movingSound) audioVolume = palette.pulleyMoveVolume;
+                else if (clip == ropeBreakSound) audioVolume = palette.ropeBreakVolume;
+                else if (clip == landedSound) audioVolume = palette.platformLandVolume;
+            }
+            var volume = GameAudioPalette.ScaleDefaultVolume(soundVolume, audioVolume);
             if (audioSource)
-                audioSource.PlayOneShot(clip, soundVolume);
+                audioSource.PlayOneShot(clip, volume);
             else
-                AudioSource.PlayClipAtPoint(clip, transform.position, soundVolume);
+                AudioSource.PlayClipAtPoint(clip, transform.position, volume);
         }
 
         void OnValidate()

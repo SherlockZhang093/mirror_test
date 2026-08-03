@@ -14,13 +14,9 @@ namespace MirrorTrial.Feedback
         [SerializeField] ScreenFxOverlay overlayPrefab;
         [SerializeField] ScreenFxOverlay overlay;
 
-        [Header("Default Look")]
-        [SerializeField] Color bossColor = new Color(0.008f, 0.012f, 0.022f, 1f);
+        [Header("Shared Look")]
         [SerializeField] Color damageColor = new Color(0.48f, 0.005f, 0.008f, 1f);
-        [SerializeField, Range(0f, 1f)] float bossStrength = 0.72f;
         [SerializeField, Range(0f, 1f)] float lowHealthStrength = 0.22f;
-        [SerializeField, Min(0.01f)] float bossFadeIn = 0.8f;
-        [SerializeField, Min(0.01f)] float bossFadeOut = 1.35f;
 
         readonly Dictionary<ScreenFxType, HashSet<int>> stateSources = new Dictionary<ScreenFxType, HashSet<int>>();
         float bossTarget;
@@ -34,6 +30,7 @@ namespace MirrorTrial.Feedback
         float phaseDuration;
         Vector2 damageDirection;
         float flowTime;
+        float bossFlickerTime;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void Bootstrap()
@@ -89,8 +86,9 @@ namespace MirrorTrial.Feedback
             EnsureOverlay();
             var dt = Time.unscaledDeltaTime;
             flowTime += dt;
+            bossFlickerTime += dt;
             bossCurrent = Mathf.MoveTowards(bossCurrent, bossTarget,
-                dt / Mathf.Max(0.01f, bossTarget > bossCurrent ? bossFadeIn : bossFadeOut));
+                dt / Mathf.Max(0.01f, bossTarget > bossCurrent ? overlay.BossFadeIn : overlay.BossFadeOut));
             lowHealthCurrent = Mathf.MoveTowards(lowHealthCurrent, lowHealthTarget, dt * 2.5f);
 
             damageRemaining = Mathf.Max(0f, damageRemaining - dt);
@@ -102,7 +100,9 @@ namespace MirrorTrial.Feedback
                 ? Mathf.Sin(Mathf.Clamp01(phaseRemaining / phaseDuration) * Mathf.PI) * 0.55f
                 : 0f;
             var lowPulse = lowHealthCurrent * (0.82f + Mathf.Sin(flowTime * 5.2f) * 0.18f);
-            overlay.Apply(bossCurrent, damage, lowPulse, phase, flowTime, damageDirection, bossColor, damageColor);
+            var bossFlicker = EvaluateBossFlicker(bossFlickerTime);
+            overlay.Apply(bossCurrent * bossFlicker, damage, lowPulse, phase, flowTime,
+                damageDirection, damageColor);
         }
 
         void OnSignal(ScreenFxSignal signal)
@@ -164,7 +164,11 @@ namespace MirrorTrial.Feedback
         {
             var active = stateSources.TryGetValue(type, out var sources) && sources.Count > 0;
             if (type == ScreenFxType.BossBattle)
-                bossTarget = active ? (intensity >= 0f ? intensity : bossStrength) : 0f;
+            {
+                EnsureOverlay();
+                if (active && bossTarget <= 0f) bossFlickerTime = 0f;
+                bossTarget = active ? (intensity >= 0f ? intensity : overlay.BossStrength) : 0f;
+            }
             else if (type == ScreenFxType.LowHealth)
                 lowHealthTarget = active ? (intensity >= 0f ? intensity : lowHealthStrength) : 0f;
         }
@@ -173,6 +177,17 @@ namespace MirrorTrial.Feedback
         {
             stateSources.Clear();
             bossTarget = lowHealthTarget = damageRemaining = phaseRemaining = 0f;
+            bossFlickerTime = 0f;
+        }
+
+        float EvaluateBossFlicker(float time)
+        {
+            var phase = time * overlay.BossFlickerFrequency * Mathf.PI * 2f;
+            var primary = Mathf.Cos(phase);
+            var irregular = Mathf.Sin(phase * 2.17f + 0.9f);
+            var pulse = Mathf.Clamp01(0.5f + primary * 0.34f + irregular * 0.16f);
+            pulse = Mathf.SmoothStep(0f, 1f, pulse);
+            return Mathf.Lerp(1f - overlay.BossFlickerAmount, 1f, pulse);
         }
 
         static float DamageCurve(float t)

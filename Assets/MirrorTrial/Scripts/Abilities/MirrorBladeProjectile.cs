@@ -63,6 +63,8 @@ namespace MirrorTrial.Abilities
                 return;
 
             hurtbox.ReceiveHit(payload);
+            if (payload.source)
+                payload.source.SendMessage("OnMirrorBladeConnected", SendMessageOptions.DontRequireReceiver);
             HitStopService.Request(payload.hitStop);
             CameraFeedbackService.RequestHit(payload);
             Destroy(gameObject);

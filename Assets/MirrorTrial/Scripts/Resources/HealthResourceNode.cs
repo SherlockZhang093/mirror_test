@@ -1,11 +1,18 @@
 using System.Collections;
 using System;
+using MirrorTrial.Audio;
 using MirrorTrial.Combat;
 using MirrorTrial.Player;
 using UnityEngine;
 
 namespace MirrorTrial.HealthResources
 {
+    public enum ResourceHitMaterial
+    {
+        Plant,
+        Stone
+    }
+
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Collider2D), typeof(Hurtbox))]
     public sealed class HealthResourceNode : MonoBehaviour
@@ -28,6 +35,8 @@ namespace MirrorTrial.HealthResources
         [SerializeField] Color flashColor = Color.white;
         [SerializeField, Min(0f)] float flashDuration = 0.08f;
         [SerializeField] AudioClip hitSound;
+        [SerializeField] ResourceHitMaterial hitMaterial;
+        [SerializeField] AudioClip depletedSound;
         [SerializeField, Range(0f, 1f)] float hitVolume = 1f;
 
         [Header("Depleted")]
@@ -106,7 +115,20 @@ namespace MirrorTrial.HealthResources
             if (animator && !string.IsNullOrEmpty(hitTrigger)) animator.SetTrigger(hitTrigger);
             if (flashRoutine != null) StopCoroutine(flashRoutine);
             if (flashDuration > 0f && flashRenderers.Length > 0) flashRoutine = StartCoroutine(FlashRoutine());
-            if (hitSound) AudioSource.PlayClipAtPoint(hitSound, transform.position, hitVolume);
+            var palette = GameAudioPalette.LoadDefault();
+            var clip = hitSound;
+            var audioVolume = 1f;
+            if (palette)
+            {
+                if (!clip)
+                    clip = hitMaterial == ResourceHitMaterial.Stone ? palette.stoneHit : palette.grassHit;
+                audioVolume = hitMaterial == ResourceHitMaterial.Stone
+                    ? palette.stoneHitVolume
+                    : palette.grassHitVolume;
+            }
+            if (clip)
+                AudioSource.PlayClipAtPoint(clip, transform.position,
+                    palette ? palette.ScaleVolume(hitVolume, audioVolume) : hitVolume);
         }
 
         IEnumerator FlashRoutine()
@@ -158,6 +180,12 @@ namespace MirrorTrial.HealthResources
             var collider = GetComponent<Collider2D>();
             if (collider) collider.enabled = false;
             Depleted?.Invoke();
+            if (depletedSound)
+            {
+                var palette = GameAudioPalette.LoadDefault();
+                var audioVolume = palette ? palette.resourcePickupVolume : 1f;
+                AudioSource.PlayClipAtPoint(depletedSound, transform.position, GameAudioPalette.ScaleDefaultVolume(hitVolume, audioVolume));
+            }
 
             if (keepDepletedVisual) return;
             if (deactivateDelay <= 0f)

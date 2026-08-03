@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MirrorTrial.HealthResources;
 using MirrorTrial.Level;
 using TMPro;
 using UnityEditor;
@@ -55,6 +56,9 @@ namespace MirrorTrial.Editor.Level
                     }
                     if (step.type == StoryTutorialStepType.CameraShot && !step.cameraTarget)
                         issues.Add($"{sequence.DisplayName}：第 {i + 1} 步的镜头目标未设置。");
+                    if (step.type == StoryTutorialStepType.HealthResourceObjective &&
+                        (!step.cameraTarget || !step.cameraTarget.GetComponentInParent<HealthResourceNode>()))
+                        issues.Add($"{sequence.DisplayName}：第 {i + 1} 步没有设置有效的生命能量目标。");
                 }
             }
 
@@ -92,7 +96,7 @@ namespace MirrorTrial.Editor.Level
 
             dynamicFont.atlasPopulationMode = AtlasPopulationMode.Dynamic;
             dynamicFont.isMultiAtlasTexturesEnabled = true;
-            const string sample = "镜界试炼当镜面开始呼吸现实便不再可靠向前走移动跳跃攻击闪避";
+            const string sample = "破映第一段空白我是谁镜子里的也是我吗移动跳跃攻击闪避";
             string missing;
             if (!dynamicFont.TryAddCharacters(sample, out missing) || !string.IsNullOrEmpty(missing))
                 issues.Add("中文字体缺少字符：" + missing);

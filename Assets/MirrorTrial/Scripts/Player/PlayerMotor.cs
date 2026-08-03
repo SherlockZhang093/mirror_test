@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace MirrorTrial.Player
@@ -29,11 +30,16 @@ namespace MirrorTrial.Player
         bool facingRight = true;
         Vector2 forcedVelocity;
         float forcedVelocityTimer;
+        bool groundingInitialized;
 
         public bool MovementLocked { get; set; }
+        public bool TraversalLocked { get; set; }
+        public event Action Jumped;
+        public event Action<float> Landed;
 
         bool EffectiveMovementLock =>
-            MovementLocked || (stateMachine != null && stateMachine.ShouldLockMovement);
+            MovementLocked || TraversalLocked ||
+            (stateMachine != null && stateMachine.ShouldLockMovement);
 
         public bool FacingRight => facingRight;
         public float MoveX => input ? input.MoveX : 0f;
@@ -68,11 +74,21 @@ namespace MirrorTrial.Player
 
         void Update()
         {
-            if (input.JumpPressed)
-                jumpBufferCounter = tuning.movement.jumpBufferTime;
+            if (TraversalLocked)
+            {
+                // Traversal actions own the jump button. Do not let the same press
+                // survive as a buffered normal jump after a ledge climb finishes.
+                jumpBufferCounter = 0f;
+                jumpCutRequested = false;
+            }
+            else
+            {
+                if (input.JumpPressed)
+                    jumpBufferCounter = tuning.movement.jumpBufferTime;
 
-            if (input.JumpReleased)
-                jumpCutRequested = true;
+                if (input.JumpReleased)
+                    jumpCutRequested = true;
+            }
 
             UpdateFacing(EffectiveMovementLock ? 0f : input.MoveX);
         }
@@ -80,7 +96,22 @@ namespace MirrorTrial.Player
         void FixedUpdate()
         {
             var deltaTime = Time.fixedDeltaTime;
+
+            if (TraversalLocked)
+            {
+                currentMoveSpeed = 0f;
+                forcedVelocity = Vector2.zero;
+                forcedVelocityTimer = 0f;
+                body.velocity = Vector2.zero;
+                return;
+            }
+
+            var wasGrounded = IsGrounded;
+            var landingSpeed = Mathf.Max(0f, -body.velocity.y);
             RefreshGrounded();
+            if (groundingInitialized && !wasGrounded && IsGrounded)
+                Landed?.Invoke(landingSpeed);
+            groundingInitialized = true;
             UpdateJumpTimers(deltaTime);
 
             if (forcedVelocityTimer > 0f)
@@ -110,6 +141,7 @@ namespace MirrorTrial.Player
                 jumpBufferCounter = 0f;
                 coyoteCounter = 0f;
                 IsGrounded = false;
+                Jumped?.Invoke();
             }
             else if (jumpCutRequested && velocity.y > 0f)
             {

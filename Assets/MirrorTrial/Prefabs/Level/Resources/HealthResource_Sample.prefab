@@ -168,4 +168,6 @@ MonoBehaviour:
   flashColor: {r: 1, g: 1, b: 1, a: 1}
   flashDuration: 0.1
   hitSound: {fileID: 0}
+  hitMaterial: 1
+  depletedSound: {fileID: 8300000, guid: 7c951a7a98f36ce4f9cc47e0dbcfaa95, type: 3}
   hitVolume: 1

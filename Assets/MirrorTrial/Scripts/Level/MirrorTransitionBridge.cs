@@ -77,7 +77,8 @@ namespace MirrorTrial.Level
             pendingRealityScene = null;
 
             OnReturnToRealityScene?.Invoke();
-            SceneManager.LoadScene(realityScene, LoadSceneMode.Single);
+            if (!GameFlow.TryLoadNextRealityScene(realityScene))
+                SceneManager.LoadScene(realityScene, LoadSceneMode.Single);
         }
 
         public bool ReturnToRealityAfterPlayerDeath()

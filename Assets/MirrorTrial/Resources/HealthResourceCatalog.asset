@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: HealthResourceCatalog
   m_EditorClassIdentifier: 
   prefabs:
-  - {fileID: 7285171119699523253, guid: c6ce9702c8b8ed046a26988eecc0f331, type: 3}
-  - {fileID: 2842938079857364138, guid: 61fc3c5038e7d514c8f160637bd9db10, type: 3}
   - {fileID: 4175825416934514049, guid: cfdc47c9becad024e83da9c5f1487303, type: 3}
+  - {fileID: 2842938079857364138, guid: 61fc3c5038e7d514c8f160637bd9db10, type: 3}
+  - {fileID: 274275194995924198, guid: 24f2adeaa95707046a1110d96d3dbd8c, type: 3}
+  - {fileID: 7258076868693210020, guid: 7869f57c099d69f4a873da1dc5d542cc, type: 3}
+  - {fileID: 7285171119699523253, guid: c6ce9702c8b8ed046a26988eecc0f331, type: 3}

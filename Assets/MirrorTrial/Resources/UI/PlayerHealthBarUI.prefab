@@ -130,7 +130,22 @@ MonoBehaviour:
   normalFill: {fileID: 21300000, guid: aa43a0eef7b2a2949ad3b5e3fc6c2af8, type: 3}
   lowFill: {fileID: 21300000, guid: aa43a0eef7b2a2949ad3b5e3fc6c2af8, type: 3}
   hitFlashDuration: 0.08
-  lowHealthThreshold: 1
+  hitFlashColor: {r: 1, g: 0.92, b: 0.82, a: 1}
+  hitDamageColor: {r: 1, g: 0.16, b: 0.12, a: 0.95}
+  damageTrailColor: {r: 0.48, g: 0.025, b: 0.02, a: 0.8}
+  damageTrailHold: 0.07
+  damageTrailFade: 0.22
+  normalShakeDistance: 4
+  heavyShakeDistance: 7
+  heavyDamageRatio: 0.4
+  shakeDuration: 0.15
+  lowHealthRatio: 0.3
+  lowHealthTint: {r: 1, g: 0.14, b: 0.1, a: 1}
+  lowHealthTintStrength: 0.28
+  lowHealthMinAlpha: 0.62
+  lowHealthPulsePeriod: 1.05
+  deathAlpha: 0.5
+  deathFadeDuration: 0.18
   reserveFill: {fileID: 7101957987401054344}
   reserveGroup: {fileID: 7813996482865265309}
   recoverKeyText: {fileID: 135906541307740342}

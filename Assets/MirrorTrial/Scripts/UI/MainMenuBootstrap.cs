@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using MirrorTrial.Audio;
 
 namespace MirrorTrial.UI
 {
@@ -12,7 +13,7 @@ namespace MirrorTrial.UI
     /// </summary>
     public static class MainMenuBootstrap
     {
-        const string FirstTutorialSequenceId = "Level_Reality_01_StoryTutorial_v1";
+        const string FirstTutorialSequenceId = "PoYing_R01_Intro_v1";
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void Initialize()
@@ -73,7 +74,16 @@ namespace MirrorTrial.UI
             }
 
             Time.timeScale = 1f;
+            skipTutorialToggle.onValueChanged.AddListener(OnSkipTutorialChanged);
         }
+
+        void OnDestroy()
+        {
+            if (skipTutorialToggle)
+                skipTutorialToggle.onValueChanged.RemoveListener(OnSkipTutorialChanged);
+        }
+
+        void OnSkipTutorialChanged(bool value) => GlobalAudioFeedback.PlaySelect();
 
         public void BuildSceneContent(Texture menuBackground = null)
         {
@@ -116,25 +126,25 @@ namespace MirrorTrial.UI
 
             CreateText("BrandMark", landingPanel.transform, "◯", 42, FontStyle.Normal, new Color(0.75f, 0.88f, 1f, 1f),
                 TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(44f, -88f), new Vector2(92f, -36f));
-            CreateText("BrandText", landingPanel.transform, "M I R R O R   T R I A L", 18, FontStyle.Normal, new Color(0.82f, 0.84f, 0.9f, 1f),
+            CreateText("BrandText", landingPanel.transform, "P O   Y I N G", 18, FontStyle.Normal, new Color(0.82f, 0.84f, 0.9f, 1f),
                 TextAnchor.MiddleLeft, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(126f, -78f), new Vector2(480f, -42f));
 
             var settingsButton = CreateButton("SettingsButton", landingPanel.transform, "⚙  设置", false,
                 new Vector2(1f, 1f), new Vector2(-200f, -86f), new Vector2(160f, 52f));
             settingsButton.GetComponent<Image>().color = new Color(0.02f, 0.04f, 0.08f, 0.18f);
 
-            CreateText("Title", landingPanel.transform, "镜中试炼", 92, FontStyle.Normal, new Color(0.92f, 0.96f, 1f, 1f),
+            CreateText("Title", landingPanel.transform, "破映", 92, FontStyle.Normal, new Color(0.92f, 0.96f, 1f, 1f),
                 TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-520f, 96f), new Vector2(1040f, 220f));
             CreateImage("TitleDividerLeft", landingPanel.transform, new Color(0.68f, 0.78f, 0.92f, 0.55f),
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-350f, 62f), new Vector2(-220f, 64f));
             CreateImage("TitleDividerRight", landingPanel.transform, new Color(0.68f, 0.78f, 0.92f, 0.55f),
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(220f, 62f), new Vector2(350f, 64f));
-            CreateText("Subtitle", landingPanel.transform, "M I R R O R   T R I A L", 23, FontStyle.Normal, new Color(0.84f, 0.87f, 0.93f, 1f),
+            CreateText("Subtitle", landingPanel.transform, "P O   Y I N G", 23, FontStyle.Normal, new Color(0.84f, 0.87f, 0.93f, 1f),
                 TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-420f, 40f), new Vector2(840f, 82f));
-            CreateText("Tagline", landingPanel.transform, "打 碎 镜 子，夺 回 失 落 的 自 己", 22, FontStyle.Normal, new Color(0.72f, 0.76f, 0.84f, 1f),
+            CreateText("Tagline", landingPanel.transform, "在 破 碎 中，找 回 自 己", 22, FontStyle.Normal, new Color(0.72f, 0.76f, 0.84f, 1f),
                 TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-460f, -22f), new Vector2(920f, 22f));
 
-            startButton = CreateButton("StartButton", landingPanel.transform, "开 始 试 炼", true,
+            startButton = CreateButton("StartButton", landingPanel.transform, "踏 入 镜 隙", true,
                 new Vector2(0.5f, 0.5f), new Vector2(-235f, -385f), new Vector2(470f, 76f));
             skipTutorialToggle = CreateToggle("SkipTutorialToggle", landingPanel.transform, "跳过新手教程",
                 new Vector2(0.5f, 0.5f), new Vector2(-150f, -326f), new Vector2(300f, 38f));
@@ -148,6 +158,7 @@ namespace MirrorTrial.UI
 
         public void StartWithTutorialPreference()
         {
+            GlobalAudioFeedback.PlaySelect();
             StartGame(!skipTutorialToggle.isOn);
         }
 

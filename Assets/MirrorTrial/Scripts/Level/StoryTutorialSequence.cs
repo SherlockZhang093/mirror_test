@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using MirrorTrial.Audio;
+using MirrorTrial.HealthResources;
 using MirrorTrial.Player;
 using TMPro;
 using UnityEngine;
@@ -19,7 +21,9 @@ namespace MirrorTrial.Level
         JumpObjective,
         PrimaryAttackObjective,
         DodgeObjective,
-        Wait
+        Wait,
+        HealthResourceObjective,
+        SystemMessage
     }
 
     [Serializable]
@@ -146,6 +150,7 @@ namespace MirrorTrial.Level
         public void Skip()
         {
             if (routine == null) return;
+            GlobalAudioFeedback.PlayCancel();
             StopCoroutine(routine);
             routine = null;
             CameraDirector.Instance?.StopShot();
@@ -216,12 +221,14 @@ namespace MirrorTrial.Level
                     yield return PlayCameraShot(step);
                     break;
                 case StoryTutorialStepType.Dialogue:
+                case StoryTutorialStepType.SystemMessage:
                     yield return PlayDialogue(step);
                     break;
                 case StoryTutorialStepType.MoveObjective:
                 case StoryTutorialStepType.JumpObjective:
                 case StoryTutorialStepType.PrimaryAttackObjective:
                 case StoryTutorialStepType.DodgeObjective:
+                case StoryTutorialStepType.HealthResourceObjective:
                     yield return PlayObjective(step);
                     break;
                 case StoryTutorialStepType.Wait:
@@ -301,7 +308,15 @@ namespace MirrorTrial.Level
             dialoguePanel.SetActive(true);
             ApplyInputLock(true);
 
-            speakerText.text = string.IsNullOrWhiteSpace(step.speaker) ? "镜中低语" : step.speaker;
+            var hasSpeaker = !string.IsNullOrWhiteSpace(step.speaker);
+            speakerText.gameObject.SetActive(hasSpeaker);
+            speakerText.text = hasSpeaker ? step.speaker : string.Empty;
+            SetRect(
+                dialogueText.rectTransform,
+                new Vector2(0.035f, 0.17f),
+                new Vector2(0.96f, hasSpeaker ? 0.68f : 0.88f),
+                Vector2.zero,
+                Vector2.zero);
             dialogueText.text = string.Empty;
             advanceText.text = "空格 / 回车  继续";
             advanceText.alpha = 0.45f;
@@ -341,6 +356,9 @@ namespace MirrorTrial.Level
             objectiveHint.text = string.IsNullOrWhiteSpace(step.hint) ? DefaultObjectiveHint(step.type) : step.hint;
 
             var startPosition = player ? player.position : Vector3.zero;
+            var healthResource = step.type == StoryTutorialStepType.HealthResourceObjective && step.cameraTarget
+                ? step.cameraTarget.GetComponentInParent<HealthResourceNode>()
+                : null;
             var completed = false;
             while (!completed)
             {
@@ -358,6 +376,9 @@ namespace MirrorTrial.Level
                         break;
                     case StoryTutorialStepType.DodgeObjective:
                         completed = playerInput && playerInput.DodgePressed;
+                        break;
+                    case StoryTutorialStepType.HealthResourceObjective:
+                        completed = !healthResource || healthResource.IsDestroyed;
                         break;
                 }
                 yield return null;
@@ -437,6 +458,7 @@ namespace MirrorTrial.Level
                 case StoryTutorialStepType.JumpObjective: return "越过断层";
                 case StoryTutorialStepType.PrimaryAttackObjective: return "挥动武器";
                 case StoryTutorialStepType.DodgeObjective: return "闪避危险";
+                case StoryTutorialStepType.HealthResourceObjective: return "打碎生命能量";
                 default: return "完成目标";
             }
         }
@@ -449,6 +471,7 @@ namespace MirrorTrial.Level
                 case StoryTutorialStepType.JumpObjective: return "空格  跳跃";
                 case StoryTutorialStepType.PrimaryAttackObjective: return "J 或鼠标左键  攻击";
                 case StoryTutorialStepType.DodgeObjective: return "左 Shift  闪避";
+                case StoryTutorialStepType.HealthResourceObjective: return "J 或鼠标左键  攻击";
                 default: return string.Empty;
             }
         }

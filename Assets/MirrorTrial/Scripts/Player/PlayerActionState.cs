@@ -38,6 +38,11 @@ namespace MirrorTrial.Player
         SwordGuardImpact,
         SwordSprintSlash,
         CrouchSlash,
-        Dodge
+        Dodge,
+        LedgeHang,
+        LedgeClimb,
+        MonkeyBarIdle,
+        AirSlashUp,
+        AirSlashDown
     }
 }

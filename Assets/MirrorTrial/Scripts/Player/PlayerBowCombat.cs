@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using MirrorTrial.Abilities;
 using MirrorTrial.Combat;
@@ -25,6 +26,8 @@ namespace MirrorTrial.Player
         Coroutine recoveryRoutine;
 
         public bool IsBusy => drawing || recoveryRoutine != null;
+        public event Action DrawStarted;
+        public event Action ArrowReleased;
 
         void Awake()
         {
@@ -65,6 +68,7 @@ namespace MirrorTrial.Player
             fullyDrawn = false;
             chargeStartedAt = Time.time;
             motor.MovementLocked = true;
+            DrawStarted?.Invoke();
             animationDriver.ForceState(PlayerActionState.Attack);
             if (drawClip) animationDriver.PlayActionClip(drawClip, tuning.abilities.bowMaxChargeTime);
             else animationDriver.ForceState(PlayerActionState.BowDraw);
@@ -110,6 +114,7 @@ namespace MirrorTrial.Player
             var damage = Mathf.RoundToInt(Mathf.Lerp(a.bowMinDamage, a.bowMaxDamage, t));
             var speed = Mathf.Lerp(a.bowMinSpeed, a.bowMaxSpeed, t);
             arrow.Launch(new DamagePayload(gameObject, damage, a.bowKnockback, direction, a.bowHitStop), direction, speed, a.bowRange);
+            ArrowReleased?.Invoke();
             if (fireClip) animationDriver.PlayActionClip(fireClip, tuning.abilities.bowRecovery);
             else animationDriver.ForceState(PlayerActionState.BowFire);
             recoveryRoutine = StartCoroutine(Recovery());

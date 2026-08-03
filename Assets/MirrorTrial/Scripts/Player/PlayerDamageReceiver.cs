@@ -21,7 +21,7 @@ namespace MirrorTrial.Player
         PlayerBodyStateController bodyState;
         PlayerActionInterruptor interruptor;
         PlayerReactionAnimationSet reactionAnimations;
-        SpriteRenderer spriteRenderer;
+        PlayerDamageVisual damageVisual;
 
         [Header("Respawn")]
         [SerializeField, Min(0f)] float respawnDelay = 2f;
@@ -34,6 +34,8 @@ namespace MirrorTrial.Player
 
         public bool IsInvincible => hurtInvincible || externalInvincibilityCount > 0;
         public event Action ExternalHitIgnored;
+        public event Action Damaged;
+        public event Action Died;
         public static event Action PlayerRespawned;
 
         public void KillAndRespawn()
@@ -57,10 +59,11 @@ namespace MirrorTrial.Player
             hurtInvincible = false;
             if (interruptor) interruptor.CancelAll(PlayerActionCancelReason.Death);
             if (bodyState) bodyState.ClearAllModifiers();
-            SetVisible(true);
+            if (damageVisual) damageVisual.ResetVisual();
             animationDriver.ForceState(PlayerActionState.Dead);
             input.InputEnabled = false;
             motor.MovementLocked = true;
+            Died?.Invoke();
             respawnRoutine = StartCoroutine(RespawnRoutine());
         }
 
@@ -79,7 +82,9 @@ namespace MirrorTrial.Player
 
             if (!GetComponent<PlayerHealthBarUI>())
                 gameObject.AddComponent<PlayerHealthBarUI>();
-            spriteRenderer = GetComponentInChildren<SpriteRenderer>(true);
+            damageVisual = GetComponent<PlayerDamageVisual>();
+            if (!damageVisual)
+                damageVisual = gameObject.AddComponent<PlayerDamageVisual>();
         }
 
         void OnHealthChanged(int current, int maximum)
@@ -136,6 +141,7 @@ namespace MirrorTrial.Player
                     BeginDeathAndRespawn();
                     return;
                 }
+                Damaged?.Invoke();
             }
 
             if (resolution.InterruptAction && interruptor)
@@ -184,7 +190,7 @@ namespace MirrorTrial.Player
             animationDriver.StopActionClip();
             animationDriver.ClearForcedState(PlayerActionState.Dead);
             health.RestoreFull();
-            SetVisible(true);
+            if (damageVisual) damageVisual.ResetVisual();
             motor.MovementLocked = false;
             input.InputEnabled = true;
 
@@ -212,11 +218,12 @@ namespace MirrorTrial.Player
 
             HitStopService.Request(Mathf.Max(hurt.hurtHitStop, payload.hitStop));
 
-            yield return SetHiddenFor(hurt.hurtFlashTime);
+            if (damageVisual)
+                damageVisual.PlayHitTint(hurt.hurtTintColor, hurt.hurtTintTime);
 
             var remainingHurtLock = Mathf.Max(
                 0f,
-                (knockdown ? hurt.knockdownAnimationTime : hurtLockTime) - hurt.hurtFlashTime);
+                knockdown ? hurt.knockdownAnimationTime : hurtLockTime);
             if (remainingHurtLock > 0f)
                 yield return new WaitForSeconds(remainingHurtLock);
 
@@ -239,10 +246,12 @@ namespace MirrorTrial.Player
                 ? Mathf.Max(hurt.invincibleTime, totalControlLock + hurt.getUpProtectionTime)
                 : hurt.invincibleTime;
             var remainingInvincible = Mathf.Max(0f, protectionTime - totalControlLock);
-            if (remainingInvincible > 0f)
-                yield return BlinkDuringInvincibility(remainingInvincible, hurt.invincibleBlinkInterval);
+            if (remainingInvincible > 0f && damageVisual)
+                yield return damageVisual.Blink(remainingInvincible, hurt.invincibleBlinkInterval);
+            else if (remainingInvincible > 0f)
+                yield return new WaitForSecondsRealtime(remainingInvincible);
 
-            SetVisible(true);
+            if (damageVisual) damageVisual.ResetVisual();
             hurtInvincible = false;
             if (bodyState)
                 bodyState.ClearBodyState(this);
@@ -277,42 +286,6 @@ namespace MirrorTrial.Player
                 animationDriver.PlayStateImmediately(PlayerActionState.Hurt);
         }
 
-        IEnumerator SetHiddenFor(float duration)
-        {
-            if (!spriteRenderer || duration <= 0f)
-                yield break;
-
-            SetVisible(false);
-            yield return new WaitForSecondsRealtime(duration);
-            SetVisible(true);
-        }
-
-        IEnumerator BlinkDuringInvincibility(float duration, float interval)
-        {
-            if (!spriteRenderer || interval <= 0f)
-            {
-                yield return new WaitForSeconds(duration);
-                yield break;
-            }
-
-            var elapsed = 0f;
-            var visible = true;
-            while (elapsed < duration)
-            {
-                visible = !visible;
-                SetVisible(visible);
-                var step = Mathf.Min(interval, duration - elapsed);
-                yield return new WaitForSecondsRealtime(step);
-                elapsed += step;
-            }
-        }
-
-        void SetVisible(bool visible)
-        {
-            if (spriteRenderer)
-                spriteRenderer.enabled = visible;
-        }
-
         void OnDisable()
         {
             if (hurtRoutine != null)
@@ -329,7 +302,7 @@ namespace MirrorTrial.Player
                 StopCoroutine(respawnRoutine);
                 respawnRoutine = null;
             }
-            SetVisible(true);
+            if (damageVisual) damageVisual.ResetVisual();
         }
     }
 }

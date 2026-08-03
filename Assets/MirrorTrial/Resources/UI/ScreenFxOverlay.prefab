@@ -111,6 +111,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mask: {fileID: 0}
+  bossColor: {r: 0, g: 0, b: 0, a: 1}
+  bossStrength: 0.72
+  bossFadeIn: 0.18
+  bossFadeOut: 1.35
+  bossFlickerFrequency: 0.8
+  bossFlickerAmount: 0.668
 --- !u!1 &5909383883900688315
 GameObject:
   m_ObjectHideFlags: 0

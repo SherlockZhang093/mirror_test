@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using MirrorTrial.Audio;
+using MirrorTrial.Player;
 using UnityEngine;
 
 namespace MirrorTrial.Level
@@ -368,8 +370,19 @@ namespace MirrorTrial.Level
         void PlayClip(AudioClip clip)
         {
             if (!clip) return;
+            var isShatter = clip == shatterClip;
+            if (GlobalAudioFeedback.TryPlayMirrorImpact(isShatter) ||
+                PlayerAudioFeedback.TryPlayMirrorImpact(isShatter))
+                return;
+
+            var palette = GameAudioPalette.LoadDefault();
+            var audioVolume = palette
+                ? isShatter ? palette.mirrorShatterVolume : palette.mirrorHitVolume
+                : 1f;
+            var volume = GameAudioPalette.ScaleDefaultVolume(1f, audioVolume);
             if (!audioSource) audioSource = GetComponent<AudioSource>();
-            if (audioSource) audioSource.PlayOneShot(clip);
+            if (audioSource) audioSource.PlayOneShot(clip, volume);
+            else AudioSource.PlayClipAtPoint(clip, transform.position, volume);
         }
 
         void SpawnParticle(GameObject prefab, Vector2 direction)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
@@ -28,6 +29,7 @@ namespace MirrorTrial.Player
         bool perfectDodgeTriggered;
 
         public bool IsDodging => dodgeRoutine != null;
+        public event Action DodgeStarted;
 
         void Awake()
         {
@@ -86,6 +88,7 @@ namespace MirrorTrial.Player
             animationDriver.ForceState(PlayerActionState.Dodge);
             animationDriver.PlayStateImmediately(PlayerActionState.Dodge);
             motor.ApplyForcedVelocity(Vector2.right * direction * speed, settings.duration);
+            DodgeStarted?.Invoke();
             onDodgeStarted?.Invoke();
 
             var invincibleStart = Mathf.Min(settings.invincibleStart, settings.duration);

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using MirrorTrial.Abilities;
 using MirrorTrial.Combat;
@@ -28,6 +29,7 @@ namespace MirrorTrial.Player
         Coroutine echoDashRoutine;
 
         public bool IsBusy => mirrorBladeRoutine != null || echoDashRoutine != null;
+        public event Action MirrorBladeReleased;
 
         void Awake()
         {
@@ -109,6 +111,7 @@ namespace MirrorTrial.Player
             var projectile = Instantiate(mirrorBladeProjectilePrefab, spawnPosition, Quaternion.identity);
             var payload = new DamagePayload(gameObject, ability.mirrorBladeDamage, ability.mirrorBladeKnockback, direction, ability.mirrorBladeHitStop);
             projectile.Launch(payload, direction, ability.mirrorBladeSpeed, ability.mirrorBladeRange);
+            MirrorBladeReleased?.Invoke();
         }
 
         public void CancelCurrentAction(PlayerActionCancelReason reason)

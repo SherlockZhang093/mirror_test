@@ -99,9 +99,10 @@ namespace MirrorTrial.Editor.Player
             Field(hurt, "hurtLockTime", "受伤锁定时间");
             Field(hurt, "invincibleTime", "受伤后无敌时间");
             Field(hurt, "hurtHitStop", "受伤停顿");
-            Field(hurt, "hurtFlashTime", "受击闪烁时间");
+            Field(hurt, "hurtTintTime", "受击染红时间");
+            Field(hurt, "hurtTintColor", "受击染色");
             Field(hurt, "invincibleBlinkInterval", "无敌闪烁间隔");
-            EditorGUILayout.HelpBox("闪烁使用实时计时，因此受伤停顿期间也能清楚显示。", MessageType.Info);
+            EditorGUILayout.HelpBox("染红和闪烁使用实时计时，因此受伤停顿期间也能清楚显示。", MessageType.Info);
             EndSection();
         }
 

@@ -62,3 +62,7 @@ Desktop.ini
 
 # Local logs
 *.log
+
+# Tool backups and temp files
+.codex-backups/
+tmp/

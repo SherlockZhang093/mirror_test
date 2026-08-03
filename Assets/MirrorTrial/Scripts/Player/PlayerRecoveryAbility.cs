@@ -26,6 +26,7 @@ namespace MirrorTrial.Player
 
         public bool IsCasting => routine != null;
         public event System.Action<bool> CastStateChanged;
+        public event System.Action HealCommitted;
 
         void Awake()
         {
@@ -99,6 +100,8 @@ namespace MirrorTrial.Player
             if (routine == null || committed) return;
             committed = true;
             var healed = health.Heal(reservedAmount);
+            if (healed > 0)
+                HealCommitted?.Invoke();
             Trace(
                 $"[恢复技能][结算] 预扣={reservedAmount}, 实际恢复={healed}, " +
                 $"HP={health.CurrentHP}/{health.maxHP}");

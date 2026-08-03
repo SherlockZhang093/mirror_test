@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee856bf4551044045b5a41d67f093752, type: 3}
   m_Name: MirrorArcherBossProfile
   m_EditorClassIdentifier: 
-  displayName: "\u955C\u4E2D\u730E\u624B"
+  displayName: "\u6301\u5F13\u7684\u5012\u5F71"
   maxHitPoints: 300
   moveSpeed: 2.8
   acceleration: 18
@@ -25,19 +25,19 @@ MonoBehaviour:
   phaseOneRecovery: {x: 3, y: 3.4}
   phaseTwoRecovery: {x: 2.6, y: 3}
   phaseThreeRecovery: {x: 2.2, y: 2.6}
-  phaseOneFeintChance: 0
-  phaseTwoFeintChance: 0
-  phaseThreeFeintChance: 0
+  phaseOneFeintChance: 0.1
+  phaseTwoFeintChance: 0.1
+  phaseThreeFeintChance: 0.1
   feintHoldDuration: 0.18
   feintResetDuration: 0.24
   maxFeintsPerCombo: 1
-  windupEffectPrefab: {fileID: 0}
+  windupEffectPrefab: {fileID: 420001, guid: f76caac7ee5b4693a77578770f020618, type: 3}
   phaseOneWindupEffectPrefab: {fileID: 0}
   phaseTwoWindupEffectPrefab: {fileID: 0}
   phaseThreeWindupEffectPrefab: {fileID: 0}
   phaseOneWindupHoldDuration: 0.65
   phaseTwoWindupHoldDuration: 0.5
-  phaseThreeWindupHoldDuration: 0.38
+  phaseThreeWindupHoldDuration: 1
   windupPresentation:
     style: 0
     coreStartColor: {r: 0.22, g: 0.58, b: 1, a: 0.55}
@@ -149,21 +149,21 @@ MonoBehaviour:
     allowFeint: 0
     feintChanceOverride: -1
     animationFrameRate: 12
-    animationFrameCount: 12
+    animationFrameCount: 8
     mirrorHitboxByFacing: 1
-    hitboxKeysMigratedToClip: 0
+    hitboxKeysMigratedToClip: 1
     hitboxKeys:
     - frame: 0
       enabled: 0
       offset: {x: 0.95, y: 0}
       size: {x: 1.55, y: 1.15}
       interpolation: 0
-    - frame: 4
+    - frame: 3
       enabled: 1
       offset: {x: 0.95, y: 0}
       size: {x: 1.55, y: 1.15}
       interpolation: 1
-    - frame: 7
+    - frame: 4
       enabled: 0
       offset: {x: 0.95, y: 0}
       size: {x: 1.55, y: 1.15}
@@ -184,31 +184,31 @@ MonoBehaviour:
     playerHitReaction: 1
     breaksSuperArmor: 0
     advanceSpeed: 0.4
-    windupFrame: -1
+    windupFrame: 2
     windupHoldDuration: 0
-    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectOffset: {x: -0.65, y: 0.9}
     windupEffectAngle: 0
     allowFeint: 1
     feintChanceOverride: -1
     animationFrameRate: 12
-    animationFrameCount: 12
+    animationFrameCount: 7
     mirrorHitboxByFacing: 1
-    hitboxKeysMigratedToClip: 0
+    hitboxKeysMigratedToClip: 1
     hitboxKeys:
     - frame: 0
       enabled: 0
       offset: {x: 0.8, y: 0.05}
       size: {x: 1.3, y: 0.9}
       interpolation: 0
-    - frame: 3
-      enabled: 1
-      offset: {x: 0.8, y: 0.05}
-      size: {x: 1.3, y: 0.9}
-      interpolation: 1
-    - frame: 6
+    - frame: 2
       enabled: 0
       offset: {x: 0.8, y: 0.05}
       size: {x: 1.3, y: 0.9}
+      interpolation: 1
+    - frame: 3
+      enabled: 1
+      offset: {x: 0.8061468, y: 0.8347406}
+      size: {x: 1.0664223, y: 1.7810407}
       interpolation: 0
   phaseTwoCombo:
   - animationState: ComboAttackA
@@ -226,28 +226,28 @@ MonoBehaviour:
     playerHitReaction: 1
     breaksSuperArmor: 0
     advanceSpeed: 0.4
-    windupFrame: -1
+    windupFrame: 1
     windupHoldDuration: 0
-    windupEffectOffset: {x: 0.7, y: 0.9}
-    windupEffectAngle: 0
+    windupEffectOffset: {x: -0.54, y: 1.11}
+    windupEffectAngle: -44.03
     allowFeint: 1
     feintChanceOverride: -1
     animationFrameRate: 12
-    animationFrameCount: 12
+    animationFrameCount: 7
     mirrorHitboxByFacing: 1
-    hitboxKeysMigratedToClip: 0
+    hitboxKeysMigratedToClip: 1
     hitboxKeys:
     - frame: 0
       enabled: 0
       offset: {x: 0.8, y: 0.05}
       size: {x: 1.3, y: 0.9}
       interpolation: 0
-    - frame: 3
+    - frame: 2
       enabled: 1
       offset: {x: 0.8, y: 0.05}
       size: {x: 1.3, y: 0.9}
       interpolation: 1
-    - frame: 6
+    - frame: 3
       enabled: 0
       offset: {x: 0.8, y: 0.05}
       size: {x: 1.3, y: 0.9}
@@ -268,29 +268,29 @@ MonoBehaviour:
     playerHitReaction: 1
     breaksSuperArmor: 0
     advanceSpeed: 0.4
-    windupFrame: -1
+    windupFrame: 2
     windupHoldDuration: 0
-    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectOffset: {x: -0.52, y: 0.9}
     windupEffectAngle: 0
     allowFeint: 1
     feintChanceOverride: -1
     animationFrameRate: 12
-    animationFrameCount: 12
+    animationFrameCount: 7
     mirrorHitboxByFacing: 1
-    hitboxKeysMigratedToClip: 0
+    hitboxKeysMigratedToClip: 1
     hitboxKeys:
     - frame: 0
       enabled: 0
       offset: {x: 0.8, y: 0.05}
       size: {x: 1.3, y: 0.9}
       interpolation: 0
-    - frame: 3
-      enabled: 1
-      offset: {x: 0.8, y: 0.05}
-      size: {x: 1.3, y: 0.9}
-      interpolation: 1
-    - frame: 6
+    - frame: 2
       enabled: 0
       offset: {x: 0.8, y: 0.05}
       size: {x: 1.3, y: 0.9}
+      interpolation: 1
+    - frame: 3
+      enabled: 1
+      offset: {x: 0.6668196, y: 0.8388387}
+      size: {x: 1.0336392, y: 1.772844}
       interpolation: 0

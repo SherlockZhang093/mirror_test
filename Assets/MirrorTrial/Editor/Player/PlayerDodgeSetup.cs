@@ -33,6 +33,8 @@ namespace MirrorTrial.Editor.Player
             {
                 if (!root.GetComponent<PlayerDodgeController>())
                     root.AddComponent<PlayerDodgeController>();
+                if (!root.GetComponent<PlayerTraversalController>())
+                    root.AddComponent<PlayerTraversalController>();
 
                 ConfigureInput(root.GetComponent<PlayerInputReader>());
                 PrefabUtility.SaveAsPrefabAsset(root, PlayerPrefabPath);

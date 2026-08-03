@@ -667,6 +667,7 @@ Transform:
   m_Children:
   - {fileID: 483546777}
   - {fileID: 1554099439}
+  - {fileID: 1067146616}
   m_Father: {fileID: 933121678}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &933121676
@@ -698,8 +699,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca03958160271b841950a300f2df6a8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  levelConfig: {fileID: 0}
   levelId: Level_Mirror_02
-  levelDisplayName: "\u7B2C\u4E8C\u5173\xB7\u955C\u4E2D\u8BD5\u70BC"
+  levelDisplayName: "\u7B2C\u4E8C\u9762\u955C\u5B50"
   playerSpawn: {fileID: 443959655}
   playerPrefab: {fileID: 7253538297837963826, guid: 0eb9dd5878ab6d849b4720b03e304987,
     type: 3}
@@ -742,6 +744,111 @@ Transform:
   - {fileID: 443959655}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1067146615
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1067146616}
+  - component: {fileID: 1067146618}
+  - component: {fileID: 1067146617}
+  m_Layer: 0
+  m_Name: "\u53D9\u4E8B_01_\u7B2C\u4E8C\u9762\u955C\u5B50"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1067146616
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1067146615}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 612036116}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1067146617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1067146615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4f4d642cbb2e2a45a7a6b7160692fcc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sequence: {fileID: 1067146618}
+  triggerMode: 1
+  enabledAtStart: 1
+  oneShot: 1
+  delay: 0.25
+  encounter: {fileID: 0}
+  mirrorGate: {fileID: 0}
+  previousSequence: {fileID: 0}
+  nextSequence: {fileID: 0}
+  nextSequenceDelay: 0
+--- !u!114 &1067146618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1067146615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99599e41003702c428738e692e0d9623, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  displayName: "\u7B2C\u4E8C\u9762\u955C\u5B50"
+  sequenceId: PoYing_M02_Intro_v1
+  playOnStart: 0
+  rememberCompletion: 1
+  replayInEditor: 1
+  skipHoldDuration: 1.2
+  steps:
+  - type: 0
+    speaker: 
+    text: "\u7B2C\u4E8C\u9762\u955C\u5B50"
+    hint: 
+    duration: 1.1
+    requiredAmount: 2
+    cameraTarget: {fileID: 0}
+    cameraSize: 5.5
+    blendIn: 0.6
+    blendOut: 0.5
+  - type: 2
+    speaker: 
+    text: "\u5B83\u5728\u7B49\u6211\u3002"
+    hint: 
+    duration: 1.5
+    requiredAmount: 2
+    cameraTarget: {fileID: 0}
+    cameraSize: 5.5
+    blendIn: 0.6
+    blendOut: 0.5
+  chineseFont: {fileID: 11400000, guid: 8ebfeea7062344f0c96b8a1d614a92b1, type: 2}
+  accentColor: {r: 0.23, g: 0.93, b: 1, a: 1}
+  panelColor: {r: 0.025, g: 0.04, b: 0.075, a: 0.94}
+  typewriterInterval: 0.022
+  objectiveSuccessHold: 0.7
+  onSequenceStarted:
+    m_PersistentCalls:
+      m_Calls: []
+  onSequenceCompleted:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1194848899
 GameObject:
   m_ObjectHideFlags: 0

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee856bf4551044045b5a41d67f093752, type: 3}
   m_Name: MirrorBossSimpleProfile
   m_EditorClassIdentifier: 
-  displayName: "\u955C\u4E2D\u884C\u5211\u8005"
+  displayName: "\u6301\u5251\u7684\u5012\u5F71"
   maxHitPoints: 300
   moveSpeed: 2.8
   acceleration: 18
@@ -400,8 +400,8 @@ MonoBehaviour:
     advanceSpeed: 1.2
     windupFrame: 1
     windupHoldDuration: 0.38
-    windupEffectOffset: {x: 0.7, y: 0.9}
-    windupEffectAngle: 0
+    windupEffectOffset: {x: -0.52, y: 1.2}
+    windupEffectAngle: -44.35
     allowFeint: 1
     feintChanceOverride: -1
     animationFrameRate: 12

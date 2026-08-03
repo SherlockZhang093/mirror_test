@@ -382,6 +382,7 @@ namespace MirrorTrial.Boss
                 }
                 Face(target.position.x - transform.position.x);
                 PlayRestart("BowDraw", 0.04f);
+                PlayerAudioFeedback.PlaySharedBowDraw();
                 CurrentWindupProgress = 0f;
                 windupPresentation = phaseWindupPresentations[Mathf.Clamp(phase - 1, 0, phaseWindupPresentations.Length - 1)];
                 if (windupPresentation)
@@ -420,6 +421,7 @@ namespace MirrorTrial.Boss
                     windupPresentation.End(ChargeTelegraphEndReason.Released, facingRight);
                 CurrentWindupProgress = 0f;
                 PlayRestart("BowFire", 0.02f);
+                PlayerAudioFeedback.PlaySharedBowFire();
                 var arrow = BowArrowProjectile.Create(spawn);
                 arrow.Launch(new DamagePayload(gameObject, profile.bowDamage,
                         new Vector2(direction.x * Mathf.Abs(profile.bowKnockback.x), profile.bowKnockback.y),
@@ -432,6 +434,7 @@ namespace MirrorTrial.Boss
         IEnumerator TeleportRoutine(bool attackAfterAppear)
         {
             CurrentState = State.TeleportWindup;
+            PlayerAudioFeedback.PlayTeleport();
             SetHitbox(false);
             StopHorizontal();
             Play("BowFull", 0.05f);
@@ -491,6 +494,7 @@ namespace MirrorTrial.Boss
         IEnumerator SummonRoutine()
         {
             CurrentState = State.Summoning;
+            PlayerAudioFeedback.PlaySummon();
             SetHitbox(false);
             StopHorizontal();
             Face(target ? target.position.x - transform.position.x : 1f);
@@ -538,11 +542,11 @@ namespace MirrorTrial.Boss
             IsFeinting = false;
             SetHitbox(false);
             StopHorizontal();
-            Face(target.position.x - transform.position.x);
             var combo = phase == 1 ? profile.phaseOneCombo : phase == 2 ? profile.phaseTwoCombo : profile.phaseThreeCombo;
             foreach (var step in combo)
             {
                 if (CurrentState != State.Combo) yield break;
+                FaceTarget();
                 yield return PlayComboStep(step);
                 if (step.gapAfter > 0f) yield return new WaitForSeconds(step.gapAfter);
             }
@@ -570,7 +574,7 @@ namespace MirrorTrial.Boss
             IsFeinting = false;
             SetHitbox(false);
             StopHorizontal();
-            Face(target.position.x - transform.position.x);
+            FaceTarget();
             yield return PlayComboStep(profile.heavySlash);
             if (CurrentState != State.Combo)
                 yield break;
@@ -610,6 +614,7 @@ namespace MirrorTrial.Boss
             var windupConsumed = step.windupFrame < 0 || windupHoldDuration <= 0f || configuredWindupFrame >= firstActiveFrame;
             var windupEndTime = 0f;
             var performFeint = !windupConsumed && ShouldPerformFeint(step);
+            var attackSoundPlayed = false;
             while (CurrentState == State.Combo || CurrentState == State.Windup)
             {
                 var info = animator.GetCurrentAnimatorStateInfo(0);
@@ -629,6 +634,7 @@ namespace MirrorTrial.Boss
                     if (CurrentState != State.Windup)
                     {
                         CurrentState = State.Windup;
+                        PlayerAudioFeedback.PlayBossCharge();
                         SetHitbox(false);
                         StopHorizontal();
                         animator.speed = 0f;
@@ -656,7 +662,7 @@ namespace MirrorTrial.Boss
                         yield return new WaitForSeconds(profile.feintResetDuration);
                         if (CurrentState != State.Windup) yield break;
 
-                        Face(target.position.x - transform.position.x);
+                        FaceTarget();
                         IsFeinting = false;
                         performFeint = false;
                         CurrentState = State.Combo;
@@ -689,6 +695,11 @@ namespace MirrorTrial.Boss
                 PlayerAttackHitboxKey key;
                 if (TryEvaluateHitboxKey(step, frame, out key) && key.enabled)
                 {
+                    if (!attackSoundPlayed)
+                    {
+                        attackSoundPlayed = true;
+                        PlayerAudioFeedback.PlayBossSwordSwing(step == profile.heavySlash);
+                    }
                     ConfigureHitbox(step, key.offset, key.size);
                     SetHitbox(true);
                 }
@@ -777,6 +788,7 @@ namespace MirrorTrial.Boss
             hitPoints = Mathf.Max(0, hitPoints - Mathf.Max(0, payload.damage));
             HealthChanged?.Invoke(this, hitPoints, MaxHitPoints);
             if (hitPoints <= 0) { Die(); return; }
+            PlayerAudioFeedback.PlayEnemyHurt();
 
             // Launch, landing and get-up own their complete reaction window. Further hits
             // still deal damage, but cannot restart launch, alter velocity or interrupt recovery.
@@ -863,6 +875,7 @@ namespace MirrorTrial.Boss
         {
             CancelAction();
             CurrentState = State.Dead;
+            PlayerAudioFeedback.PlayEnemyDeath();
             if (minionController) minionController.ClearAll();
             if (hurtbox) hurtbox.enabled = false;
             Play("Die", 0.05f);
@@ -895,6 +908,11 @@ namespace MirrorTrial.Boss
             if (Mathf.Abs(delta) < 0.05f) return;
             facingRight = delta > 0f;
             if (sprite) sprite.flipX = !facingRight;
+        }
+
+        void FaceTarget()
+        {
+            if (target) Face(target.position.x - transform.position.x);
         }
 
         void StopHorizontal() => body.velocity = new Vector2(0f, body.velocity.y);

@@ -19,12 +19,14 @@ namespace MirrorTrial.Editor.Level
         {
             "章节标题",
             "镜头特写",
-            "角色对白",
+            "内心独白",
             "移动教学",
             "跳跃教学",
             "攻击教学",
             "闪避教学",
-            "等待"
+            "等待",
+            "生命能量教学",
+            "系统说明"
         };
 
         static readonly Color Cyan = new Color(0.22f, 0.82f, 0.95f, 1f);
@@ -345,12 +347,14 @@ namespace MirrorTrial.Editor.Level
             switch (type)
             {
                 case StoryTutorialStepType.CameraShot: return 142f;
-                case StoryTutorialStepType.Dialogue: return 132f;
+                case StoryTutorialStepType.Dialogue:
+                case StoryTutorialStepType.SystemMessage: return 120f;
                 case StoryTutorialStepType.TitleCard: return 112f;
                 case StoryTutorialStepType.MoveObjective: return 132f;
                 case StoryTutorialStepType.JumpObjective:
                 case StoryTutorialStepType.PrimaryAttackObjective:
-                case StoryTutorialStepType.DodgeObjective: return 112f;
+                case StoryTutorialStepType.DodgeObjective:
+                case StoryTutorialStepType.HealthResourceObjective: return 134f;
                 default: return 72f;
             }
         }
@@ -382,8 +386,14 @@ namespace MirrorTrial.Editor.Level
                     DrawTwoStepFields(element, "blendIn", "进入过渡", "blendOut", "退出过渡", ref inner);
                     break;
                 case StoryTutorialStepType.Dialogue:
-                    DrawStepField(element, "speaker", "说话人", ref inner);
-                    DrawStepText(element, ref inner, "对白内容", 46f);
+                    EditorGUI.LabelField(new Rect(inner.x, inner.y, inner.width, 19f), "第一人称内心独白，不显示说话人", EditorStyles.miniLabel);
+                    inner.y += 22f;
+                    DrawStepText(element, ref inner, "独白内容", 46f);
+                    break;
+                case StoryTutorialStepType.SystemMessage:
+                    EditorGUI.LabelField(new Rect(inner.x, inner.y, inner.width, 19f), "玩法规则说明，不属于角色独白", EditorStyles.miniLabel);
+                    inner.y += 22f;
+                    DrawStepText(element, ref inner, "说明内容", 46f);
                     break;
                 case StoryTutorialStepType.MoveObjective:
                     DrawStepField(element, "text", "教学目标", ref inner);
@@ -393,6 +403,11 @@ namespace MirrorTrial.Editor.Level
                 case StoryTutorialStepType.JumpObjective:
                 case StoryTutorialStepType.PrimaryAttackObjective:
                 case StoryTutorialStepType.DodgeObjective:
+                    DrawStepField(element, "text", "教学目标", ref inner);
+                    DrawStepField(element, "hint", "按键提示", ref inner);
+                    break;
+                case StoryTutorialStepType.HealthResourceObjective:
+                    DrawStepField(element, "cameraTarget", "生命能量目标", ref inner);
                     DrawStepField(element, "text", "教学目标", ref inner);
                     DrawStepField(element, "hint", "按键提示", ref inner);
                     break;
@@ -443,7 +458,7 @@ namespace MirrorTrial.Editor.Level
             array.InsertArrayElementAtIndex(index);
             var element = array.GetArrayElementAtIndex(index);
             element.FindPropertyRelative("type").enumValueIndex = (int)type;
-            element.FindPropertyRelative("speaker").stringValue = type == StoryTutorialStepType.Dialogue ? "引路者" : string.Empty;
+            element.FindPropertyRelative("speaker").stringValue = string.Empty;
             element.FindPropertyRelative("text").stringValue = DefaultText(type);
             element.FindPropertyRelative("hint").stringValue = DefaultHint(type);
             element.FindPropertyRelative("duration").floatValue = type == StoryTutorialStepType.TitleCard ? 1.5f : 1f;
@@ -543,7 +558,7 @@ namespace MirrorTrial.Editor.Level
                 case StorySequenceTriggerMode.PlayerEnter: return "玩家进入区域";
                 case StorySequenceTriggerMode.EncounterCleared: return "战斗清场";
                 case StorySequenceTriggerMode.MirrorSmashed: return "镜门击碎";
-                case StorySequenceTriggerMode.MirrorCompleted: return "镜中试炼完成";
+                case StorySequenceTriggerMode.MirrorCompleted: return "镜中战斗完成";
                 case StorySequenceTriggerMode.PreviousSequenceCompleted: return "上一段完成";
                 default: return "手动触发";
             }
@@ -554,11 +569,13 @@ namespace MirrorTrial.Editor.Level
             switch (type)
             {
                 case StoryTutorialStepType.TitleCard: return "新章节";
-                case StoryTutorialStepType.Dialogue: return "在这里输入对白……";
-                case StoryTutorialStepType.MoveObjective: return "向前探索";
-                case StoryTutorialStepType.JumpObjective: return "越过障碍";
-                case StoryTutorialStepType.PrimaryAttackObjective: return "攻击目标";
-                case StoryTutorialStepType.DodgeObjective: return "闪避危险";
+                case StoryTutorialStepType.Dialogue: return "在这里输入第一人称独白……";
+                case StoryTutorialStepType.SystemMessage: return "在这里输入玩法说明……";
+                case StoryTutorialStepType.MoveObjective: return "移动";
+                case StoryTutorialStepType.JumpObjective: return "跳跃";
+                case StoryTutorialStepType.PrimaryAttackObjective: return "攻击";
+                case StoryTutorialStepType.DodgeObjective: return "闪避";
+                case StoryTutorialStepType.HealthResourceObjective: return "打碎生命能量";
                 default: return string.Empty;
             }
         }
@@ -571,6 +588,7 @@ namespace MirrorTrial.Editor.Level
                 case StoryTutorialStepType.JumpObjective: return "空格  跳跃";
                 case StoryTutorialStepType.PrimaryAttackObjective: return "J 或鼠标左键  攻击";
                 case StoryTutorialStepType.DodgeObjective: return "左 Shift  闪避";
+                case StoryTutorialStepType.HealthResourceObjective: return "J 或鼠标左键  攻击";
                 default: return string.Empty;
             }
         }

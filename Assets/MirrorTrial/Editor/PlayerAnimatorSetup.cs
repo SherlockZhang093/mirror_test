@@ -19,6 +19,7 @@ namespace MirrorTrial.Editor
         static readonly HashSet<string> LoopingStates = new HashSet<string>
         {
             "Idle", "Run", "JumpRise", "JumpFall",
+            "LedgeHang", "MonkeyBarIdle",
             "BowAim", "BowFull",
             "SwordGuard", "SwordSprint",
             "SwordIdle", "SwordWalk", "SwordRun", "SwordRunAltGrip",
@@ -35,7 +36,13 @@ namespace MirrorTrial.Editor
                 { "Land", "Land.anim" },
                 { "SwordAttack", "SwordAttack.anim" },
                 { "AirSlash", "AirSlash.anim" },
+                { "AirSlashUp", "AirSlashUp.anim" },
+                { "AirSlashDown", "AirSlashDown.anim" },
                 { "Dash", "Dash.anim" },
+                { "Roll", "Roll.anim" },
+                { "LedgeHang", "LedgeHang.anim" },
+                { "LedgeClimb", "LedgeClimb.anim" },
+                { "MonkeyBarIdle", "MonkeyBarIdle.anim" },
                 { "HitDamage", "HitDamage.anim" },
                 { "Die", "Die.anim" },
                 { "BowDraw", "BowDraw.anim" },

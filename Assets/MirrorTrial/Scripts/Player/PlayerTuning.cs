@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MirrorTrial.Player
 {
@@ -55,7 +56,9 @@ namespace MirrorTrial.Player
             public float knockbackDuration = 0.12f;
             public float invincibleTime = 0.75f;
             public float hurtHitStop = 0.05f;
-            public float hurtFlashTime = 0.08f;
+            [FormerlySerializedAs("hurtFlashTime")]
+            public float hurtTintTime = 0.12f;
+            public Color hurtTintColor = new Color(1f, 0.18f, 0.18f, 1f);
             public float invincibleBlinkInterval = 0.08f;
         }
 

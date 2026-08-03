@@ -40,6 +40,11 @@ namespace MirrorTrial.Player
             CurrentState == PlayerActionState.Cast ||
             CurrentState == PlayerActionState.Dash ||
             CurrentState == PlayerActionState.Dodge ||
+            CurrentState == PlayerActionState.LedgeHang ||
+            CurrentState == PlayerActionState.LedgeClimb ||
+            CurrentState == PlayerActionState.MonkeyBarIdle ||
+            CurrentState == PlayerActionState.AirSlashUp ||
+            CurrentState == PlayerActionState.AirSlashDown ||
             CurrentState == PlayerActionState.Hurt ||
             CurrentState == PlayerActionState.Dead;
 
@@ -47,6 +52,11 @@ namespace MirrorTrial.Player
         public bool ShouldLockMovement =>
             CurrentState == PlayerActionState.Attack ||
             CurrentState == PlayerActionState.Dodge ||
+            CurrentState == PlayerActionState.LedgeHang ||
+            CurrentState == PlayerActionState.LedgeClimb ||
+            CurrentState == PlayerActionState.MonkeyBarIdle ||
+            CurrentState == PlayerActionState.AirSlashUp ||
+            CurrentState == PlayerActionState.AirSlashDown ||
             CurrentState == PlayerActionState.Hurt ||
             CurrentState == PlayerActionState.Dead;
 

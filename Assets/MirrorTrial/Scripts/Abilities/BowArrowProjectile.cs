@@ -67,6 +67,7 @@ namespace MirrorTrial.Abilities
             var hurtbox = other.GetComponent<Hurtbox>();
             if (!hurtbox) return;
             hurtbox.ReceiveHit(payload);
+            MirrorTrial.Player.PlayerAudioFeedback.PlaySharedArrowHit();
             HitStopService.Request(payload.hitStop);
             CameraFeedbackService.RequestHit(payload);
             Destroy(gameObject);
