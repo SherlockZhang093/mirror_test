@@ -2,15 +2,22 @@ fileFormatVersion: 2
 guid: 34ca897fba2910d9732531fdf028e2d9
 TextureImporter:
   internalIDToNameTable:
-  - first:
-      213: 21300000
+  - first: {213: 21300000}
     second: E001_NewEnemy_Attack_0
-  - first:
-      213: 21300002
+  - first: {213: 21300002}
     second: E001_NewEnemy_Attack_1
-  - first:
-      213: 21300004
+  - first: {213: 21300004}
     second: E001_NewEnemy_Attack_2
+  - first: {213: 741464973}
+    second: E001_NewEnemy_Attack_3
+  - first: {213: -1033435880}
+    second: E001_NewEnemy_Attack_4
+  - first: {213: 1180702517}
+    second: E001_NewEnemy_Attack_5
+  - first: {213: 780467174}
+    second: E001_NewEnemy_Attack_6
+  - first: {213: 1955050437}
+    second: E001_NewEnemy_Attack_7
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -40,10 +47,10 @@ TextureImporter:
   cubemapConvolution: 0
   seamlessCubemap: 0
   textureFormat: 1
-  maxTextureSize: 2048
+  maxTextureSize: 4096
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -78,7 +85,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 4096
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
@@ -91,7 +98,7 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
-    maxTextureSize: 2048
+    maxTextureSize: 4096
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
@@ -107,14 +114,9 @@ TextureImporter:
     sprites:
     - serializedVersion: 2
       name: E001_NewEnemy_Attack_0
-      rect:
-        serializedVersion: 2
-        x: 50
-        y: 221
-        width: 339
-        height: 277
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      rect: {serializedVersion: 2, x: 0, y: 0, width: 448, height: 320}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0625}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -128,14 +130,9 @@ TextureImporter:
       weights: []
     - serializedVersion: 2
       name: E001_NewEnemy_Attack_1
-      rect:
-        serializedVersion: 2
-        x: 493
-        y: 221
-        width: 343
-        height: 205
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      rect: {serializedVersion: 2, x: 448, y: 0, width: 448, height: 320}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0625}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -149,14 +146,9 @@ TextureImporter:
       weights: []
     - serializedVersion: 2
       name: E001_NewEnemy_Attack_2
-      rect:
-        serializedVersion: 2
-        x: 930
-        y: 223
-        width: 364
-        height: 269
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      rect: {serializedVersion: 2, x: 896, y: 0, width: 448, height: 320}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0625}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -170,14 +162,9 @@ TextureImporter:
       weights: []
     - serializedVersion: 2
       name: E001_NewEnemy_Attack_3
-      rect:
-        serializedVersion: 2
-        x: 1379
-        y: 210
-        width: 380
-        height: 276
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      rect: {serializedVersion: 2, x: 1344, y: 0, width: 448, height: 320}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0625}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -190,15 +177,42 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
+      name: E001_NewEnemy_Attack_4
+      rect: {serializedVersion: 2, x: 1792, y: 0, width: 448, height: 320}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a331b8aa1c614d349b3b9b17c8f3e401
+      internalID: -1033435880
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: E001_NewEnemy_Attack_5
+      rect: {serializedVersion: 2, x: 2240, y: 0, width: 448, height: 320}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c5526a2d285e49749d8b962d04756602
+      internalID: 1180702517
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
       name: E001_NewEnemy_Attack_6
-      rect:
-        serializedVersion: 2
-        x: 1828
-        y: 214
-        width: 321
-        height: 249
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      rect: {serializedVersion: 2, x: 2688, y: 0, width: 448, height: 320}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0625}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -206,6 +220,22 @@ TextureImporter:
       bones: []
       spriteID: 5acfc568a53a23746ad79d2e3e57910f
       internalID: 780467174
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: E001_NewEnemy_Attack_7
+      rect: {serializedVersion: 2, x: 3136, y: 0, width: 448, height: 320}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7ba5d620f9784d02a00acf992f3d128f
+      internalID: 1955050437
       vertices: []
       indices: 
       edges: []
@@ -223,19 +253,12 @@ TextureImporter:
     nameFileIdTable:
       E001_NewEnemy_Attack_0: 21300000
       E001_NewEnemy_Attack_1: 21300002
-      E001_NewEnemy_Attack_10: -374806368
-      E001_NewEnemy_Attack_11: -773175926
-      E001_NewEnemy_Attack_12: 1010736834
-      E001_NewEnemy_Attack_13: -1586173615
-      E001_NewEnemy_Attack_14: -1235129498
       E001_NewEnemy_Attack_2: 21300004
       E001_NewEnemy_Attack_3: 741464973
       E001_NewEnemy_Attack_4: -1033435880
       E001_NewEnemy_Attack_5: 1180702517
       E001_NewEnemy_Attack_6: 780467174
       E001_NewEnemy_Attack_7: 1955050437
-      E001_NewEnemy_Attack_8: 1495969409
-      E001_NewEnemy_Attack_9: 1228180743
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

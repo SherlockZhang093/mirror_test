@@ -129,7 +129,7 @@ namespace MirrorTrial.Editor.HealthResources
         {
             var data = new SerializedObject(node);
             data.FindProperty("maxDurability").intValue = 3;
-            data.FindProperty("healthReward").intValue = 3;
+            data.FindProperty("lifeEssenceReward").intValue = 3;
             data.FindProperty("countHitsInsteadOfDamage").boolValue = true;
             data.FindProperty("rewardOrbSprite").objectReferenceValue = rewardSprite;
             data.FindProperty("rewardEffectOffset").vector3Value = new Vector3(0f, rewardHeight, 0f);

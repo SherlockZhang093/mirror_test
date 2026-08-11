@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "part_count": 5,
+  "parts": [
+    "far_wing",
+    "near_wing",
+    "body",
+    "upper_tail",
+    "lower_tail"
+  ],
+  "body_includes": [
+    "head",
+    "neck",
+    "chest",
+    "pelvis",
+    "both_shoulders",
+    "saddle"
+  ],
+  "body_excludes": [
+    "far_wing",
+    "near_wing",
+    "upper_tail",
+    "lower_tail"
+  ],
+  "source_canvas": [
+    1536,
+    1024
+  ],
+  "full_canvas_layers": true,
+  "tight_crop_used": false,
+  "per_part_scaling_used": false,
+  "reassembly_mismatch_pixels": 0,
+  "formal_unity_assets_modified": false
+}

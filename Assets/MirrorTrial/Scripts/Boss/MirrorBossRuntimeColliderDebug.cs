@@ -12,6 +12,7 @@ namespace MirrorTrial.Boss
         [SerializeField] KeyCode shortcut = KeyCode.F8;
         [SerializeField] Vector2 buttonPosition = new Vector2(18f, 18f);
 
+#if UNITY_EDITOR
         readonly List<Hitbox> hitboxes = new List<Hitbox>();
         readonly List<Hurtbox> hurtboxes = new List<Hurtbox>();
         readonly List<EnemyAI> enemies = new List<EnemyAI>();
@@ -179,5 +180,13 @@ namespace MirrorTrial.Boss
             };
             labelStyle.normal.textColor = Color.white;
         }
+#else
+        // Keep the component type valid for prefabs, but strip all runtime debug
+        // input and drawing from standalone builds.
+        void Awake()
+        {
+            enabled = false;
+        }
+#endif
     }
 }

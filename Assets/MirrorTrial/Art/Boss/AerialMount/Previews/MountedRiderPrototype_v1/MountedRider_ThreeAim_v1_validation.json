@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "timeline_frames": 18,
+  "fps": 12,
+  "aim_bands_degrees": {
+    "up": 18,
+    "level": 0,
+    "down": -18
+  },
+  "rider_cell": [
+    96,
+    84
+  ],
+  "bird_cell": [
+    192,
+    128
+  ],
+  "seat_pivot": [
+    108,
+    72
+  ],
+  "rider_root_pivot": [
+    48,
+    68
+  ],
+  "shoulder_pivot": [
+    49,
+    56
+  ],
+  "hip_pivots": [
+    [
+      50,
+      68
+    ],
+    [
+      46,
+      68
+    ]
+  ],
+  "seated_leg_angles": [
+    52,
+    -34
+  ],
+  "scale_factors": [
+    1,
+    1,
+    1
+  ],
+  "lower_body_source_mismatch": 0,
+  "gif_decoded_frames": 18,
+  "gif_alpha_ok": true,
+  "formal_unity_assets_modified": false
+}

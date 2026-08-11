@@ -1,0 +1,346 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3036d8427134cde45b23521c23861042, type: 3}
+  m_Name: MirrorArcherTwoStageProfile
+  m_EditorClassIdentifier: 
+  mountedBossPrefab: {fileID: 8136397143727504024, guid: 6d249abb497f93b409084d1103bad37f,
+    type: 3}
+  groundBossPrefab: {fileID: 2457785708012118478, guid: fb76c12084b436d47ba53eb3903362dd,
+    type: 3}
+  sharedGroundMeleeProfile: {fileID: 11400000, guid: edffee12edff59c449e4009d0e10a45c,
+    type: 2}
+  mountedDisplayName: "\u955C\u4E2D\u730E\u624B \xB7 \u9A91\u4E58"
+  mountedHitPoints: 180
+  airMoveSpeed: 5
+  airPadding: {x: 1.2, y: 0.8}
+  firstActionDelay: 0.8
+  crashDuration: 1.15
+  crashCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.45
+      value: 0.22
+      inSlope: 0.7
+      outSlope: 0.15
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2.2
+      outSlope: 2.2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  crashLandingOffset: {x: 0, y: 0}
+  crashImpactPrefab: {fileID: 931694689763239066, guid: 171d0a3c8e8940143b339d9c2ca4cc82,
+    type: 3}
+  impactCoverDuration: 0.35
+  mountedFallState: MountedFall
+  mountedFallLoopState: MountedFallLoop
+  mountedFallStartDuration: 0.55
+  mountedImpactState: MountedImpact
+  groundKnockdownState: GroundKnockdown
+  groundGetUpState: GroundGetUp
+  groundKnockdownDuration: 0.5
+  groundGetUpDuration: 0.75
+  groundCloseRange: 3
+  groundDecisionGap: 0.35
+  airSkills:
+  - displayName: "\u9501\u5B9A\u7BAD"
+    stage: 0
+    type: 0
+    animationClip: {fileID: 0}
+    animatorState: MountedBowFire
+    windup: 4
+    recovery: 0.7
+    lockMoment: 0.25
+    releaseMoment: 0.6
+    windupEffectPrefab: {fileID: 410001, guid: e5a992aef4054333a24bbc61feaedc38, type: 3}
+    effectOffset: {x: 0.65, y: 0.9}
+    projectilePrefab: {fileID: 5795612966017665024, guid: 09753b6602c3a5245993c31d4c0b6e44,
+      type: 3}
+    impactPrefab: {fileID: 931694689763239066, guid: 171d0a3c8e8940143b339d9c2ca4cc82,
+      type: 3}
+    arrowCount: 1
+    initialAngleOffset: 0
+    arrowAngle: 18
+    arrowSpeed: 12
+    arrowRange: 20
+    damage: 1
+    knockback: {x: 1.5, y: 0.3}
+    movementOffset: {x: 4, y: 1.5}
+    movementDuration: 0.6
+    effectRadius: 0.75
+    range: 7
+    safeRadius: 2.2
+    waveCount: 3
+    impactsPerWave: 5
+    waveInterval: 0.45
+    perImpactStagger: 0.18
+  - displayName: "\u6247\u5F62\u7BAD"
+    stage: 0
+    type: 1
+    animationClip: {fileID: 0}
+    animatorState: MountedBowFire
+    windup: 4
+    recovery: 0.7
+    lockMoment: 0.25
+    releaseMoment: 0.6
+    windupEffectPrefab: {fileID: 410001, guid: e5a992aef4054333a24bbc61feaedc38, type: 3}
+    effectOffset: {x: 0.65, y: 0.9}
+    projectilePrefab: {fileID: 5795612966017665024, guid: 09753b6602c3a5245993c31d4c0b6e44,
+      type: 3}
+    impactPrefab: {fileID: 931694689763239066, guid: 171d0a3c8e8940143b339d9c2ca4cc82,
+      type: 3}
+    arrowCount: 5
+    initialAngleOffset: 0
+    arrowAngle: 18
+    arrowSpeed: 12
+    arrowRange: 20
+    damage: 1
+    knockback: {x: 1.5, y: 0.3}
+    movementOffset: {x: 4, y: 1.5}
+    movementDuration: 0.6
+    effectRadius: 0.75
+    range: 7
+    safeRadius: 2.2
+    waveCount: 3
+    impactsPerWave: 5
+    waveInterval: 0.45
+    perImpactStagger: 0.18
+  - displayName: "\u5BF9\u5730\u7BAD\u96E8"
+    stage: 0
+    type: 2
+    animationClip: {fileID: 0}
+    animatorState: MountedBowFire
+    windup: 4
+    recovery: 0.7
+    lockMoment: 0.25
+    releaseMoment: 0.6
+    windupEffectPrefab: {fileID: 410001, guid: e5a992aef4054333a24bbc61feaedc38, type: 3}
+    effectOffset: {x: 0.65, y: 0.9}
+    projectilePrefab: {fileID: 5795612966017665024, guid: 09753b6602c3a5245993c31d4c0b6e44,
+      type: 3}
+    impactPrefab: {fileID: 931694689763239066, guid: 171d0a3c8e8940143b339d9c2ca4cc82,
+      type: 3}
+    arrowCount: 2
+    initialAngleOffset: 0
+    arrowAngle: 0
+    arrowSpeed: 12
+    arrowRange: 20
+    damage: 1
+    knockback: {x: 1.5, y: 0.3}
+    movementOffset: {x: 4, y: 1.5}
+    movementDuration: 0.6
+    effectRadius: 0.75
+    range: 5
+    safeRadius: 2.2
+    waveCount: 3
+    impactsPerWave: 5
+    waveInterval: 0.45
+    perImpactStagger: 0.18
+  - displayName: "\u5750\u9A91\u4FEF\u51B2"
+    stage: 0
+    type: 3
+    animationClip: {fileID: 0}
+    animatorState: MountedDive
+    windup: 0.75
+    recovery: 0.7
+    lockMoment: 0.25
+    releaseMoment: 0.6
+    windupEffectPrefab: {fileID: 410001, guid: e5a992aef4054333a24bbc61feaedc38, type: 3}
+    effectOffset: {x: 0.65, y: 0.9}
+    projectilePrefab: {fileID: 0}
+    impactPrefab: {fileID: 931694689763239066, guid: 171d0a3c8e8940143b339d9c2ca4cc82,
+      type: 3}
+    arrowCount: 1
+    initialAngleOffset: 0
+    arrowAngle: 18
+    arrowSpeed: 12
+    arrowRange: 20
+    damage: 0
+    knockback: {x: 1.5, y: 0.3}
+    movementOffset: {x: 4, y: 1.5}
+    movementDuration: 0.65
+    effectRadius: 1.1
+    range: 7
+    safeRadius: 2.2
+    waveCount: 3
+    impactsPerWave: 5
+    waveInterval: 0.45
+    perImpactStagger: 0.18
+  - displayName: "\u7A7A\u4E2D\u6362\u4F4D"
+    stage: 0
+    type: 4
+    animationClip: {fileID: 0}
+    animatorState: MountedFlight
+    windup: 0.2
+    recovery: 0.25
+    lockMoment: 0.25
+    releaseMoment: 0.6
+    windupEffectPrefab: {fileID: 410001, guid: e5a992aef4054333a24bbc61feaedc38, type: 3}
+    effectOffset: {x: 0.65, y: 0.9}
+    projectilePrefab: {fileID: 0}
+    impactPrefab: {fileID: 931694689763239066, guid: 171d0a3c8e8940143b339d9c2ca4cc82,
+      type: 3}
+    arrowCount: 1
+    initialAngleOffset: 0
+    arrowAngle: 18
+    arrowSpeed: 12
+    arrowRange: 20
+    damage: 1
+    knockback: {x: 1.5, y: 0.3}
+    movementOffset: {x: 4.5, y: 1.8}
+    movementDuration: 0.6
+    effectRadius: 0.75
+    range: 7
+    safeRadius: 2.2
+    waveCount: 3
+    impactsPerWave: 5
+    waveInterval: 0.45
+    perImpactStagger: 0.18
+  groundSkills:
+  - displayName: "\u671D\u5929\u5C04\u7BAD / \u591A\u6CE2\u843D\u77F3"
+    stage: 1
+    type: 5
+    animationClip: {fileID: 0}
+    animatorState: BowFire
+    windup: 0.9
+    recovery: 1.15
+    lockMoment: 0.25
+    releaseMoment: 0.8
+    windupEffectPrefab: {fileID: 410001, guid: e5a992aef4054333a24bbc61feaedc38, type: 3}
+    effectOffset: {x: 0.65, y: 0.9}
+    projectilePrefab: {fileID: 5325135801238476195, guid: 103af15014f852248b24898ad10f5ecf,
+      type: 3}
+    impactPrefab: {fileID: 931694689763239066, guid: 171d0a3c8e8940143b339d9c2ca4cc82,
+      type: 3}
+    arrowCount: 5
+    initialAngleOffset: 0
+    arrowAngle: 18
+    arrowSpeed: 12
+    arrowRange: 20
+    damage: 1
+    knockback: {x: 1.5, y: 0.3}
+    movementOffset: {x: 4, y: 1.5}
+    movementDuration: 0.6
+    effectRadius: 0.8
+    range: 8
+    safeRadius: 2.4
+    waveCount: 3
+    impactsPerWave: 5
+    waveInterval: 0.45
+    perImpactStagger: 0.18
+  - displayName: "\u5171\u4EAB\u57FA\u7840\u8FDE\u62DB"
+    stage: 1
+    type: 6
+    animationClip: {fileID: 0}
+    animatorState: ComboAttackA
+    windup: 0.6
+    recovery: 0.7
+    lockMoment: 0.25
+    releaseMoment: 0.6
+    windupEffectPrefab: {fileID: 0}
+    effectOffset: {x: 0.65, y: 0.9}
+    projectilePrefab: {fileID: 0}
+    impactPrefab: {fileID: 0}
+    arrowCount: 1
+    initialAngleOffset: 0
+    arrowAngle: 18
+    arrowSpeed: 12
+    arrowRange: 20
+    damage: 1
+    knockback: {x: 1.5, y: 0.3}
+    movementOffset: {x: 4, y: 1.5}
+    movementDuration: 0.6
+    effectRadius: 0.75
+    range: 7
+    safeRadius: 2.2
+    waveCount: 3
+    impactsPerWave: 5
+    waveInterval: 0.45
+    perImpactStagger: 0.18
+  - displayName: "\u5171\u4EAB\u84C4\u529B\u91CD\u65A9"
+    stage: 1
+    type: 7
+    animationClip: {fileID: 0}
+    animatorState: ComboAttackA
+    windup: 0.6
+    recovery: 0.7
+    lockMoment: 0.25
+    releaseMoment: 0.6
+    windupEffectPrefab: {fileID: 0}
+    effectOffset: {x: 0.65, y: 0.9}
+    projectilePrefab: {fileID: 0}
+    impactPrefab: {fileID: 0}
+    arrowCount: 1
+    initialAngleOffset: 0
+    arrowAngle: 18
+    arrowSpeed: 12
+    arrowRange: 20
+    damage: 1
+    knockback: {x: 1.5, y: 0.3}
+    movementOffset: {x: 4, y: 1.5}
+    movementDuration: 0.6
+    effectRadius: 0.75
+    range: 7
+    safeRadius: 2.2
+    waveCount: 3
+    impactsPerWave: 5
+    waveInterval: 0.45
+    perImpactStagger: 0.18
+  - displayName: "\u5171\u4EAB\u5047\u52A8\u4F5C"
+    stage: 1
+    type: 8
+    animationClip: {fileID: 0}
+    animatorState: ComboAttackA
+    windup: 0.6
+    recovery: 0.7
+    lockMoment: 0.25
+    releaseMoment: 0.6
+    windupEffectPrefab: {fileID: 0}
+    effectOffset: {x: 0.65, y: 0.9}
+    projectilePrefab: {fileID: 0}
+    impactPrefab: {fileID: 0}
+    arrowCount: 1
+    initialAngleOffset: 0
+    arrowAngle: 18
+    arrowSpeed: 12
+    arrowRange: 20
+    damage: 1
+    knockback: {x: 1.5, y: 0.3}
+    movementOffset: {x: 4, y: 1.5}
+    movementDuration: 0.6
+    effectRadius: 0.75
+    range: 7
+    safeRadius: 2.2
+    waveCount: 3
+    impactsPerWave: 5
+    waveInterval: 0.45
+    perImpactStagger: 0.18

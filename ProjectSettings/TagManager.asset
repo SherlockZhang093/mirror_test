@@ -42,3 +42,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: player
+    uniqueID: 1460967371
+    locked: 0
+  - name: archered_boss
+    uniqueID: 383416751
+    locked: 0
+  - name: boss
+    uniqueID: 1586583903
+    locked: 0

@@ -27,6 +27,7 @@ namespace MirrorTrial.Player
         float bufferedUntil;
         float readyTime;
         bool perfectDodgeTriggered;
+        bool airDodgeUsed;
 
         public bool IsDodging => dodgeRoutine != null;
         public event Action DodgeStarted;
@@ -45,17 +46,22 @@ namespace MirrorTrial.Player
         {
             if (damageReceiver)
                 damageReceiver.ExternalHitIgnored += OnExternalHitIgnored;
+            motor.Landed += OnLanded;
         }
 
         void OnDisable()
         {
             if (damageReceiver)
                 damageReceiver.ExternalHitIgnored -= OnExternalHitIgnored;
+            motor.Landed -= OnLanded;
             CancelCurrentAction(PlayerActionCancelReason.Hit);
         }
 
         void Update()
         {
+            if (motor.IsGrounded)
+                airDodgeUsed = false;
+
             if (input.DodgePressed)
                 bufferedUntil = Time.time + tuning.dodge.inputBufferTime;
 
@@ -70,7 +76,9 @@ namespace MirrorTrial.Player
         {
             if (!input.InputEnabled || Time.time < readyTime || stateMachine.IsInActionState)
                 return false;
-            return tuning.dodge.allowAirDodge || motor.IsGrounded;
+            if (motor.IsGrounded)
+                return true;
+            return tuning.dodge.allowAirDodge && !airDodgeUsed;
         }
 
         IEnumerator DodgeRoutine()
@@ -78,6 +86,8 @@ namespace MirrorTrial.Player
             var settings = tuning.dodge;
             readyTime = Time.time + settings.cooldown;
             perfectDodgeTriggered = false;
+            if (!motor.IsGrounded)
+                airDodgeUsed = true;
 
             var direction = Mathf.Abs(input.MoveX) > 0.01f
                 ? Mathf.Sign(input.MoveX)
@@ -106,6 +116,11 @@ namespace MirrorTrial.Player
                 yield return new WaitForSeconds(remaining);
 
             FinishDodge(false);
+        }
+
+        void OnLanded(float landingSpeed)
+        {
+            airDodgeUsed = false;
         }
 
         void OnExternalHitIgnored()

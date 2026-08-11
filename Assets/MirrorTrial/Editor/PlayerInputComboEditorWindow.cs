@@ -8,12 +8,10 @@ namespace MirrorTrial.Editor
 {
     public sealed partial class PlayerInputComboEditorWindow : EditorWindow
     {
+        const string DefaultPlayerPrefabPath = "Assets/MirrorTrial/Prefabs/Characters/Player_MirrorTrial.prefab";
         static readonly PlayerInputCommand[] CommandValues =
         {
             PlayerInputCommand.PrimaryAttack,
-            PlayerInputCommand.SecondaryAttack,
-            PlayerInputCommand.WeaponSkill,
-            PlayerInputCommand.MobilitySkill,
             PlayerInputCommand.WeaponSlot1,
             PlayerInputCommand.WeaponSlot2,
             PlayerInputCommand.WeaponSlot3,
@@ -146,13 +144,15 @@ namespace MirrorTrial.Editor
         bool scenePreviewEnabled = true;
         bool animationPlaying;
         double lastAnimationUpdate;
-        enum EditorTargetMode { Player, MirrorBoss }
+        enum EditorTargetMode { Player, FirstMirrorBoss, MirrorBoss }
         EditorTargetMode targetMode;
 
         [MenuItem("Tools/镜像试炼/战斗/玩家按键与连招编辑器")]
         public static void OpenFromMenu()
         {
             var selected = Selection.activeGameObject;
+            if (!selected || !selected.GetComponent<PlayerInputReader>())
+                selected = AssetDatabase.LoadAssetAtPath<GameObject>(DefaultPlayerPrefabPath);
             var window = GetWindow<PlayerInputComboEditorWindow>();
             window.titleContent = new GUIContent("按键与连招");
             window.minSize = new Vector2(780f, 480f);
@@ -168,8 +168,10 @@ namespace MirrorTrial.Editor
             AssemblyReloadEvents.beforeAssemblyReload += StopAnimationPreview;
             EditorApplication.quitting += StopAnimationPreview;
             EnableRuntimePreviewBridge();
-            if (Selection.activeGameObject)
-                SetTarget(Selection.activeGameObject);
+            var selected = Selection.activeGameObject;
+            if (!selected || !selected.GetComponent<PlayerInputReader>())
+                selected = AssetDatabase.LoadAssetAtPath<GameObject>(DefaultPlayerPrefabPath);
+            SetTarget(selected);
         }
 
         void OnDisable()
@@ -231,11 +233,26 @@ namespace MirrorTrial.Editor
 
         void OnGUI()
         {
-            var nextMode = (EditorTargetMode)GUILayout.Toolbar((int)targetMode, new[] { "玩家连招", "Boss 攻击框" }, GUILayout.Height(25f));
+            var nextMode = (EditorTargetMode)GUILayout.Toolbar(
+                (int)targetMode,
+                new[] { "玩家连招", "第一个 Boss 逐帧", "第二个 Boss 两阶段技能" },
+                GUILayout.Height(25f));
             if (nextMode != targetMode)
             {
                 StopAnimationPreview();
                 targetMode = nextMode;
+                if (targetMode == EditorTargetMode.FirstMirrorBoss)
+                    MirrorTrial.Editor.Boss.MirrorBossFrameEditorWindow.Open();
+            }
+            if (targetMode == EditorTargetMode.FirstMirrorBoss)
+            {
+                EditorGUILayout.Space(12f);
+                EditorGUILayout.HelpBox(
+                    "第一个 Boss 使用独立的逐帧动作编辑界面，以避免与第二个 Boss 的两阶段预览状态互相干扰。",
+                    MessageType.Info);
+                if (GUILayout.Button("打开第一个 Boss 逐帧动作编辑器", GUILayout.Height(36f)))
+                    MirrorTrial.Editor.Boss.MirrorBossFrameEditorWindow.Open();
+                return;
             }
             if (targetMode == EditorTargetMode.MirrorBoss)
             {
@@ -901,6 +918,7 @@ namespace MirrorTrial.Editor
 
         void TickAnimationPreview()
         {
+            if (targetMode == EditorTargetMode.FirstMirrorBoss) return;
             if (targetMode == EditorTargetMode.MirrorBoss)
             {
                 TickBossAnimationPreview();
@@ -1169,6 +1187,7 @@ namespace MirrorTrial.Editor
 
         void OnSceneGUI(SceneView sceneView)
         {
+            if (targetMode == EditorTargetMode.FirstMirrorBoss) return;
             if (targetMode == EditorTargetMode.MirrorBoss)
             {
                 DrawBossScenePreview(sceneView);

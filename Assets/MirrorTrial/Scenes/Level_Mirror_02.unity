@@ -186,7 +186,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 1.4539776}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -197,7 +197,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.5, y: 9.5}
+  m_Size: {x: 0.5, y: 12.407955}
   m_EdgeRadius: 0
 --- !u!1 &67197756
 GameObject:
@@ -258,7 +258,7 @@ Transform:
   m_GameObject: {fileID: 322619898}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -4.25, z: 0}
+  m_LocalPosition: {x: 0, y: -3.76, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -296,7 +296,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.09709597, y: 0.1948123}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -307,7 +307,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 20.6, y: 1}
+  m_Size: {x: 23.59924, y: 0.41558838}
   m_EdgeRadius: 0
 --- !u!1 &401061417
 GameObject:
@@ -382,6 +382,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 612036116}
     m_Modifications:
+    - target: {fileID: 1904862337998889585, guid: 6ea770a67e146ee489c3ba53c9aa44e5,
+        type: 3}
+      propertyPath: rockfallArea
+      value: 
+      objectReference: {fileID: 2101000004}
     - target: {fileID: 3134675689419246063, guid: 6ea770a67e146ee489c3ba53c9aa44e5,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -501,8 +506,8 @@ Transform:
   m_GameObject: {fileID: 491400502}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.1518, y: 0.0163, z: 0}
-  m_LocalScale: {x: 1.131692, y: 1.1282871, z: 1}
+  m_LocalPosition: {x: -0.02, y: 1.38, z: 0}
+  m_LocalScale: {x: 1.3944811, y: 1.444546, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1769841809}
@@ -623,7 +628,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 1.2083282}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -634,7 +639,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.5, y: 9.5}
+  m_Size: {x: 0.5, y: 11.9166565}
   m_EdgeRadius: 0
 --- !u!1 &612036115
 GameObject:
@@ -668,6 +673,7 @@ Transform:
   - {fileID: 483546777}
   - {fileID: 1554099439}
   - {fileID: 1067146616}
+  - {fileID: 2101000002}
   m_Father: {fileID: 933121678}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &933121676
@@ -825,6 +831,11 @@ MonoBehaviour:
     duration: 1.1
     requiredAmount: 2
     cameraTarget: {fileID: 0}
+    completionType: 0
+    inputAction: 7
+    objectiveTarget: {fileID: 0}
+    requireTargetProximity: 0
+    targetDistance: 2
     cameraSize: 5.5
     blendIn: 0.6
     blendOut: 0.5
@@ -835,6 +846,11 @@ MonoBehaviour:
     duration: 1.5
     requiredAmount: 2
     cameraTarget: {fileID: 0}
+    completionType: 0
+    inputAction: 7
+    objectiveTarget: {fileID: 0}
+    requireTargetProximity: 0
+    targetDistance: 2
     cameraSize: 5.5
     blendIn: 0.6
     blendOut: 0.5
@@ -1298,6 +1314,116 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &2101000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2101000002}
+  - component: {fileID: 2101000003}
+  - component: {fileID: 2101000004}
+  m_Layer: 2
+  m_Name: RockfallArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2101000002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2101000001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.65, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 612036116}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &2101000003
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2101000001}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 1.5927957}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 18, y: 11.18559}
+  m_EdgeRadius: 0
+--- !u!114 &2101000004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2101000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51c1ad07f3d84467ad5ceeb30ac48d82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  firstDelay: 3
+  cooldown: 7
+  waveCount: 3
+  impactsPerWave: 5
+  waveInterval: 0.45
+  perImpactStagger: 0.18
+  impactRadius: 0.8
+  impactSpacingMultiplier: 2.25
+  minimumImpactSpacing: 1.2
+  damage: 1
+  knockback: {x: 1.5, y: 0.3}
+  lockMoment: 0.25
+  releaseMoment: 0.8
+  minimumFallDuration: 0.15
+  recovery: 1.15
+  platformLiftHeight: 2.2
+  platformFramesPerSecond: 12
+  platformPixelsPerUnit: 100
+  platformSurfaceOffset: 0.2
+  safeRadius: 2.4
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

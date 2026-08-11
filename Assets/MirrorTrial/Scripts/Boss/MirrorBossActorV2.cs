@@ -56,6 +56,8 @@ namespace MirrorTrial.Boss
         bool lastAttackWasHeavySlash;
         bool meleeAttackDecisionValid;
         bool meleeHeavySlashSelected;
+        bool externalCombatDriver;
+        bool rockfallInvulnerable;
 
         public State CurrentState { get; private set; } = State.Dormant;
         public int CurrentHitPoints => hitPoints;
@@ -75,6 +77,7 @@ namespace MirrorTrial.Boss
         public bool LastAttackWasHeavySlash => lastAttackWasHeavySlash;
         public float HeavySlashRecovery => profile ? profile.heavySlashRecovery : 1.1f;
         public bool IsActionRunning => action != null;
+        public bool RockfallInvulnerable => rockfallInvulnerable;
         public MirrorBossTacticalAction TacticalDecision => tacticalDecision;
         public int AliveMinionCount => minionController ? minionController.AliveCount : 0;
         public string DisplayName => profile ? profile.displayName : "镜中行刑者";
@@ -257,6 +260,25 @@ namespace MirrorTrial.Boss
             if (CurrentState != State.Launch) StopHorizontal();
         }
 
+        /// <summary>Current facing, exposed so ground-melee BT tasks can pick a side-step direction.</summary>
+        public bool FacingRight => facingRight;
+
+        /// <summary>
+        /// Free horizontal strafe used by the ground-melee behaviour tree for retreat, side-step
+        /// and spacing. Unlike <see cref="BTTickApproach"/> it does NOT stop when inside attack
+        /// range, so the tree fully owns spacing decisions. <paramref name="faceTarget"/> keeps the
+        /// boss looking at the player while back-pedalling; set false for a neutral strafe.
+        /// </summary>
+        public void BTStrafe(float direction, float speedMultiplier = 1f, bool faceTarget = true)
+        {
+            if (!profile || CurrentState == State.Dead || CurrentState == State.PhaseChange ||
+                CurrentState == State.Launch) return;
+            CurrentState = State.Approach;
+            if (faceTarget && target) Face(target.position.x - transform.position.x);
+            else Face(direction);
+            Move(Mathf.Sign(direction), speedMultiplier);
+        }
+
         public void BTPlayStunned()
         {
             if (CurrentState == State.Dead || CurrentState == State.Launch) return;
@@ -271,6 +293,12 @@ namespace MirrorTrial.Boss
             if (minionController) minionController.Configure(profile, arenaLeft, arenaRight);
         }
 
+        /// <summary>Left/right arena edges configured by the coordinator (may be infinite until set).</summary>
+        public float ArenaLeft => arenaLeft;
+        public float ArenaRight => arenaRight;
+        public bool HasArenaBounds => !float.IsInfinity(arenaLeft) && !float.IsInfinity(arenaRight);
+
+
         public void Activate(Transform playerTarget)
         {
             if (!profile || !playerTarget || activated) return;
@@ -281,6 +309,38 @@ namespace MirrorTrial.Boss
             if (behaviourTreeControlled) return;
             CurrentState = State.Intro;
             action = StartCoroutine(IntroRoutine());
+        }
+
+        /// <summary>
+        /// Gives the dedicated two-stage coordinator ownership of decisions while this actor continues
+        /// to own the shared melee combo, heavy-slash, feint, hit reaction and health implementations.
+        /// </summary>
+        public void SetExternalCombatDriver(bool enabled, int fixedPhase = 1)
+        {
+            externalCombatDriver = enabled;
+            if (enabled)
+            {
+                CancelAction();
+                phase = Mathf.Clamp(fixedPhase, 1, 3);
+                tacticalDecisionValid = false;
+                meleeAttackDecisionValid = false;
+                ApplyPhaseTint();
+            }
+        }
+
+        public void ExternalPlayAnimation(string state, float transition = 0.05f)
+        {
+            Play(state, transition);
+        }
+
+        public void ExternalFaceTarget()
+        {
+            FaceTarget();
+        }
+
+        public void SetRockfallInvulnerable(bool value)
+        {
+            rockfallInvulnerable = value && CurrentState != State.Dead;
         }
 
         public void BTRefreshTacticalDecision()
@@ -785,7 +845,18 @@ namespace MirrorTrial.Boss
         void OnDamagePayloadReceived(DamagePayload payload)
         {
             if (CurrentState == State.Dead) return;
-            hitPoints = Mathf.Max(0, hitPoints - Mathf.Max(0, payload.damage));
+            if (rockfallInvulnerable)
+            {
+                var ward = GetComponent<MirrorArcherRockfallPlatformPresentation>();
+                if (ward) ward.PlayBlockedHit();
+                return;
+            }
+            var beforeDamage = hitPoints;
+            var requestedDamage = Mathf.Max(0, payload.damage);
+            hitPoints = Mathf.Max(0, hitPoints - requestedDamage);
+            var actualDamage = beforeDamage - hitPoints;
+            if (actualDamage > 0)
+                DamageDealtEvents.RaisePlayerDamageDealt(new DamageDealtResult(payload.source, gameObject, requestedDamage, actualDamage));
             HealthChanged?.Invoke(this, hitPoints, MaxHitPoints);
             if (hitPoints <= 0) { Die(); return; }
             PlayerAudioFeedback.PlayEnemyHurt();
@@ -804,8 +875,8 @@ namespace MirrorTrial.Boss
             if (CurrentState == State.PhaseChange) return;
 
             var ratio = hitPoints / (float)MaxHitPoints;
-            if (phase == 1 && ratio <= profile.phaseTwoAt) { BeginPhase(2); return; }
-            if (phase == 2 && ratio <= profile.phaseThreeAt) { BeginPhase(3); return; }
+            if (!externalCombatDriver && phase == 1 && ratio <= profile.phaseTwoAt) { BeginPhase(2); return; }
+            if (!externalCombatDriver && phase == 2 && ratio <= profile.phaseThreeAt) { BeginPhase(3); return; }
 
             if (payload.breaksSuperArmor &&
                 (CurrentState == State.TeleportWindup || CurrentState == State.TeleportRecover || CurrentState == State.Summoning))
@@ -838,8 +909,8 @@ namespace MirrorTrial.Boss
         {
             if (CurrentState != State.Launch) return;
             var ratio = hitPoints / (float)MaxHitPoints;
-            if (phase == 1 && ratio <= profile.phaseTwoAt) { BeginPhase(2); return; }
-            if (phase == 2 && ratio <= profile.phaseThreeAt) { BeginPhase(3); return; }
+            if (!externalCombatDriver && phase == 1 && ratio <= profile.phaseTwoAt) { BeginPhase(2); return; }
+            if (!externalCombatDriver && phase == 2 && ratio <= profile.phaseThreeAt) { BeginPhase(3); return; }
             stunnedUntil = 0f;
             CurrentState = State.Approach;
             Play(UsesRangedTeleportKit ? "BowAim" : "SwordIdle", 0.08f);

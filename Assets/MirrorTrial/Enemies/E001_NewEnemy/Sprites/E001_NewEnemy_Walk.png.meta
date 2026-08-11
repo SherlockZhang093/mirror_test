@@ -40,7 +40,7 @@ TextureImporter:
   cubemapConvolution: 0
   seamlessCubemap: 0
   textureFormat: 1
-  maxTextureSize: 2048
+  maxTextureSize: 4096
   textureSettings:
     serializedVersion: 2
     filterMode: 1
@@ -78,7 +78,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 4096
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
@@ -91,7 +91,7 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
-    maxTextureSize: 2048
+    maxTextureSize: 4096
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
@@ -107,14 +107,9 @@ TextureImporter:
     sprites:
     - serializedVersion: 2
       name: E001_NewEnemy_Walk_0
-      rect:
-        serializedVersion: 2
-        x: 56
-        y: 220
-        width: 292
-        height: 255
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      rect: {serializedVersion: 2, x: 0, y: 0, width: 448, height: 320}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0625}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -128,14 +123,9 @@ TextureImporter:
       weights: []
     - serializedVersion: 2
       name: E001_NewEnemy_Walk_1
-      rect:
-        serializedVersion: 2
-        x: 409
-        y: 221
-        width: 301
-        height: 270
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      rect: {serializedVersion: 2, x: 448, y: 0, width: 448, height: 320}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0625}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -149,14 +139,9 @@ TextureImporter:
       weights: []
     - serializedVersion: 2
       name: E001_NewEnemy_Walk_2
-      rect:
-        serializedVersion: 2
-        x: 754
-        y: 222
-        width: 292
-        height: 259
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      rect: {serializedVersion: 2, x: 896, y: 0, width: 448, height: 320}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0625}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -170,14 +155,9 @@ TextureImporter:
       weights: []
     - serializedVersion: 2
       name: E001_NewEnemy_Walk_3
-      rect:
-        serializedVersion: 2
-        x: 1109
-        y: 220
-        width: 294
-        height: 254
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      rect: {serializedVersion: 2, x: 1344, y: 0, width: 448, height: 320}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0625}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -191,14 +171,9 @@ TextureImporter:
       weights: []
     - serializedVersion: 2
       name: E001_NewEnemy_Walk_4
-      rect:
-        serializedVersion: 2
-        x: 1486
-        y: 221
-        width: 295
-        height: 270
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      rect: {serializedVersion: 2, x: 1792, y: 0, width: 448, height: 320}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0625}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -212,14 +187,9 @@ TextureImporter:
       weights: []
     - serializedVersion: 2
       name: E001_NewEnemy_Walk_5
-      rect:
-        serializedVersion: 2
-        x: 1834
-        y: 219
-        width: 293
-        height: 254
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      rect: {serializedVersion: 2, x: 2240, y: 0, width: 448, height: 320}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0625}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []

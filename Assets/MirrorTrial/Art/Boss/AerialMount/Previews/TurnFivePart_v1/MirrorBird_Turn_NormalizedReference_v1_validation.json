@@ -1,0 +1,19 @@
+{
+  "frames": 8,
+  "fps": 16,
+  "canvas": [
+    192,
+    128
+  ],
+  "formal_unity_assets_modified": false,
+  "fixed_scale": 0.38497652582159625,
+  "fixed_source_anchor": [
+    96,
+    550
+  ],
+  "target_anchor": [
+    96,
+    75
+  ],
+  "generated_reference_only": true
+}

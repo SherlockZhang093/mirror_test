@@ -36,6 +36,18 @@ namespace MirrorTrial.Abilities
             return arrow.AddComponent<BowArrowProjectile>();
         }
 
+        public static BowArrowProjectile Create(GameObject projectilePrefab, Vector3 position)
+        {
+            if (!projectilePrefab) return Create(position);
+            var instance = Instantiate(projectilePrefab, position, Quaternion.identity);
+            var projectile = instance.GetComponent<BowArrowProjectile>();
+            if (projectile) return projectile;
+            Debug.LogError("[BowArrowProjectile] Projectile prefab is missing BowArrowProjectile: " +
+                           projectilePrefab.name, projectilePrefab);
+            Destroy(instance);
+            return Create(position);
+        }
+
         public void Launch(DamagePayload nextPayload, Vector2 nextDirection, float nextSpeed, float nextRange)
         {
             Launch(nextPayload, nextDirection, nextSpeed, nextRange, null);
@@ -50,12 +62,26 @@ namespace MirrorTrial.Abilities
             range = nextRange;
             origin = transform.position;
             requiredTarget = onlyDamageTarget;
-            if (direction.x < 0f) transform.localScale = new Vector3(-1f, 1f, 1f);
+            // Arrow prefabs are authored pointing along local +X. Keep the visual aligned with
+            // the actual launch vector so aerial, fan and rain arrows no longer fly sideways.
+            if (direction.sqrMagnitude > 0f)
+                transform.rotation = Quaternion.Euler(0f, 0f,
+                    Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
         }
 
         void Update()
         {
-            transform.position += (Vector3)(direction * speed * Time.deltaTime);
+            var currentPosition = (Vector2)transform.position;
+            var nextPosition = currentPosition + direction * speed * Time.deltaTime;
+            var groundHit = Physics2D.Linecast(currentPosition, nextPosition, LayerMask.GetMask("Ground"));
+            if (groundHit.collider)
+            {
+                transform.position = groundHit.point;
+                Destroy(gameObject);
+                return;
+            }
+
+            transform.position = nextPosition;
             if (Vector3.Distance(origin, transform.position) >= range) Destroy(gameObject);
         }
 

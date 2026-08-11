@@ -1,7 +1,7 @@
 using MirrorTrial.Player;
 using MirrorTrial.Audio;
+using MirrorTrial.Growth;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace MirrorTrial.Level
 {
@@ -23,7 +23,8 @@ namespace MirrorTrial.Level
             if (loading || string.IsNullOrEmpty(nextSceneName))
                 return;
 
-            if (!other.GetComponentInParent<PlayerInputReader>())
+            var playerInput = other.GetComponentInParent<PlayerInputReader>();
+            if (!playerInput)
                 return;
 
             loading = true;
@@ -31,7 +32,15 @@ namespace MirrorTrial.Level
                 GlobalAudioFeedback.PlayComplete();
             else
                 PlayerAudioFeedback.PlayComplete();
-            SceneManager.LoadScene(nextSceneName, LoadSceneMode.Single);
+
+            if (!LevelEndGrowthController.TryShow(playerInput.gameObject, LoadNextScene))
+                loading = false;
+        }
+
+        void LoadNextScene()
+        {
+            if (!GameFlow.LoadSceneWithTransition(nextSceneName))
+                loading = false;
         }
     }
 }

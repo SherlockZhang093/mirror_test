@@ -103,11 +103,20 @@ namespace MirrorTrial.Editor.Level
                     size = size,
                     isBoundary = child.name.Contains("Boundary"),
                     isPlatform = child.name.StartsWith("Platform_") || child.Find("PlatformVisual") != null,
+                    geometryType = ResolveGeometryType(child),
                     platformVisualIndex = ExtractPlatformVisualIndex(child),
                     color = renderer ? renderer.color : Color.white
                 };
                 config.geometry.Add(entry);
             }
+        }
+
+        static GeometryType ResolveGeometryType(Transform geometry)
+        {
+            if (geometry.GetComponent<ClimbableWall>()) return GeometryType.ClimbableWall;
+            if (geometry.name.Contains("Boundary")) return GeometryType.Boundary;
+            if (geometry.name.StartsWith("Platform_") || geometry.Find("PlatformVisual")) return GeometryType.Platform;
+            return GeometryType.SolidBlock;
         }
 
         static int ExtractPlatformVisualIndex(Transform platform)

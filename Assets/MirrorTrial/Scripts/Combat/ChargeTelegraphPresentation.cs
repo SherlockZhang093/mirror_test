@@ -101,6 +101,9 @@ namespace MirrorTrial.Combat
         float tipFlashUntil;
         float readyFlashUntil;
         float fullLockUntil;
+        AudioClip chargingLoopOverride;
+        AudioClip fullChargeCueOverride;
+        bool loopChargingAudioOverride = true;
 
 #if UNITY_EDITOR
         [NonSerialized] bool editorPreviewActive;
@@ -129,9 +132,13 @@ namespace MirrorTrial.Combat
         }
 
         public void Begin(ChargeTelegraphSettings visualSettings, Vector2 chargeOffset, bool pointsRight, Sprite coreSprite = null,
-            float effectAngle = 0f, float readyThresholdOverride = -1f)
+            float effectAngle = 0f, float readyThresholdOverride = -1f,
+            AudioClip loopOverride = null, AudioClip fullCueOverride = null, bool loopChargingAudio = true)
         {
             settings = visualSettings ?? defaultSettings ?? new ChargeTelegraphSettings();
+            chargingLoopOverride = loopOverride;
+            fullChargeCueOverride = fullCueOverride;
+            loopChargingAudioOverride = loopChargingAudio;
             localChargeOffset = chargeOffset;
             localEffectAngle = effectAngle;
             facingRight = pointsRight;
@@ -158,11 +165,13 @@ namespace MirrorTrial.Combat
                     ? Resources.Load<Sprite>("Effects/pixel_charge_star")
                     : coreSprite ? coreSprite : Resources.Load<Sprite>("Effects/pixel_charge_ring");
             SetVisible(true);
-            if (settings.chargingLoop)
+            var chargingLoop = chargingLoopOverride ? chargingLoopOverride : settings.chargingLoop;
+            if (chargingLoop)
             {
-                audioSource.clip = settings.chargingLoop;
+                audioSource.clip = chargingLoop;
                 audioSource.volume = settings.audioVolume;
-                audioSource.loop = true;
+                audioSource.pitch = loopChargingAudioOverride ? 0.82f : 1f;
+                audioSource.loop = loopChargingAudioOverride;
                 audioSource.Play();
             }
             ApplyVisuals();
@@ -173,6 +182,8 @@ namespace MirrorTrial.Combat
             if (!active) return;
             facingRight = pointsRight;
             progress = Mathf.Clamp01(normalized);
+            if (audioSource && audioSource.isPlaying && loopChargingAudioOverride)
+                audioSource.pitch = Mathf.Lerp(0.82f, 1.18f, progress);
             if (!readyCuePlayed && progress >= readyThreshold)
             {
                 readyCuePlayed = true;
@@ -181,7 +192,7 @@ namespace MirrorTrial.Combat
                     EmitPunchLockBurst();
                 PlayOneShot(settings.readyChargeCue);
             }
-            if (!fullCuePlayed && progress >= settings.finalFlashStart)
+            if (!fullCuePlayed && progress >= 1f)
             {
                 fullCuePlayed = true;
                 if (settings.style == ChargeTelegraphStyle.Sword)
@@ -191,7 +202,7 @@ namespace MirrorTrial.Combat
                     fullLockUntil = Time.unscaledTime + 0.2f;
                     EmitPunchFullBurst();
                 }
-                PlayOneShot(settings.fullChargeCue);
+                PlayOneShot(fullChargeCueOverride ? fullChargeCueOverride : settings.fullChargeCue);
             }
             ApplyVisuals();
         }

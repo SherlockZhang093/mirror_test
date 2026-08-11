@@ -15,18 +15,24 @@ namespace MirrorTrial.Editor.Level
     {
         const string FontPath = "Assets/MirrorTrial/Mod Assets/Mod Resources/Fonts/ZCOOLKuaiLe-Regular SDF.asset";
 
+        static readonly StoryTutorialStepType[] StepTypes =
+        {
+            StoryTutorialStepType.Tutorial,
+            StoryTutorialStepType.Monologue,
+            StoryTutorialStepType.SystemMessage,
+            StoryTutorialStepType.CameraShot,
+            StoryTutorialStepType.TitleCard,
+            StoryTutorialStepType.Wait
+        };
+
         static readonly string[] StepNames =
         {
-            "章节标题",
-            "镜头特写",
+            "新手指引",
             "内心独白",
-            "移动教学",
-            "跳跃教学",
-            "攻击教学",
-            "闪避教学",
-            "等待",
-            "生命能量教学",
-            "系统说明"
+            "系统提示",
+            "镜头演出",
+            "章节标题",
+            "等待"
         };
 
         static readonly Color Cyan = new Color(0.22f, 0.82f, 0.95f, 1f);
@@ -111,7 +117,7 @@ namespace MirrorTrial.Editor.Level
             EditorGUILayout.BeginVertical(GUILayout.Width(285f));
             EditorGUILayout.Space(8f);
             EditorGUILayout.LabelField("剧情段落", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField("按触发顺序组织整关叙事", EditorStyles.miniLabel);
+            EditorGUILayout.LabelField("当前关卡的剧情与指引", EditorStyles.miniLabel);
             EditorGUILayout.Space(4f);
 
             sequenceScroll = EditorGUILayout.BeginScrollView(sequenceScroll);
@@ -121,26 +127,18 @@ namespace MirrorTrial.Editor.Level
             }
 
             for (var i = 0; i < sequences.Count; i++)
-                DrawSequenceCard(sequences[i], i);
+                DrawSequenceCard(sequences[i]);
             EditorGUILayout.EndScrollView();
-
-            EditorGUILayout.Space(6f);
-            using (new EditorGUI.DisabledScope(sequences.Count < 2))
-            {
-                if (GUILayout.Button("按列表顺序自动串联", GUILayout.Height(28f)))
-                    ChainInOrder();
-            }
             EditorGUILayout.Space(7f);
             EditorGUILayout.EndVertical();
         }
 
-        void DrawSequenceCard(StoryTutorialSequence sequence, int index)
+        void DrawSequenceCard(StoryTutorialSequence sequence)
         {
             if (!sequence) return;
             var style = sequence == selected ? selectedCardStyle : cardStyle;
             EditorGUILayout.BeginVertical(style);
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label((index + 1).ToString("00"), EditorStyles.miniBoldLabel, GUILayout.Width(24f));
             GUILayout.Label(sequence.DisplayName, EditorStyles.boldLabel);
             GUILayout.FlexibleSpace();
             GUILayout.Label(sequence.Steps.Count + " 步", EditorStyles.miniLabel);
@@ -285,6 +283,10 @@ namespace MirrorTrial.Editor.Level
                 case StorySequenceTriggerMode.PreviousSequenceCompleted:
                     DrawTriggerProperty("previousSequence", "上一剧情段落");
                     break;
+                case StorySequenceTriggerMode.PlayerHealthAtOrBelow:
+                    DrawTriggerProperty("healthThreshold", "生命值不高于");
+                    DrawTriggerProperty("requireLifeEnergy", "仅在拥有生命能量时提醒");
+                    break;
             }
         }
 
@@ -322,6 +324,15 @@ namespace MirrorTrial.Editor.Level
 
         void Select(StoryTutorialSequence sequence)
         {
+            if (sequence && sequence.HasLegacySteps)
+            {
+                Undo.RecordObject(sequence, "升级旧版新手指引");
+                if (sequence.MigrateLegacySteps())
+                {
+                    EditorUtility.SetDirty(sequence);
+                    EditorSceneManager.MarkSceneDirty(sequence.gameObject.scene);
+                }
+            }
             selected = sequence;
             sequenceObject = sequence ? new SerializedObject(sequence) : null;
             var trigger = sequence ? sequence.GetComponent<StorySequenceTrigger>() : null;
@@ -347,14 +358,10 @@ namespace MirrorTrial.Editor.Level
             switch (type)
             {
                 case StoryTutorialStepType.CameraShot: return 142f;
-                case StoryTutorialStepType.Dialogue:
+                case StoryTutorialStepType.Monologue:
                 case StoryTutorialStepType.SystemMessage: return 120f;
                 case StoryTutorialStepType.TitleCard: return 112f;
-                case StoryTutorialStepType.MoveObjective: return 132f;
-                case StoryTutorialStepType.JumpObjective:
-                case StoryTutorialStepType.PrimaryAttackObjective:
-                case StoryTutorialStepType.DodgeObjective:
-                case StoryTutorialStepType.HealthResourceObjective: return 134f;
+                case StoryTutorialStepType.Tutorial: return 222f;
                 default: return 72f;
             }
         }
@@ -369,7 +376,10 @@ namespace MirrorTrial.Editor.Level
             var typeProperty = element.FindPropertyRelative("type");
             var type = (StoryTutorialStepType)typeProperty.enumValueIndex;
             EditorGUI.LabelField(new Rect(inner.x, inner.y, 28f, inner.height), (index + 1).ToString("00"), EditorStyles.miniBoldLabel);
-            typeProperty.enumValueIndex = EditorGUI.Popup(new Rect(inner.x + 30f, inner.y, 145f, inner.height), typeProperty.enumValueIndex, StepNames);
+            var typeIndex = Array.IndexOf(StepTypes, type);
+            if (typeIndex < 0) typeIndex = 0;
+            typeIndex = EditorGUI.Popup(new Rect(inner.x + 30f, inner.y, 145f, inner.height), typeIndex, StepNames);
+            typeProperty.enumValueIndex = (int)StepTypes[typeIndex];
             type = (StoryTutorialStepType)typeProperty.enumValueIndex;
             inner.y += 24f;
 
@@ -385,7 +395,7 @@ namespace MirrorTrial.Editor.Level
                     DrawStepField(element, "duration", "停留时间", ref inner);
                     DrawTwoStepFields(element, "blendIn", "进入过渡", "blendOut", "退出过渡", ref inner);
                     break;
-                case StoryTutorialStepType.Dialogue:
+                case StoryTutorialStepType.Monologue:
                     EditorGUI.LabelField(new Rect(inner.x, inner.y, inner.width, 19f), "第一人称内心独白，不显示说话人", EditorStyles.miniLabel);
                     inner.y += 22f;
                     DrawStepText(element, ref inner, "独白内容", 46f);
@@ -395,21 +405,8 @@ namespace MirrorTrial.Editor.Level
                     inner.y += 22f;
                     DrawStepText(element, ref inner, "说明内容", 46f);
                     break;
-                case StoryTutorialStepType.MoveObjective:
-                    DrawStepField(element, "text", "教学目标", ref inner);
-                    DrawStepField(element, "hint", "按键提示", ref inner);
-                    DrawStepField(element, "requiredAmount", "移动距离", ref inner);
-                    break;
-                case StoryTutorialStepType.JumpObjective:
-                case StoryTutorialStepType.PrimaryAttackObjective:
-                case StoryTutorialStepType.DodgeObjective:
-                    DrawStepField(element, "text", "教学目标", ref inner);
-                    DrawStepField(element, "hint", "按键提示", ref inner);
-                    break;
-                case StoryTutorialStepType.HealthResourceObjective:
-                    DrawStepField(element, "cameraTarget", "生命能量目标", ref inner);
-                    DrawStepField(element, "text", "教学目标", ref inner);
-                    DrawStepField(element, "hint", "按键提示", ref inner);
+                case StoryTutorialStepType.Tutorial:
+                    DrawTutorialStep(element, ref inner);
                     break;
                 case StoryTutorialStepType.Wait:
                     DrawStepField(element, "duration", "等待时间", ref inner);
@@ -417,6 +414,43 @@ namespace MirrorTrial.Editor.Level
             }
         }
 
+        void DrawTutorialStep(SerializedProperty element, ref Rect inner)
+        {
+            DrawStepField(element, "text", "指引目标", ref inner);
+            DrawStepField(element, "hint", "操作提示", ref inner);
+            DrawStepField(element, "completionType", "完成条件", ref inner);
+            var completion = (StoryTutorialCompletionType)element.FindPropertyRelative("completionType").enumValueIndex;
+            switch (completion)
+            {
+                case StoryTutorialCompletionType.PressInput:
+                    DrawStepField(element, "inputAction", "玩家操作", ref inner);
+                    DrawStepField(element, "requireTargetProximity", "需要靠近目标", ref inner);
+                    if (element.FindPropertyRelative("requireTargetProximity").boolValue)
+                    {
+                        DrawStepField(element, "objectiveTarget", "交互目标", ref inner);
+                        DrawStepField(element, "targetDistance", "有效距离", ref inner);
+                    }
+                    break;
+                case StoryTutorialCompletionType.MoveDistance:
+                    DrawStepField(element, "requiredAmount", "移动距离", ref inner);
+                    break;
+                case StoryTutorialCompletionType.ReachTarget:
+                    DrawStepField(element, "objectiveTarget", "到达目标", ref inner);
+                    DrawStepField(element, "targetDistance", "完成距离", ref inner);
+                    break;
+                case StoryTutorialCompletionType.TargetCompleted:
+                    DrawStepField(element, "objectiveTarget", "目标对象", ref inner);
+                    break;
+                case StoryTutorialCompletionType.WaitForSeconds:
+                    DrawStepField(element, "duration", "持续时间", ref inner);
+                    break;
+                case StoryTutorialCompletionType.ExternalSignal:
+                    EditorGUI.LabelField(new Rect(inner.x, inner.y, inner.width, 19f), "由机关、任务或其他脚本通知完成", EditorStyles.miniLabel);
+                    inner.y += 22f;
+                    break;
+
+            }
+        }
         void DrawStepField(SerializedProperty element, string propertyName, string label, ref Rect rect)
         {
             var property = element.FindPropertyRelative(propertyName);
@@ -444,7 +478,7 @@ namespace MirrorTrial.Editor.Level
             var menu = new GenericMenu();
             for (var i = 0; i < StepNames.Length; i++)
             {
-                var type = (StoryTutorialStepType)i;
+                var type = StepTypes[i];
                 menu.AddItem(new GUIContent(StepNames[i]), false, () => AddStep(type));
             }
             menu.ShowAsContext();
@@ -462,8 +496,13 @@ namespace MirrorTrial.Editor.Level
             element.FindPropertyRelative("text").stringValue = DefaultText(type);
             element.FindPropertyRelative("hint").stringValue = DefaultHint(type);
             element.FindPropertyRelative("duration").floatValue = type == StoryTutorialStepType.TitleCard ? 1.5f : 1f;
-            element.FindPropertyRelative("requiredAmount").floatValue = type == StoryTutorialStepType.MoveObjective ? 2.5f : 1f;
+            element.FindPropertyRelative("requiredAmount").floatValue = 1f;
             element.FindPropertyRelative("cameraTarget").objectReferenceValue = null;
+            element.FindPropertyRelative("completionType").enumValueIndex = (int)StoryTutorialCompletionType.PressInput;
+            element.FindPropertyRelative("inputAction").enumValueIndex = (int)StoryTutorialInputAction.Interact;
+            element.FindPropertyRelative("objectiveTarget").objectReferenceValue = null;
+            element.FindPropertyRelative("requireTargetProximity").boolValue = false;
+            element.FindPropertyRelative("targetDistance").floatValue = 2f;
             element.FindPropertyRelative("cameraSize").floatValue = 5.5f;
             element.FindPropertyRelative("blendIn").floatValue = 0.6f;
             element.FindPropertyRelative("blendOut").floatValue = 0.5f;
@@ -490,22 +529,6 @@ namespace MirrorTrial.Editor.Level
             Refresh();
             Select(sequence);
             Selection.activeGameObject = go;
-        }
-
-        void ChainInOrder()
-        {
-            for (var i = 0; i < sequences.Count; i++)
-            {
-                var trigger = sequences[i].GetComponent<StorySequenceTrigger>();
-                if (!trigger) trigger = Undo.AddComponent<StorySequenceTrigger>(sequences[i].gameObject);
-                var serialized = new SerializedObject(trigger);
-                serialized.FindProperty("sequence").objectReferenceValue = sequences[i];
-                serialized.FindProperty("nextSequence").objectReferenceValue = i + 1 < sequences.Count ? sequences[i + 1] : null;
-                serialized.ApplyModifiedProperties();
-                EditorUtility.SetDirty(trigger);
-            }
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-            Select(selected);
         }
 
         void Refresh()
@@ -560,6 +583,7 @@ namespace MirrorTrial.Editor.Level
                 case StorySequenceTriggerMode.MirrorSmashed: return "镜门击碎";
                 case StorySequenceTriggerMode.MirrorCompleted: return "镜中战斗完成";
                 case StorySequenceTriggerMode.PreviousSequenceCompleted: return "上一段完成";
+                case StorySequenceTriggerMode.PlayerHealthAtOrBelow: return "玩家生命值过低";
                 default: return "手动触发";
             }
         }
@@ -569,13 +593,9 @@ namespace MirrorTrial.Editor.Level
             switch (type)
             {
                 case StoryTutorialStepType.TitleCard: return "新章节";
-                case StoryTutorialStepType.Dialogue: return "在这里输入第一人称独白……";
+                case StoryTutorialStepType.Monologue: return "在这里输入第一人称独白……";
                 case StoryTutorialStepType.SystemMessage: return "在这里输入玩法说明……";
-                case StoryTutorialStepType.MoveObjective: return "移动";
-                case StoryTutorialStepType.JumpObjective: return "跳跃";
-                case StoryTutorialStepType.PrimaryAttackObjective: return "攻击";
-                case StoryTutorialStepType.DodgeObjective: return "闪避";
-                case StoryTutorialStepType.HealthResourceObjective: return "打碎生命能量";
+                case StoryTutorialStepType.Tutorial: return "完成新手指引";
                 default: return string.Empty;
             }
         }
@@ -584,11 +604,7 @@ namespace MirrorTrial.Editor.Level
         {
             switch (type)
             {
-                case StoryTutorialStepType.MoveObjective: return "A / D 或 ← / →  移动";
-                case StoryTutorialStepType.JumpObjective: return "空格  跳跃";
-                case StoryTutorialStepType.PrimaryAttackObjective: return "J 或鼠标左键  攻击";
-                case StoryTutorialStepType.DodgeObjective: return "左 Shift  闪避";
-                case StoryTutorialStepType.HealthResourceObjective: return "J 或鼠标左键  攻击";
+                case StoryTutorialStepType.Tutorial: return "E  交互";
                 default: return string.Empty;
             }
         }

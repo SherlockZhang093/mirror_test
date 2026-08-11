@@ -68,16 +68,22 @@ namespace MirrorTrial.Editor
                     EditorGUILayout.PropertyField(graph.FindPropertyRelative("name"), new GUIContent("名称"));
                     EditorGUILayout.PropertyField(graph.FindPropertyRelative("weaponType"), new GUIContent("所属武器"));
                 }
-                DrawCommandPopup(graph.FindPropertyRelative("entryInput"), new GUIContent("起手输入"));
+                var hasEntryDecision = !string.IsNullOrEmpty(graph.FindPropertyRelative("entryDecisionId").stringValue);
+                DrawCommandPopup(graph.FindPropertyRelative("entryInput"), new GUIContent(
+                    hasEntryDecision ? "备用起手输入" : "起手输入",
+                    hasEntryDecision ? "起手判定节点停用或删除时使用。" : "开始这套连招的输入。"));
             }
 
             var moves = graph.FindPropertyRelative("instances");
             var links = graph.FindPropertyRelative("transitions");
-            DrawComboComposition(graph, moves, links);
+            var decisions = graph.FindPropertyRelative("inputDecisions");
+            DrawComboComposition(graph, moves, links, decisions);
             if (moves.arraySize > 0)
             {
                 selectedGraphMoveIndex = Mathf.Clamp(selectedGraphMoveIndex, 0, moves.arraySize - 1);
-                if (selectedTransitionIndex >= 0 && selectedTransitionIndex < links.arraySize)
+                if (selectedDecisionIndex >= 0 && selectedDecisionIndex < decisions.arraySize)
+                    DrawSelectedDecisionEditor(graph, decisions.GetArrayElementAtIndex(selectedDecisionIndex), selectedDecisionIndex, moves);
+                else if (selectedTransitionIndex >= 0 && selectedTransitionIndex < links.arraySize)
                     DrawSelectedConnectionEditor(links.GetArrayElementAtIndex(selectedTransitionIndex), selectedTransitionIndex, moves);
                 else
                     DrawSelectedMoveEditor(moves.GetArrayElementAtIndex(selectedGraphMoveIndex), selectedGraphMoveIndex);
@@ -91,7 +97,7 @@ namespace MirrorTrial.Editor
             public Rect rect;
         }
 
-        void DrawComboComposition(SerializedProperty graph, SerializedProperty moves, SerializedProperty links)
+        void DrawComboComposition(SerializedProperty graph, SerializedProperty moves, SerializedProperty links, SerializedProperty decisions)
         {
             EditorGUILayout.Space(6f);
             using (new EditorGUILayout.HorizontalScope())
@@ -100,6 +106,7 @@ namespace MirrorTrial.Editor
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button("\u81ea\u52a8\u6574\u7406", GUILayout.Width(72f))) { AutoArrangeCurrentGraph(); return; }
                 if (GUILayout.Button("添加招式", GUILayout.Width(82f))) { AddComboMove(false); return; }
+                if (GUILayout.Button("添加判定", GUILayout.Width(82f))) { AddInputDecisionAt(new Vector2(40f, 40f)); return; }
                 using (new EditorGUI.DisabledScope(moves.arraySize == 0))
                     if (GUILayout.Button("复制所选", GUILayout.Width(72f))) { AddComboMove(true); return; }
             }
@@ -112,19 +119,23 @@ namespace MirrorTrial.Editor
             var labels = BuildNameLabels(moves, "招式");
             var entryId = graph.FindPropertyRelative("entryInstanceId");
             var entryIndex = FindStringIndex(moves, "id", entryId.stringValue);
-            entryIndex = EditorGUILayout.Popup("起手招式", Mathf.Max(0, entryIndex), labels);
+            var hasEntryDecision = !string.IsNullOrEmpty(graph.FindPropertyRelative("entryDecisionId").stringValue);
+            entryIndex = EditorGUILayout.Popup(hasEntryDecision ? "点按默认招式" : "起手招式",
+                Mathf.Max(0, entryIndex), labels);
             entryId.stringValue = moves.GetArrayElementAtIndex(entryIndex).FindPropertyRelative("id").stringValue;
 
-            DrawComboGraphCanvas(moves, links, entryId.stringValue, labels);
+            DrawComboGraphCanvas(graph, moves, links, decisions, entryId.stringValue, labels);
 
             connectionSettingsExpanded = EditorGUILayout.Foldout(connectionSettingsExpanded, "连接参数（需要调整输入窗口时展开）", true, EditorStyles.foldoutHeader);
             if (connectionSettingsExpanded)
                 DrawComboTransitions(links, moves);
         }
 
-        void DrawComboGraphCanvas(SerializedProperty moves, SerializedProperty links, string entryId, string[] labels)
+        void DrawComboGraphCanvas(SerializedProperty graph, SerializedProperty moves, SerializedProperty links,
+            SerializedProperty decisions, string entryId, string[] labels)
         {
             var layouts = BuildComboLayouts(moves);
+            var decisionLayouts = BuildDecisionLayouts(decisions);
             var maxX = 620f;
             var maxY = 190f;
             for (var i = 0; i < layouts.Count; i++)
@@ -132,15 +143,22 @@ namespace MirrorTrial.Editor
                 maxX = Mathf.Max(maxX, layouts[i].rect.xMax + 45f);
                 maxY = Mathf.Max(maxY, layouts[i].rect.yMax + 40f);
             }
+            for (var i = 0; i < decisionLayouts.Count; i++)
+            {
+                maxX = Mathf.Max(maxX, decisionLayouts[i].rect.xMax + 65f);
+                maxY = Mathf.Max(maxY, decisionLayouts[i].rect.yMax + 40f);
+            }
 
             comboGraphScroll = EditorGUILayout.BeginScrollView(comboGraphScroll, true, false, GUILayout.Height(Mathf.Min(420f, maxY + 18f)));
             var canvas = GUILayoutUtility.GetRect(maxX, maxY);
             lastGraphCanvasRect = canvas;
             EditorGUI.DrawRect(canvas, new Color(0.12f, 0.13f, 0.15f, 1f));
             DrawComboEdges(canvas, layouts, moves, links);
-            DrawConnectionPreview(canvas, layouts);
+            DrawDecisionEdges(canvas, layouts, decisionLayouts, moves, decisions);
+            DrawConnectionPreview(canvas, layouts, decisionLayouts);
             DrawComboNodes(canvas, layouts, moves, entryId, labels);
-            HandleCanvasContextMenu(canvas, layouts);
+            DrawDecisionNodes(canvas, decisionLayouts, decisions, graph.FindPropertyRelative("entryDecisionId").stringValue);
+            HandleCanvasContextMenu(canvas, layouts, decisionLayouts);
             HandleGraphDeleteShortcut();
             EditorGUILayout.EndScrollView();
         }
@@ -156,27 +174,42 @@ namespace MirrorTrial.Editor
             return layouts;
         }
 
-        void DrawConnectionPreview(Rect canvas, List<ComboNodeLayout> layouts)
+        void DrawConnectionPreview(Rect canvas, List<ComboNodeLayout> layouts, List<ComboDecisionLayout> decisionLayouts)
         {
-            if (connectingFromNodeIndex < 0 || connectingFromNodeIndex >= layouts.Count) return;
-            var from = OffsetRect(layouts[connectingFromNodeIndex].rect, canvas.position);
-            var start = new Vector3(from.xMax, from.center.y);
+            Vector3 start;
+            Color color;
+            if (connectingFromDecisionIndex >= 0 && connectingFromDecisionIndex < decisionLayouts.Count)
+            {
+                var fromDecision = OffsetRect(decisionLayouts[connectingFromDecisionIndex].rect, canvas.position);
+                start = DecisionOutputCenter(fromDecision, connectingDecisionBranch);
+                color = connectingDecisionBranch == 0 ? TapDecisionColor : HoldDecisionColor;
+            }
+            else
+            {
+                if (connectingFromNodeIndex < 0 || connectingFromNodeIndex >= layouts.Count) return;
+                var from = OffsetRect(layouts[connectingFromNodeIndex].rect, canvas.position);
+                start = new Vector3(from.xMax, from.center.y);
+                color = new Color(0.3f, 0.9f, 1f);
+            }
             var end = (Vector3)Event.current.mousePosition;
             Handles.BeginGUI();
-            Handles.DrawBezier(start, end, start + Vector3.right * 70f, end + Vector3.left * 70f, new Color(0.3f, 0.9f, 1f), null, 3f);
+            Handles.DrawBezier(start, end, start + Vector3.right * 70f, end + Vector3.left * 70f, color, null, 3f);
             Handles.EndGUI();
             Repaint();
         }
 
-        void HandleCanvasContextMenu(Rect canvas, List<ComboNodeLayout> layouts)
+        void HandleCanvasContextMenu(Rect canvas, List<ComboNodeLayout> layouts, List<ComboDecisionLayout> decisionLayouts)
         {
             var evt = Event.current;
             if (evt.type != EventType.ContextClick || !canvas.Contains(evt.mousePosition)) return;
             for (var i = 0; i < layouts.Count; i++)
                 if (OffsetRect(layouts[i].rect, canvas.position).Contains(evt.mousePosition)) return;
+            for (var i = 0; i < decisionLayouts.Count; i++)
+                if (OffsetRect(decisionLayouts[i].rect, canvas.position).Contains(evt.mousePosition)) return;
             var graphPosition = evt.mousePosition - canvas.position;
             var menu = new GenericMenu();
             menu.AddItem(new GUIContent("新建招式"), false, () => AddComboMoveAt(graphPosition));
+            menu.AddItem(new GUIContent("新建点按 / 长按判定"), false, () => AddInputDecisionAt(graphPosition));
             menu.AddItem(new GUIContent("自动整理"), false, AutoArrangeCurrentGraph);
             menu.ShowAsContext();
             evt.Use();
@@ -189,6 +222,12 @@ namespace MirrorTrial.Editor
             if (selectedTransitionIndex >= 0)
             {
                 DeleteComboTransition(selectedTransitionIndex);
+                evt.Use();
+                return;
+            }
+            if (selectedDecisionIndex >= 0)
+            {
+                DeleteInputDecision(selectedDecisionIndex);
                 evt.Use();
                 return;
             }
@@ -239,6 +278,7 @@ namespace MirrorTrial.Editor
             if (clickedLink >= 0)
             {
                 selectedTransitionIndex = clickedLink;
+                selectedDecisionIndex = -1;
                 draggingNodeIndex = -1;
                 connectingFromNodeIndex = -1;
                 evt.Use();
@@ -272,7 +312,7 @@ namespace MirrorTrial.Editor
                 var nodeId = node.FindPropertyRelative("id").stringValue;
                 var isEntry = nodeId == entryId;
                 var isRuntime = IsRuntimePreviewMove(nodeId);
-                var isSelected = layout.index == selectedGraphMoveIndex && selectedTransitionIndex < 0;
+                var isSelected = layout.index == selectedGraphMoveIndex && selectedTransitionIndex < 0 && selectedDecisionIndex < 0;
                 var charge = node.FindPropertyRelative("enableCharge").boolValue;
                 var heavy = move != null && move.FindPropertyRelative("attackType").enumValueIndex == 1;
 
@@ -288,7 +328,8 @@ namespace MirrorTrial.Editor
                 if (isRuntime) DrawRectOutline(rect, new Color(0.35f, 1f, 0.38f), 4f);
                 else if (isSelected) DrawRectOutline(rect, new Color(0.25f, 0.85f, 1f), 3f);
             }
-            HandleConnectionRelease(evt, canvas, layouts);
+            HandleConnectionRelease(evt, canvas, layouts, BuildDecisionLayouts(
+                serializedCombat.FindProperty("comboGraphs").GetArrayElementAtIndex(selectedGraphIndex).FindPropertyRelative("inputDecisions")));
             if (evt.type == EventType.MouseUp && evt.button == 0) draggingNodeIndex = -1;
         }
 
@@ -297,8 +338,10 @@ namespace MirrorTrial.Editor
             if (evt.type == EventType.MouseDown && evt.button == 0 && outputPort.Contains(evt.mousePosition))
             {
                 connectingFromNodeIndex = index;
+                connectingFromDecisionIndex = -1;
                 selectedGraphMoveIndex = index;
                 selectedTransitionIndex = -1;
+                selectedDecisionIndex = -1;
                 evt.Use();
                 return;
             }
@@ -307,6 +350,7 @@ namespace MirrorTrial.Editor
                 selectedGraphMoveIndex = index;
                 selectedComboIndex = index;
                 selectedTransitionIndex = -1;
+                selectedDecisionIndex = -1;
                 currentFrame = 0;
                 animationPlaying = false;
                 draggingNodeIndex = index;
@@ -338,7 +382,7 @@ namespace MirrorTrial.Editor
             }
         }
 
-        void HandleConnectionRelease(Event evt, Rect canvas, List<ComboNodeLayout> layouts)
+        void HandleConnectionRelease(Event evt, Rect canvas, List<ComboNodeLayout> layouts, List<ComboDecisionLayout> decisionLayouts)
         {
             if (evt.type != EventType.MouseUp || evt.button != 0 || connectingFromNodeIndex < 0) return;
             var target = -1;
@@ -350,7 +394,17 @@ namespace MirrorTrial.Editor
             }
             var source = connectingFromNodeIndex;
             connectingFromNodeIndex = -1;
-            if (target >= 0 && target != source) CreateGraphConnection(source, target);
+            var decisionTarget = -1;
+            for (var i = 0; i < decisionLayouts.Count; i++)
+            {
+                var rect = OffsetRect(decisionLayouts[i].rect, canvas.position);
+                var inputPort = new Rect(rect.x - 12f, rect.center.y - 14f, 28f, 28f);
+                if (inputPort.Contains(evt.mousePosition)) { decisionTarget = i; break; }
+            }
+            if (decisionTarget >= 0)
+                ConnectMoveToDecision(source, decisionTarget);
+            else if (target >= 0 && target != source)
+                CreateGraphConnection(source, target);
             evt.Use();
             Repaint();
         }
@@ -373,7 +427,7 @@ namespace MirrorTrial.Editor
         string BuildTransitionLabel(SerializedProperty link)
         {
             var condition = (ComboInputCondition)link.FindPropertyRelative("condition").enumValueIndex;
-            var text = condition == ComboInputCondition.Press ? "点击" : condition == ComboInputCondition.Tap ? "轻点" : condition == ComboInputCondition.Hold ? "按住" : "松开";
+            var text = condition == ComboInputCondition.Press ? "点击" : condition == ComboInputCondition.Tap ? "点按" : condition == ComboInputCondition.Hold ? "按住" : "松开";
             var command = (PlayerInputCommand)link.FindPropertyRelative("input").enumValueIndex;
             for (var i = 0; i < CommandValues.Length; i++) if (CommandValues[i] == command) { text += " " + CommandLabels[i]; break; }
             if (link.FindPropertyRelative("requiresHit").boolValue) text += " · 需命中";
@@ -556,9 +610,16 @@ namespace MirrorTrial.Editor
 
                 var autoRelease = node.FindPropertyRelative("autoReleaseAtFullCharge");
                 EditorGUILayout.PropertyField(autoRelease, new GUIContent("蓄满后自动出招", "关闭时，蓄满后会保持满蓄力，直到玩家松开按键。"));
+                if (!autoRelease.boolValue)
+                {
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.PropertyField(node.FindPropertyRelative("fullChargeHoldLimit"),
+                        new GUIContent("满蓄力保持上限", "蓄满后还能保持的时间；倒计时结束会自动释放攻击。"));
+                    EditorGUI.indentLevel--;
+                }
                 EditorGUILayout.HelpBox(autoRelease.boolValue
                     ? "当前释放方式：达到满蓄力后自动出招。"
-                    : "当前释放方式：可以一直按住；蓄满后保持，松开按键才出招。", MessageType.None);
+                    : "当前释放方式：蓄满后开始倒计时；松开按键或倒计时结束时出招。", MessageType.None);
 
                 EditorGUILayout.Space(3f);
                 EditorGUILayout.LabelField("蓄力表现", EditorStyles.boldLabel);
@@ -576,6 +637,13 @@ EditorGUILayout.PropertyField(
                     EditorGUILayout.HelpBox("这里只选择 Prefab 和调整挂点位置。特效外观请直接打开 Prefab 调整。", MessageType.Info);
                     EditorGUI.indentLevel--;
                 }
+
+                EditorGUILayout.Space(3f);
+                EditorGUILayout.LabelField("蓄力倒计时 UI", EditorStyles.boldLabel);
+                EditorGUILayout.PropertyField(node.FindPropertyRelative("chargeCountdownPrefab"),
+                    new GUIContent("倒计时 Prefab", "留空时使用 Resources/Effects/PlayerChargeCountdownUI 默认 Prefab。"));
+                EditorGUILayout.PropertyField(node.FindPropertyRelative("chargeCountdownOffset"),
+                    new GUIContent("倒计时位置偏移"));
             }
         }
         void DrawComboTransitions(SerializedProperty links, SerializedProperty moves)
@@ -676,6 +744,7 @@ EditorGUILayout.PropertyField(
             combat.ComboGraphs.Add(new PlayerComboGraph { name = "新连招" });
             selectedGraphIndex = combat.ComboGraphs.Count - 1;
             selectedGraphMoveIndex = 0;
+            selectedDecisionIndex = -1;
             RefreshAfterStructureChange();
         }
 
@@ -686,6 +755,7 @@ EditorGUILayout.PropertyField(
             if (combat.ComboGraphs.Count > 0) combat.ComboGraphs.RemoveAt(Mathf.Clamp(selectedGraphIndex, 0, combat.ComboGraphs.Count - 1));
             selectedGraphIndex = Mathf.Max(0, selectedGraphIndex - 1);
             selectedGraphMoveIndex = 0;
+            selectedDecisionIndex = -1;
             RefreshAfterStructureChange();
         }
 
@@ -712,9 +782,18 @@ EditorGUILayout.PropertyField(
             var id = graph.instances[index].id;
             graph.instances.RemoveAt(index);
             graph.transitions.RemoveAll(x => x.fromInstanceId == id || x.toInstanceId == id);
+            for (var i = 0; i < graph.inputDecisions.Count; i++)
+            {
+                var decision = graph.inputDecisions[i];
+                if (decision.sourceInstanceId == id) decision.sourceInstanceId = string.Empty;
+                if (decision.tapTargetInstanceId == id) decision.tapTargetInstanceId = string.Empty;
+                if (decision.holdTargetInstanceId == id) decision.holdTargetInstanceId = string.Empty;
+                if (decision.noInputTargetInstanceId == id) decision.noInputTargetInstanceId = string.Empty;
+            }
             if (graph.entryInstanceId == id) graph.entryInstanceId = graph.instances.Count > 0 ? graph.instances[0].id : string.Empty;
             selectedGraphMoveIndex = Mathf.Max(0, selectedGraphMoveIndex - 1);
             selectedTransitionIndex = -1;
+            selectedDecisionIndex = -1;
             RefreshAfterStructureChange();
         }
 
@@ -738,6 +817,7 @@ EditorGUILayout.PropertyField(
             Undo.RecordObject(combat, "删除连招连接");
             combat.ComboGraphs[selectedGraphIndex].transitions.RemoveAt(index);
             selectedTransitionIndex = -1;
+            selectedDecisionIndex = -1;
             RefreshAfterStructureChange();
         }
 
@@ -757,6 +837,7 @@ EditorGUILayout.PropertyField(
             if (string.IsNullOrEmpty(graph.entryInstanceId)) graph.entryInstanceId = node.id;
             selectedGraphMoveIndex = graph.instances.Count - 1;
             selectedTransitionIndex = -1;
+            selectedDecisionIndex = -1;
             RefreshAfterStructureChange();
         }
 
@@ -847,6 +928,20 @@ EditorGUILayout.PropertyField(
                 var row = cursor.TryGetValue(depth[i], out var current) ? current : 0;
                 cursor[depth[i]] = row + 1;
                 graph.instances[i].graphPosition = new Vector2(35f + depth[i] * 225f, 28f + (row + (maxRows - rows[depth[i]]) * 0.5f) * 105f);
+            }
+            for (var i = 0; i < graph.inputDecisions.Count; i++)
+            {
+                var decision = graph.inputDecisions[i];
+                var source = graph.instances.Find(move => move.id == decision.sourceInstanceId);
+                if (source != null)
+                    decision.graphPosition = source.graphPosition + new Vector2(172f, -9f);
+                else
+                {
+                    var tap = graph.instances.Find(move => move.id == decision.tapTargetInstanceId);
+                    decision.graphPosition = tap != null
+                        ? new Vector2(Mathf.Max(18f, tap.graphPosition.x - 172f), tap.graphPosition.y - 9f)
+                        : new Vector2(18f, 28f + i * 100f);
+                }
             }
             RefreshAfterStructureChange();
         }

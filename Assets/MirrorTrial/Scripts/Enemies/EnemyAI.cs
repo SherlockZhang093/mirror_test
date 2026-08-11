@@ -556,9 +556,13 @@ namespace MirrorTrial.Enemies
             if (CurrentState == State.Dead) return;
 
             var beforeDamage = currentHitPoints;
-            currentHitPoints = Mathf.Max(0, currentHitPoints - payload.damage);
+            var requestedDamage = Mathf.Max(0, payload.damage);
+            currentHitPoints = Mathf.Max(0, currentHitPoints - requestedDamage);
+            var actualDamage = beforeDamage - currentHitPoints;
+            if (actualDamage > 0)
+                DamageDealtEvents.RaisePlayerDamageDealt(new DamageDealtResult(payload.source, gameObject, requestedDamage, actualDamage));
             if (damageVisual)
-                damageVisual.PlayDamage(beforeDamage - currentHitPoints, MaxHitPoints);
+                damageVisual.PlayDamage(actualDamage, MaxHitPoints);
 
             pendingDeath = currentHitPoints <= 0;
             if (pendingDeath)

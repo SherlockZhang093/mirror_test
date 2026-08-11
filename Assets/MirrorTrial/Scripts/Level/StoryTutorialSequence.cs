@@ -14,16 +14,39 @@ namespace MirrorTrial.Level
 {
     public enum StoryTutorialStepType
     {
-        TitleCard,
-        CameraShot,
-        Dialogue,
-        MoveObjective,
-        JumpObjective,
-        PrimaryAttackObjective,
-        DodgeObjective,
-        Wait,
-        HealthResourceObjective,
-        SystemMessage
+        TitleCard = 0,
+        CameraShot = 1,
+        Monologue = 2,
+        [Obsolete("Use Tutorial with a completion condition.")] MoveObjective = 3,
+        [Obsolete("Use Tutorial with a completion condition.")] JumpObjective = 4,
+        [Obsolete("Use Tutorial with a completion condition.")] PrimaryAttackObjective = 5,
+        [Obsolete("Use Tutorial with a completion condition.")] DodgeObjective = 6,
+        Wait = 7,
+        [Obsolete("Use Tutorial with a completion condition.")] HealthResourceObjective = 8,
+        SystemMessage = 9,
+        Tutorial = 10
+    }
+
+    public enum StoryTutorialCompletionType
+    {
+        [InspectorName("按下指定操作")] PressInput,
+        [InspectorName("移动指定距离")] MoveDistance,
+        [InspectorName("到达指定目标")] ReachTarget,
+        [InspectorName("目标完成或消失")] TargetCompleted,
+        [InspectorName("等待一定时间")] WaitForSeconds,
+        [InspectorName("由外部事件通知")] ExternalSignal
+    }
+
+    public enum StoryTutorialInputAction
+    {
+        [InspectorName("跳跃")] Jump,
+        [InspectorName("主要攻击")] PrimaryAttack,
+        [InspectorName("次要攻击")] SecondaryAttack,
+        [InspectorName("武器技能")] WeaponSkill,
+        [InspectorName("移动技能")] MobilitySkill,
+        [InspectorName("闪避")] Dodge,
+        [InspectorName("恢复")] Recover,
+        [InspectorName("交互")] Interact
     }
 
     [Serializable]
@@ -36,9 +59,58 @@ namespace MirrorTrial.Level
         [Min(0f)] public float duration = 1.5f;
         [Min(0.1f)] public float requiredAmount = 2f;
         public Transform cameraTarget;
+        public StoryTutorialCompletionType completionType = StoryTutorialCompletionType.PressInput;
+        public StoryTutorialInputAction inputAction = StoryTutorialInputAction.Interact;
+        public Transform objectiveTarget;
+        public bool requireTargetProximity;
+        [Min(0.1f)] public float targetDistance = 2f;
         [Min(1f)] public float cameraSize = 5.5f;
         [Min(0f)] public float blendIn = 0.6f;
         [Min(0f)] public float blendOut = 0.5f;
+
+        public bool IsLegacyTutorialType
+        {
+            get
+            {
+                var value = (int)type;
+                return (value >= 3 && value <= 6) || value == 8;
+            }
+        }
+
+        public bool MigrateLegacyTutorialType()
+        {
+#pragma warning disable CS0618
+            switch (type)
+            {
+                case StoryTutorialStepType.MoveObjective:
+                    type = StoryTutorialStepType.Tutorial;
+                    completionType = StoryTutorialCompletionType.MoveDistance;
+                    return true;
+                case StoryTutorialStepType.JumpObjective:
+                    type = StoryTutorialStepType.Tutorial;
+                    completionType = StoryTutorialCompletionType.PressInput;
+                    inputAction = StoryTutorialInputAction.Jump;
+                    return true;
+                case StoryTutorialStepType.PrimaryAttackObjective:
+                    type = StoryTutorialStepType.Tutorial;
+                    completionType = StoryTutorialCompletionType.PressInput;
+                    inputAction = StoryTutorialInputAction.PrimaryAttack;
+                    return true;
+                case StoryTutorialStepType.DodgeObjective:
+                    type = StoryTutorialStepType.Tutorial;
+                    completionType = StoryTutorialCompletionType.PressInput;
+                    inputAction = StoryTutorialInputAction.Dodge;
+                    return true;
+                case StoryTutorialStepType.HealthResourceObjective:
+                    type = StoryTutorialStepType.Tutorial;
+                    completionType = StoryTutorialCompletionType.TargetCompleted;
+                    objectiveTarget = objectiveTarget ? objectiveTarget : cameraTarget;
+                    return true;
+                default:
+                    return false;
+            }
+#pragma warning restore CS0618
+        }
     }
 
     /// <summary>
@@ -78,6 +150,7 @@ namespace MirrorTrial.Level
         Transform player;
         Coroutine routine;
         bool inputLocked;
+        bool tutorialCompletedExternally;
         float skipHeld;
 
         CanvasGroup rootGroup;
@@ -99,6 +172,7 @@ namespace MirrorTrial.Level
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
         public string SequenceId => sequenceId;
         public IReadOnlyList<StoryTutorialStep> Steps => steps;
+        public bool HasLegacySteps => steps.Exists(step => step != null && step.IsLegacyTutorialType);
         public event Action SequenceStarted;
         public event Action SequenceCompleted;
 
@@ -163,6 +237,19 @@ namespace MirrorTrial.Level
             Play();
         }
 
+        public void CompleteCurrentTutorial()
+        {
+            tutorialCompletedExternally = true;
+        }
+
+        public bool MigrateLegacySteps()
+        {
+            var changed = false;
+            for (var i = 0; i < steps.Count; i++)
+                if (steps[i] != null) changed |= steps[i].MigrateLegacyTutorialType();
+            return changed;
+        }
+
         public void Configure(string id, TMP_FontAsset font, List<StoryTutorialStep> authoredSteps, string title = null)
         {
             sequenceId = id;
@@ -220,15 +307,18 @@ namespace MirrorTrial.Level
                 case StoryTutorialStepType.CameraShot:
                     yield return PlayCameraShot(step);
                     break;
-                case StoryTutorialStepType.Dialogue:
+                case StoryTutorialStepType.Monologue:
                 case StoryTutorialStepType.SystemMessage:
                     yield return PlayDialogue(step);
                     break;
+#pragma warning disable CS0618
                 case StoryTutorialStepType.MoveObjective:
                 case StoryTutorialStepType.JumpObjective:
                 case StoryTutorialStepType.PrimaryAttackObjective:
                 case StoryTutorialStepType.DodgeObjective:
                 case StoryTutorialStepType.HealthResourceObjective:
+#pragma warning restore CS0618
+                case StoryTutorialStepType.Tutorial:
                     yield return PlayObjective(step);
                     break;
                 case StoryTutorialStepType.Wait:
@@ -346,39 +436,48 @@ namespace MirrorTrial.Level
 
         IEnumerator PlayObjective(StoryTutorialStep step)
         {
+            step.MigrateLegacyTutorialType();
             SetAllPresentationVisible(false);
             ResolvePlayer();
             ApplyInputLock(false);
             objectivePanel.SetActive(true);
             objectiveMarker.color = accentColor;
             objectiveTitle.color = Color.white;
-            objectiveTitle.text = string.IsNullOrWhiteSpace(step.text) ? DefaultObjectiveTitle(step.type) : step.text;
-            objectiveHint.text = string.IsNullOrWhiteSpace(step.hint) ? DefaultObjectiveHint(step.type) : step.hint;
+            objectiveTitle.text = string.IsNullOrWhiteSpace(step.text) ? DefaultObjectiveTitle(step) : step.text;
+            objectiveHint.text = string.IsNullOrWhiteSpace(step.hint) ? DefaultObjectiveHint(step) : step.hint;
 
             var startPosition = player ? player.position : Vector3.zero;
-            var healthResource = step.type == StoryTutorialStepType.HealthResourceObjective && step.cameraTarget
-                ? step.cameraTarget.GetComponentInParent<HealthResourceNode>()
+            var hadObjectiveTarget = step.objectiveTarget != null;
+            var healthResource = step.completionType == StoryTutorialCompletionType.TargetCompleted && step.objectiveTarget
+                ? step.objectiveTarget.GetComponentInParent<HealthResourceNode>()
                 : null;
+            tutorialCompletedExternally = false;
+            var startedAt = Time.unscaledTime;
             var completed = false;
             while (!completed)
             {
                 if (!playerInput) ResolvePlayer();
-                switch (step.type)
+                switch (step.completionType)
                 {
-                    case StoryTutorialStepType.MoveObjective:
+                    case StoryTutorialCompletionType.PressInput:
+                        completed = TutorialInputPressed(step.inputAction) && IsNearObjectiveTarget(step);
+                        break;
+                    case StoryTutorialCompletionType.MoveDistance:
                         completed = player && Mathf.Abs(player.position.x - startPosition.x) >= Mathf.Max(0.1f, step.requiredAmount);
                         break;
-                    case StoryTutorialStepType.JumpObjective:
-                        completed = playerInput && playerInput.JumpPressed;
+                    case StoryTutorialCompletionType.ReachTarget:
+                        completed = player && step.objectiveTarget &&
+                            Vector2.Distance(player.position, step.objectiveTarget.position) <= Mathf.Max(0.1f, step.targetDistance);
                         break;
-                    case StoryTutorialStepType.PrimaryAttackObjective:
-                        completed = playerInput && playerInput.AttackPressed;
+                    case StoryTutorialCompletionType.TargetCompleted:
+                        completed = hadObjectiveTarget && (!step.objectiveTarget ||
+                            !step.objectiveTarget.gameObject.activeInHierarchy || (healthResource && healthResource.IsDestroyed));
                         break;
-                    case StoryTutorialStepType.DodgeObjective:
-                        completed = playerInput && playerInput.DodgePressed;
+                    case StoryTutorialCompletionType.WaitForSeconds:
+                        completed = Time.unscaledTime - startedAt >= Mathf.Max(0f, step.duration);
                         break;
-                    case StoryTutorialStepType.HealthResourceObjective:
-                        completed = !healthResource || healthResource.IsDestroyed;
+                    case StoryTutorialCompletionType.ExternalSignal:
+                        completed = tutorialCompletedExternally;
                         break;
                 }
                 yield return null;
@@ -450,29 +549,80 @@ namespace MirrorTrial.Level
                    Input.GetMouseButtonDown(0);
         }
 
-        static string DefaultObjectiveTitle(StoryTutorialStepType type)
+        bool TutorialInputPressed(StoryTutorialInputAction action)
         {
-            switch (type)
+            if (!playerInput) return false;
+            switch (action)
             {
-                case StoryTutorialStepType.MoveObjective: return "向前探索";
-                case StoryTutorialStepType.JumpObjective: return "越过断层";
-                case StoryTutorialStepType.PrimaryAttackObjective: return "挥动武器";
-                case StoryTutorialStepType.DodgeObjective: return "闪避危险";
-                case StoryTutorialStepType.HealthResourceObjective: return "打碎生命能量";
-                default: return "完成目标";
+                case StoryTutorialInputAction.Jump: return playerInput.JumpPressed;
+                case StoryTutorialInputAction.PrimaryAttack: return playerInput.AttackPressed;
+                case StoryTutorialInputAction.SecondaryAttack:
+                case StoryTutorialInputAction.WeaponSkill:
+                case StoryTutorialInputAction.MobilitySkill:
+                    return false;
+                case StoryTutorialInputAction.Dodge: return playerInput.DodgePressed;
+                case StoryTutorialInputAction.Recover: return playerInput.RecoverPressed;
+                case StoryTutorialInputAction.Interact: return playerInput.InteractPressed;
+                default: return false;
             }
         }
 
-        static string DefaultObjectiveHint(StoryTutorialStepType type)
+        bool IsNearObjectiveTarget(StoryTutorialStep step)
         {
-            switch (type)
+            if (!step.requireTargetProximity) return true;
+            return player && step.objectiveTarget &&
+                Vector2.Distance(player.position, step.objectiveTarget.position) <= Mathf.Max(0.1f, step.targetDistance);
+        }
+        static string DefaultObjectiveTitle(StoryTutorialStep step)
+
+        {
+            switch (step.completionType)
             {
-                case StoryTutorialStepType.MoveObjective: return "A / D 或 ← / →  移动";
-                case StoryTutorialStepType.JumpObjective: return "空格  跳跃";
-                case StoryTutorialStepType.PrimaryAttackObjective: return "J 或鼠标左键  攻击";
-                case StoryTutorialStepType.DodgeObjective: return "左 Shift  闪避";
-                case StoryTutorialStepType.HealthResourceObjective: return "J 或鼠标左键  攻击";
+                case StoryTutorialCompletionType.MoveDistance: return "向前探索";
+                case StoryTutorialCompletionType.ReachTarget: return "前往目标";
+                case StoryTutorialCompletionType.TargetCompleted: return "完成目标";
+                case StoryTutorialCompletionType.WaitForSeconds: return "请稍候";
+                case StoryTutorialCompletionType.ExternalSignal: return "完成当前目标";
+                default: return DefaultInputTitle(step.inputAction);
+            }
+        }
+
+        static string DefaultObjectiveHint(StoryTutorialStep step)
+        {
+            if (step.completionType == StoryTutorialCompletionType.MoveDistance)
+                return "A / D 或 ← / →  移动";
+            if (step.completionType != StoryTutorialCompletionType.PressInput)
+                return string.Empty;
+
+            switch (step.inputAction)
+            {
+                case StoryTutorialInputAction.Jump: return "空格  跳跃";
+                case StoryTutorialInputAction.PrimaryAttack: return "J 或鼠标左键  攻击";
+                case StoryTutorialInputAction.SecondaryAttack:
+                case StoryTutorialInputAction.WeaponSkill:
+                case StoryTutorialInputAction.MobilitySkill:
+                    return string.Empty;
+                case StoryTutorialInputAction.Dodge: return "左 Shift  闪避";
+                case StoryTutorialInputAction.Recover: return "G  恢复";
+                case StoryTutorialInputAction.Interact: return "E  交互";
                 default: return string.Empty;
+            }
+        }
+
+        static string DefaultInputTitle(StoryTutorialInputAction action)
+        {
+            switch (action)
+            {
+                case StoryTutorialInputAction.Jump: return "越过断层";
+                case StoryTutorialInputAction.PrimaryAttack: return "挥动武器";
+                case StoryTutorialInputAction.SecondaryAttack:
+                case StoryTutorialInputAction.WeaponSkill:
+                case StoryTutorialInputAction.MobilitySkill:
+                    return string.Empty;
+                case StoryTutorialInputAction.Dodge: return "闪避危险";
+                case StoryTutorialInputAction.Recover: return "恢复状态";
+                case StoryTutorialInputAction.Interact: return "与目标交互";
+                default: return "完成目标";
             }
         }
 

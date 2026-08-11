@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "frames": 10,
+  "fps": 8,
+  "cell": [
+    192,
+    128
+  ],
+  "fixed_root_box": [
+    53,
+    79,
+    61,
+    87
+  ],
+  "fixed_root_mismatch_frames": 0,
+  "unchanged_core_mismatch_bytes": 0,
+  "consecutive_tail_difference_bytes": [
+    393,
+    486,
+    638,
+    542,
+    382,
+    526,
+    688,
+    547,
+    393
+  ],
+  "gif_decoded_frames": 10,
+  "gif_alpha_ok": true,
+  "nearest_neighbor_scale": 4,
+  "formal_unity_assets_modified": false
+}

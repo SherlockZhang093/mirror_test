@@ -141,6 +141,13 @@ namespace MirrorTrial.Editor.Level
                 var col = go.AddComponent<BoxCollider2D>();
                 col.size = g.size;
                 col.isTrigger = false;
+                var groundLayer = LayerMask.NameToLayer("Ground");
+                if (groundLayer >= 0) go.layer = groundLayer;
+
+                var isClimbable = g.geometryType == GeometryType.ClimbableWall ||
+                    (g.geometryType == GeometryType.Unknown && go.name.StartsWith("ClimbWall_"));
+                if (isClimbable)
+                    go.AddComponent<ClimbableWall>();
             }
         }
 

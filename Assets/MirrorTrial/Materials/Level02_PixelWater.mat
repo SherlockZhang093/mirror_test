@@ -36,7 +36,7 @@ Material:
     - _FlowSpeed: 0.16
     - _PixelDensity: 14
     - _ReflectionStrength: 0.24
-    - _ReflectionSurfaceV: 0.07726008
+    - _ReflectionSurfaceV: -0.528154
     - _WaterTop: -6.1000004
     - _WaveScale: 0.8
     - _WorldTiling: 0.22

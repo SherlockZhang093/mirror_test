@@ -212,7 +212,12 @@ namespace MirrorTrial.Boss
         void OnDamagePayloadReceived(DamagePayload payload)
         {
             if (IsDead || CurrentState == BossState.PhaseChange) return;
-            hitPoints = Mathf.Max(0, hitPoints - Mathf.Max(0, payload.damage));
+            var beforeDamage = hitPoints;
+            var requestedDamage = Mathf.Max(0, payload.damage);
+            hitPoints = Mathf.Max(0, hitPoints - requestedDamage);
+            var actualDamage = beforeDamage - hitPoints;
+            if (actualDamage > 0)
+                DamageDealtEvents.RaisePlayerDamageDealt(new DamageDealtResult(payload.source, gameObject, requestedDamage, actualDamage));
             HealthChanged?.Invoke(this, hitPoints, MaxHitPoints);
             if (hitPoints <= 0) { Die(); return; }
 

@@ -33,8 +33,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.2336, y: -0.1988, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -122,18 +122,18 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.0066708326, y: -0.01334174}
+  m_Offset: {x: -0.012109801, y: 0.20604026}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 3.3100002, y: 2.5912645}
+    pivot: {x: 0.5, y: 0.0625}
+    oldSize: {x: 6, y: 4.8}
     newSize: {x: 1.1671729, y: 0.8024935}
     adaptiveTilingThreshold: 0.5
     drawMode: 1
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.3430693, y: 0.87979996}
+  m_Size: {x: 0.6577271, y: 0.441036}
   m_EdgeRadius: 0
 --- !u!114 &612424256375132596
 MonoBehaviour:
@@ -192,14 +192,16 @@ MonoBehaviour:
   profile: {fileID: 11400000, guid: 4960672a3dfd4214493ad1ff81c09ec1, type: 2}
   overrideMaxHitPoints: -1
   overrideMoveSpeed: -1
-  overrideDetectionSize: {x: -1, y: -1}
-  patrolLeftOffset: -2
-  patrolRightOffset: 2
+  overrideDetectionSize: {x: 9.415941, y: 2.1468039}
+  patrolLeftOffset: -2.195466
+  patrolRightOffset: 3.0523849
+  isFlying: 0
   attackEffectPrefab: {fileID: 0}
   attackEffectPoint: {fileID: 0}
   attackEffectLifetime: 1
   mirrorAttackEffectByFacing: 1
   showDebugGizmos: 1
+  passiveTestTarget: 0
 --- !u!95 &8200100100100100101
 Animator:
   serializedVersion: 5

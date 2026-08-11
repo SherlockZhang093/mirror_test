@@ -43,6 +43,7 @@ namespace MirrorTrial.Player
             CurrentState == PlayerActionState.LedgeHang ||
             CurrentState == PlayerActionState.LedgeClimb ||
             CurrentState == PlayerActionState.MonkeyBarIdle ||
+            IsLadderState(CurrentState) ||
             CurrentState == PlayerActionState.AirSlashUp ||
             CurrentState == PlayerActionState.AirSlashDown ||
             CurrentState == PlayerActionState.Hurt ||
@@ -55,6 +56,7 @@ namespace MirrorTrial.Player
             CurrentState == PlayerActionState.LedgeHang ||
             CurrentState == PlayerActionState.LedgeClimb ||
             CurrentState == PlayerActionState.MonkeyBarIdle ||
+            IsLadderState(CurrentState) ||
             CurrentState == PlayerActionState.AirSlashUp ||
             CurrentState == PlayerActionState.AirSlashDown ||
             CurrentState == PlayerActionState.Hurt ||
@@ -101,6 +103,9 @@ namespace MirrorTrial.Player
             if (requestedAction != PlayerActionState.None)
                 return requestedAction;
 
+            if (motor.IsDoubleJumpAnimating)
+                return PlayerActionState.DoubleJump;
+
             // 空中：上升 / 下落
             if (!grounded)
                 return motor.IsRising ? PlayerActionState.JumpRise : PlayerActionState.JumpFall;
@@ -130,6 +135,11 @@ namespace MirrorTrial.Player
         public void CancelRequestedAction()
         {
             requestedAction = PlayerActionState.None;
+        }
+
+        static bool IsLadderState(PlayerActionState state)
+        {
+            return state >= PlayerActionState.LadderGrab && state <= PlayerActionState.LadderJumpPrepare;
         }
     }
 }

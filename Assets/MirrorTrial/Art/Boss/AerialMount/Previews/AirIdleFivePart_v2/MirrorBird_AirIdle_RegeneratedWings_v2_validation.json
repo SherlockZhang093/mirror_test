@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "frames": 6,
+  "fps": 8,
+  "canvas": [
+    192,
+    128
+  ],
+  "parts": [
+    "far_wing",
+    "near_wing",
+    "body",
+    "upper_tail",
+    "lower_tail"
+  ],
+  "regenerated_wing_key_poses_used": true,
+  "whole_wing_warp_used": false,
+  "body_mismatch_pixels_across_all_frames": 0,
+  "tails_animated_in_this_preview": false,
+  "consecutive_frame_difference_bytes": [
+    2868,
+    3047,
+    2368,
+    2164,
+    3192
+  ],
+  "gif_decoded_frames": 6,
+  "gif_alpha_ok": true,
+  "formal_unity_assets_modified": false
+}

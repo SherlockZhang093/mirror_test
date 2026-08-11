@@ -77,7 +77,12 @@ namespace MirrorTrial.Player
         [Serializable]
         public class AbilityTuning
         {
-            public bool mirrorBladeUnlocked = true;
+            [Header("Double Jump")]
+            public bool doubleJumpUnlocked;
+            public float doubleJumpSpeed = 7.5f;
+            [Min(0.05f)] public float doubleJumpAnimationTime = 0.22f;
+
+            public bool mirrorBladeUnlocked;
             public int mirrorBladeDamage = 15;
             public float mirrorBladeStartup = 0.15f;
             public float mirrorBladeRecovery = 0.20f;
@@ -87,7 +92,7 @@ namespace MirrorTrial.Player
             public Vector2 mirrorBladeKnockback = new Vector2(2.5f, 0.5f);
             public float mirrorBladeHitStop = 0.04f;
 
-            public bool echoDashUnlocked = true;
+            public bool echoDashUnlocked;
             public float echoDashDistance = 5f;
             public float echoDashDuration = 0.18f;
             public float echoDashInvincibleTime = 0.15f;

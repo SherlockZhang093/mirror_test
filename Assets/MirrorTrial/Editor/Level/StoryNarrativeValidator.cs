@@ -56,9 +56,19 @@ namespace MirrorTrial.Editor.Level
                     }
                     if (step.type == StoryTutorialStepType.CameraShot && !step.cameraTarget)
                         issues.Add($"{sequence.DisplayName}：第 {i + 1} 步的镜头目标未设置。");
+                    if (step.type == StoryTutorialStepType.Tutorial)
+                    {
+                        var requiresTarget = step.completionType == StoryTutorialCompletionType.ReachTarget ||
+                            step.completionType == StoryTutorialCompletionType.TargetCompleted ||
+                            (step.completionType == StoryTutorialCompletionType.PressInput && step.requireTargetProximity);
+                        if (requiresTarget && !step.objectiveTarget)
+                            issues.Add($"{sequence.DisplayName}：第 {i + 1} 步的新手指引缺少目标对象。");
+                    }
+#pragma warning disable CS0618
                     if (step.type == StoryTutorialStepType.HealthResourceObjective &&
                         (!step.cameraTarget || !step.cameraTarget.GetComponentInParent<HealthResourceNode>()))
                         issues.Add($"{sequence.DisplayName}：第 {i + 1} 步没有设置有效的生命能量目标。");
+#pragma warning restore CS0618
                 }
             }
 

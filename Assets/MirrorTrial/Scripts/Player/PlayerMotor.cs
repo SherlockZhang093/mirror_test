@@ -31,10 +31,13 @@ namespace MirrorTrial.Player
         Vector2 forcedVelocity;
         float forcedVelocityTimer;
         bool groundingInitialized;
+        int remainingAirJumps;
+        float doubleJumpAnimationTimer;
 
         public bool MovementLocked { get; set; }
         public bool TraversalLocked { get; set; }
         public event Action Jumped;
+        public event Action DoubleJumped;
         public event Action<float> Landed;
 
         bool EffectiveMovementLock =>
@@ -48,6 +51,7 @@ namespace MirrorTrial.Player
         public bool IsRising => Velocity.y > 0.01f;
         public bool IsFalling => Velocity.y < -0.01f;
         public Vector2 Velocity => body ? body.velocity : Vector2.zero;
+        public bool IsDoubleJumpAnimating => doubleJumpAnimationTimer > 0f;
 
         void Awake()
         {
@@ -74,6 +78,7 @@ namespace MirrorTrial.Player
 
         void Update()
         {
+            doubleJumpAnimationTimer = Mathf.Max(0f, doubleJumpAnimationTimer - Time.deltaTime);
             if (TraversalLocked)
             {
                 // Traversal actions own the jump button. Do not let the same press
@@ -109,6 +114,8 @@ namespace MirrorTrial.Player
             var wasGrounded = IsGrounded;
             var landingSpeed = Mathf.Max(0f, -body.velocity.y);
             RefreshGrounded();
+            if (IsGrounded)
+                remainingAirJumps = tuning.abilities.doubleJumpUnlocked ? 1 : 0;
             if (groundingInitialized && !wasGrounded && IsGrounded)
                 Landed?.Invoke(landingSpeed);
             groundingInitialized = true;
@@ -142,6 +149,15 @@ namespace MirrorTrial.Player
                 coyoteCounter = 0f;
                 IsGrounded = false;
                 Jumped?.Invoke();
+            }
+            else if (jumpBufferCounter > 0f && !IsGrounded && remainingAirJumps > 0 &&
+                     tuning.abilities.doubleJumpUnlocked && !EffectiveMovementLock)
+            {
+                velocity.y = tuning.abilities.doubleJumpSpeed;
+                jumpBufferCounter = 0f;
+                remainingAirJumps--;
+                doubleJumpAnimationTimer = tuning.abilities.doubleJumpAnimationTime;
+                DoubleJumped?.Invoke();
             }
             else if (jumpCutRequested && velocity.y > 0f)
             {
@@ -216,6 +232,12 @@ namespace MirrorTrial.Player
 
             if (spriteRenderer)
                 spriteRenderer.flipX = !facingRight;
+        }
+
+        public void FaceDirection(float direction)
+        {
+            if (Mathf.Abs(direction) > 0.01f)
+                UpdateFacing(direction);
         }
 
         public void ApplyForcedVelocity(Vector2 nextVelocity, float duration)

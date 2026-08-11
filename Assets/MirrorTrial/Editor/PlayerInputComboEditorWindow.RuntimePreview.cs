@@ -117,6 +117,13 @@ namespace MirrorTrial.Editor
                     GUILayout.Label("\u5f53\u524d\u62db\u5f0f: " + (string.IsNullOrEmpty(runtimePreviewCombat.RuntimeCurrentMoveName) ? "—" : runtimePreviewCombat.RuntimeCurrentMoveName));
                 }
 
+                if (!string.IsNullOrEmpty(runtimePreviewCombat.RuntimeCurrentDecisionId))
+                {
+                    var decisionRect = EditorGUILayout.GetControlRect(false, 18f);
+                    EditorGUI.ProgressBar(decisionRect, runtimePreviewCombat.RuntimeDecisionProgress,
+                        string.Format("输入判定 {0:0%}：松开＝点按，保持＝长按", runtimePreviewCombat.RuntimeDecisionProgress));
+                }
+
                 var charge = runtimePreviewCombat.RuntimeChargeNormalized;
                 var chargeRect = EditorGUILayout.GetControlRect(false, 18f);
                 EditorGUI.ProgressBar(chargeRect, charge, string.Format("蓄力 {0:0%}  |  {1}  |  {2:0.00}s  |  伤害 ×{3:0.00}", charge,

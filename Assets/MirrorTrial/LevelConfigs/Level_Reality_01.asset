@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Level_Reality_01
   m_EditorClassIdentifier: 
   levelId: Level_Reality_01
-  displayName: "\u73B0\u5B9E\u5173\u5361 1"
+  displayName: "\u7B2C\u4E00\u6BB5 \xB7 \u7A7A\u767D"
   isMirrorLevel: 0
   playerPrefab: {fileID: 7253538297837963826, guid: 0eb9dd5878ab6d849b4720b03e304987,
     type: 3}
@@ -105,6 +105,20 @@ MonoBehaviour:
     size: {x: 12.662191, y: 0.85071754}
     isBoundary: 0
     isPlatform: 1
+    platformVisualIndex: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - name: Boundary_01_02
+    position: {x: 7.0085163, y: -1.3385086, z: 0}
+    size: {x: 2.5416431, y: 8.878491}
+    isBoundary: 1
+    isPlatform: 0
+    platformVisualIndex: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - name: Boundary_01_03
+    position: {x: -29.299595, y: -1.2882186, z: 0}
+    size: {x: 1.5694027, y: 11.05765}
+    isBoundary: 1
+    isPlatform: 0
     platformVisualIndex: 0
     color: {r: 1, g: 1, b: 1, a: 1}
   segments: []

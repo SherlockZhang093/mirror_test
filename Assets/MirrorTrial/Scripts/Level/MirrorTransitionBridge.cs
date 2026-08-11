@@ -1,4 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
+using MirrorTrial.Player;
+using MirrorTrial.Growth;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,6 +17,9 @@ namespace MirrorTrial.Level
         [SerializeField] GameObject persistentPlayer;
 
         readonly HashSet<string> completedGates = new HashSet<string>();
+        bool swordUnlocked;
+        bool bowUnlocked;
+        PlayerWeaponType pendingUnlockPresentation = PlayerWeaponType.Unarmed;
 
         public GameObject PersistentPlayer => persistentPlayer;
         public bool IsInMirror => !string.IsNullOrEmpty(pendingMirrorGateId);
@@ -31,6 +37,7 @@ namespace MirrorTrial.Level
 
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
         public static MirrorTransitionBridge Ensure()
@@ -73,9 +80,15 @@ namespace MirrorTrial.Level
 
             completedGates.Add(pendingMirrorGateId);
             var realityScene = pendingRealityScene;
+            UnlockRewardFor(realityScene);
             pendingMirrorGateId = null;
             pendingRealityScene = null;
 
+            LevelEndGrowthController.TryShow(persistentPlayer, () => CompleteMirrorBossClear(realityScene));
+        }
+
+        void CompleteMirrorBossClear(string realityScene)
+        {
             OnReturnToRealityScene?.Invoke();
             if (!GameFlow.TryLoadNextRealityScene(realityScene))
                 SceneManager.LoadScene(realityScene, LoadSceneMode.Single);
@@ -114,6 +127,7 @@ namespace MirrorTrial.Level
 
             persistentPlayer = player;
             DontDestroyOnLoad(player);
+            ApplyWeaponProgression(player);
         }
 
         public GameObject GetOrCreatePersistentPlayer(GameObject scenePlayer)
@@ -146,6 +160,14 @@ namespace MirrorTrial.Level
         {
             ClearAll();
 
+            var session = GameSessionProgress.Instance;
+            if (session != null)
+                session.ResetSession();
+
+            swordUnlocked = false;
+            bowUnlocked = false;
+            pendingUnlockPresentation = PlayerWeaponType.Unarmed;
+
             if (persistentPlayer)
                 Destroy(persistentPlayer);
 
@@ -161,8 +183,67 @@ namespace MirrorTrial.Level
 
         void OnDestroy()
         {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
             if (Instance == this)
                 Instance = null;
+        }
+
+        void UnlockRewardFor(string completedRealityScene)
+        {
+            if (completedRealityScene.Equals(GameFlow.FirstRealitySceneName, System.StringComparison.OrdinalIgnoreCase))
+            {
+                swordUnlocked = true;
+                pendingUnlockPresentation = PlayerWeaponType.Sword;
+            }
+            else if (completedRealityScene.Equals(GameFlow.SecondRealitySceneName, System.StringComparison.OrdinalIgnoreCase))
+            {
+                bowUnlocked = true;
+                pendingUnlockPresentation = PlayerWeaponType.Bow;
+            }
+
+            ApplyWeaponProgression(persistentPlayer);
+            var weapons = persistentPlayer ? persistentPlayer.GetComponent<PlayerWeaponController>() : null;
+            if (weapons && pendingUnlockPresentation != PlayerWeaponType.Unarmed)
+                weapons.ForceEquipWeapon(pendingUnlockPresentation);
+        }
+
+        void ApplyWeaponProgression(GameObject player)
+        {
+            if (!player) return;
+            var weapons = player.GetComponent<PlayerWeaponController>();
+            if (weapons) weapons.ApplyProgression(swordUnlocked, bowUnlocked);
+        }
+
+        void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            ApplyWeaponProgression(persistentPlayer);
+            if (pendingUnlockPresentation == PlayerWeaponType.Unarmed || !persistentPlayer)
+                return;
+
+            var weapon = pendingUnlockPresentation;
+            pendingUnlockPresentation = PlayerWeaponType.Unarmed;
+            StartCoroutine(PlayUnlockWhenPresentationIsClear(weapon));
+        }
+
+        IEnumerator PlayUnlockWhenPresentationIsClear(PlayerWeaponType weapon)
+        {
+            while (SceneTransitionController.IsTransitioning || IsStorySequencePlaying())
+                yield return null;
+
+            if (persistentPlayer)
+                PlayerWeaponUnlockSequence.Play(persistentPlayer, weapon);
+        }
+
+        static bool IsStorySequencePlaying()
+        {
+            var sequences = FindObjectsOfType<StoryTutorialSequence>(true);
+            for (var i = 0; i < sequences.Length; i++)
+            {
+                if (sequences[i].IsPlaying)
+                    return true;
+            }
+
+            return false;
         }
     }
 }

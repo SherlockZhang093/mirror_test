@@ -122,18 +122,18 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.00000023841858, y: 0.034326434}
+  m_Offset: {x: 0.012663364, y: 0.30869222}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2.92, y: 2.551245}
+    pivot: {x: 0.5, y: 0.0625}
+    oldSize: {x: 4.48, y: 3.2}
     newSize: {x: 0.9236089, y: 0.77762717}
     adaptiveTilingThreshold: 0.5
     drawMode: 1
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.043263, y: 0.92538905}
+  m_Size: {x: 0.7309084, y: 0.62147665}
   m_EdgeRadius: 0
 --- !u!114 &261780304349338403
 MonoBehaviour:
@@ -190,16 +190,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   profile: {fileID: 11400000, guid: 4a2a44bbf5d2d5c41b32c9f28bb06cea, type: 2}
-  overrideMaxHitPoints: -1
+  overrideMaxHitPoints: 2
   overrideMoveSpeed: -1
-  overrideDetectionSize: {x: -1, y: -1}
+  overrideDetectionSize: {x: 5.482369, y: 2.2155488}
   patrolLeftOffset: -2
   patrolRightOffset: 2
+  isFlying: 0
   attackEffectPrefab: {fileID: 0}
   attackEffectPoint: {fileID: 0}
   attackEffectLifetime: 1
   mirrorAttackEffectByFacing: 1
   showDebugGizmos: 1
+  passiveTestTarget: 0
 --- !u!95 &8100100100100100101
 Animator:
   serializedVersion: 5

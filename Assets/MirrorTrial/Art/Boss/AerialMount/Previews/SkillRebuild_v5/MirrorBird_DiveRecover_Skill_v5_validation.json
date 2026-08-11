@@ -1,0 +1,61 @@
+{
+  "sequence": "DiveRecover",
+  "frame_count": 4,
+  "cell": [
+    192,
+    128
+  ],
+  "target_anchor": [
+    96,
+    66
+  ],
+  "single_sequence_scale": 0.285141,
+  "source_anchors": [
+    [
+      388.454,
+      389.569
+    ],
+    [
+      341.33,
+      367.106
+    ],
+    [
+      330.282,
+      367.285
+    ],
+    [
+      305.865,
+      369.55
+    ]
+  ],
+  "alpha_bboxes": [
+    [
+      15,
+      58,
+      125,
+      87
+    ],
+    [
+      17,
+      33,
+      125,
+      93
+    ],
+    [
+      15,
+      8,
+      126,
+      94
+    ],
+    [
+      15,
+      41,
+      125,
+      91
+    ]
+  ],
+  "transparent_corners": true,
+  "green_like_pixels": 0,
+  "unique_frames": 4,
+  "passes": true
+}

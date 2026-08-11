@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "canvas": [
+    192,
+    128
+  ],
+  "ppu_target": 32,
+  "sampling": "nearest-neighbour",
+  "reference_scale": 0.118,
+  "reference_offset": [
+    2,
+    14
+  ],
+  "wing_offset": [
+    4,
+    0
+  ],
+  "layer_order": [
+    "far_wing",
+    "near_wing",
+    "connected_core"
+  ],
+  "connected_core_chain": [
+    "pelvis",
+    "chest",
+    "neck_base",
+    "head",
+    "beak"
+  ],
+  "sprite_root_is_art_layer": false,
+  "rider_seat_is_art_layer": false,
+  "removed_old_wing_pixels": 1693,
+  "connected_core_mismatch_pixels": 0,
+  "near_wing_shoulder_distance_to_art_pixels": 0.0,
+  "far_wing_shoulder_distance_to_art_pixels": 0.0,
+  "transparent_corners": true,
+  "unexpected_palette_colors": [],
+  "output": "Assets/MirrorTrial/Art/Boss/AerialMount/Previews/AirIdleReassembly_v1/MirrorBird_ReassemblySample_v1.png",
+  "comparison": "Assets/MirrorTrial/Art/Boss/AerialMount/Previews/AirIdleReassembly_v1/MirrorBird_ReassemblySample_v1_Comparison_4x.png",
+  "formal_unity_assets_modified": false
+}

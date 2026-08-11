@@ -35,7 +35,7 @@ namespace MirrorTrial.Editor.HealthResources
                 "HealthResource_RiftlightCrystal",
                 "RiftlightCrystal",
                 maxDurability: 3,
-                healthReward: 2,
+                lifeEssenceReward: 2,
                 colliderSize: new Vector2(1.45f, 1.55f),
                 colliderOffset: new Vector2(0f, 0.78f),
                 glowPosition: new Vector3(0f, 0.95f, 0f),
@@ -47,7 +47,7 @@ namespace MirrorTrial.Editor.HealthResources
                 "HealthResource_MirrorDewReliquary",
                 "MirrorDewReliquary",
                 maxDurability: 4,
-                healthReward: 3,
+                lifeEssenceReward: 3,
                 colliderSize: new Vector2(1.55f, 1.5f),
                 colliderOffset: new Vector2(0f, 0.75f),
                 glowPosition: new Vector3(0f, 1.15f, 0f),
@@ -130,7 +130,7 @@ namespace MirrorTrial.Editor.HealthResources
             string prefabName,
             string artPrefix,
             int maxDurability,
-            int healthReward,
+            int lifeEssenceReward,
             Vector2 colliderSize,
             Vector2 colliderOffset,
             Vector3 glowPosition,
@@ -176,7 +176,7 @@ namespace MirrorTrial.Editor.HealthResources
 
                 var nodeData = new SerializedObject(node);
                 nodeData.FindProperty("maxDurability").intValue = maxDurability;
-                nodeData.FindProperty("healthReward").intValue = healthReward;
+                nodeData.FindProperty("lifeEssenceReward").intValue = lifeEssenceReward;
                 nodeData.FindProperty("countHitsInsteadOfDamage").boolValue = true;
                 nodeData.FindProperty("rewardOrbSprite").objectReferenceValue = sparkleSprite;
                 nodeData.FindProperty("rewardEffectOffset").vector3Value = glowPosition;

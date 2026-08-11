@@ -230,6 +230,10 @@ GameObject:
   - component: {fileID: 89275410039288737}
   - component: {fileID: 6472099761644701565}
   - component: {fileID: 6013503503503503504}
+  - component: {fileID: 2545846301071119600}
+  - component: {fileID: 5534295138115088618}
+  - component: {fileID: 3141829786607232412}
+  - component: {fileID: 6176927086389555720}
   m_Layer: 0
   m_Name: Player_MirrorTrial
   m_TagString: Player
@@ -647,15 +651,6 @@ MonoBehaviour:
   - command: 0
     buttonName: Fire1
     key: 106
-  - command: 1
-    buttonName: Fire2
-    key: 107
-  - command: 2
-    buttonName: Fire3
-    key: 108
-  - command: 3
-    buttonName: 
-    key: 113
   - command: 4
     buttonName: 
     key: 49
@@ -674,7 +669,10 @@ MonoBehaviour:
   - command: 9
     buttonName: 
     key: 103
-  bindingSchemaVersion: 5
+  - command: 10
+    buttonName: 
+    key: 101
+  bindingSchemaVersion: 7
 --- !u!114 &3517131352704987190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -731,8 +729,11 @@ MonoBehaviour:
     invincibleDuration: 0.14
     cooldown: 0.28
     inputBufferTime: 0.1
-    allowAirDodge: 0
+    allowAirDodge: 1
   abilities:
+    doubleJumpUnlocked: 0
+    doubleJumpSpeed: 7.5
+    doubleJumpAnimationTime: 0.22
     mirrorBladeUnlocked: 1
     mirrorBladeDamage: 15
     mirrorBladeStartup: 0.15
@@ -932,6 +933,42 @@ MonoBehaviour:
   - action: 36
     animatorState: AirSlashDown
     sourceClipDuration: 0.42857143
+    timingSource: 0
+  - action: 37
+    animatorState: DoubleJump
+    sourceClipDuration: 0.3333333
+    timingSource: 0
+  - action: 38
+    animatorState: LadderGrab
+    sourceClipDuration: 0.25
+    timingSource: 0
+  - action: 39
+    animatorState: LadderIdle
+    sourceClipDuration: 0.5
+    timingSource: 0
+  - action: 40
+    animatorState: LadderClimbUpLeft
+    sourceClipDuration: 0.6666666
+    timingSource: 0
+  - action: 41
+    animatorState: LadderClimbUpRight
+    sourceClipDuration: 0.6666666
+    timingSource: 0
+  - action: 42
+    animatorState: LadderClimbDownLeft
+    sourceClipDuration: 0.6666666
+    timingSource: 0
+  - action: 43
+    animatorState: LadderClimbDownRight
+    sourceClipDuration: 0.6666666
+    timingSource: 0
+  - action: 44
+    animatorState: LadderClimbFinish
+    sourceClipDuration: 0.6666666
+    timingSource: 0
+  - action: 45
+    animatorState: LadderJumpPrepare
+    sourceClipDuration: 0.3333333
     timingSource: 0
 --- !u!114 &3603827661786735700
 MonoBehaviour:
@@ -1515,6 +1552,7 @@ MonoBehaviour:
     weaponType: 1
     entryInput: 0
     entryInstanceId: legacy-instance-0-0
+    entryDecisionId: decision-entry-0
     instances:
     - id: legacy-instance-0-0
       name: Combo A
@@ -1535,14 +1573,14 @@ MonoBehaviour:
           size: {x: 1, y: 0.8}
           interpolation: 0
         - frame: 1
-          enabled: 1
+          enabled: 0
           offset: {x: 0.21022987, y: 0.72193456}
           size: {x: 0.5170145, y: 1.5321026}
           interpolation: 1
         - frame: 3
           enabled: 1
-          offset: {x: 1.1456947, y: 0.72447646}
-          size: {x: 2.3879433, y: 1.5270188}
+          offset: {x: 0.5987611, y: 0.8860321}
+          size: {x: 1.2940769, y: 1.8501301}
           interpolation: 0
         - frame: 4
           enabled: 0
@@ -1566,8 +1604,8 @@ MonoBehaviour:
           enableHitStop: 1
           useAttackTypeDefaultHitStop: 1
           hitStopDuration: 0.035
-          enableCameraFeedback: 0
-          cameraPower: 0.35
+          enableCameraFeedback: 1
+          cameraPower: 0.2
           enableHitSound: 0
           hitSound: {fileID: 0}
           hitSoundVolume: 1
@@ -1583,7 +1621,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 79.00001, y: 73.33334}
+      graphPosition: {x: 288.3333, y: 66.66669}
       moveId: legacy-move-0-0
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -1659,6 +1697,9 @@ MonoBehaviour:
       fullChargeDamageMultiplier: 1.5
       fullChargeKnockbackMultiplier: 1.35
       autoReleaseAtFullCharge: 1
+      fullChargeHoldLimit: 1.5
+      chargeCountdownPrefab: {fileID: 0}
+      chargeCountdownOffset: {x: 0, y: 1.15}
     - id: legacy-instance-0-1
       name: Combo B
       move:
@@ -1682,6 +1723,11 @@ MonoBehaviour:
           offset: {x: 1.0606318, y: 0.7270185}
           size: {x: 1.1, y: 0.85}
           interpolation: 1
+        - frame: 2
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
         - frame: 4
           enabled: 0
           offset: {x: 0.65, y: 0}
@@ -1704,8 +1750,8 @@ MonoBehaviour:
           enableHitStop: 1
           useAttackTypeDefaultHitStop: 1
           hitStopDuration: 0.035
-          enableCameraFeedback: 0
-          cameraPower: 0.35
+          enableCameraFeedback: 1
+          cameraPower: 0.2
           enableHitSound: 0
           hitSound: {fileID: 0}
           hitSoundVolume: 1
@@ -1721,7 +1767,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 417.33334, y: 69.33334}
+      graphPosition: {x: 612.00006, y: 67.33334}
       moveId: legacy-move-0-1
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -1797,6 +1843,9 @@ MonoBehaviour:
       fullChargeDamageMultiplier: 1.5
       fullChargeKnockbackMultiplier: 1.35
       autoReleaseAtFullCharge: 1
+      fullChargeHoldLimit: 1.5
+      chargeCountdownPrefab: {fileID: 0}
+      chargeCountdownOffset: {x: 0, y: 1.15}
     - id: legacy-instance-0-2
       name: Combo C
       move:
@@ -1817,9 +1866,14 @@ MonoBehaviour:
           interpolation: 0
         - frame: 1
           enabled: 1
-          offset: {x: 1.5400658, y: 0.51790035}
-          size: {x: 1.5313034, y: 1.0220172}
+          offset: {x: 1.2522941, y: 0.6727245}
+          size: {x: 0.95576143, y: 0.71236897}
           interpolation: 1
+        - frame: 2
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
         - frame: 4
           enabled: 0
           offset: {x: 0.65, y: 0}
@@ -1842,8 +1896,8 @@ MonoBehaviour:
           enableHitStop: 1
           useAttackTypeDefaultHitStop: 1
           hitStopDuration: 0.035
-          enableCameraFeedback: 0
-          cameraPower: 0.35
+          enableCameraFeedback: 1
+          cameraPower: 0.2
           enableHitSound: 0
           hitSound: {fileID: 0}
           hitSoundVolume: 1
@@ -1859,7 +1913,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 811, y: 12}
+      graphPosition: {x: 1001.66675, y: 14.666672}
       moveId: legacy-move-0-2
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -1935,6 +1989,9 @@ MonoBehaviour:
       fullChargeDamageMultiplier: 1.5
       fullChargeKnockbackMultiplier: 1.35
       autoReleaseAtFullCharge: 1
+      fullChargeHoldLimit: 1.5
+      chargeCountdownPrefab: {fileID: 0}
+      chargeCountdownOffset: {x: 0, y: 1.15}
     - id: legacy-instance-0-3
       name: Combo D
       move:
@@ -1954,10 +2011,15 @@ MonoBehaviour:
           size: {x: 1, y: 0.8}
           interpolation: 0
         - frame: 1
-          enabled: 1
+          enabled: 0
           offset: {x: 0.86, y: 0.06}
           size: {x: 1.25, y: 0.95}
           interpolation: 1
+        - frame: 3
+          enabled: 1
+          offset: {x: 0.119894505, y: 0.5688106}
+          size: {x: 2.349663, y: 1.1635005}
+          interpolation: 0
         - frame: 4
           enabled: 0
           offset: {x: 0.65, y: 0}
@@ -1978,10 +2040,10 @@ MonoBehaviour:
           mirrorHitEffectByDirection: 1
           hitEffectLifetime: 0.15
           enableHitStop: 1
-          useAttackTypeDefaultHitStop: 1
-          hitStopDuration: 0.035
-          enableCameraFeedback: 0
-          cameraPower: 0.35
+          useAttackTypeDefaultHitStop: 0
+          hitStopDuration: 0.2
+          enableCameraFeedback: 1
+          cameraPower: 0.5
           enableHitSound: 0
           hitSound: {fileID: 0}
           hitSoundVolume: 1
@@ -1997,7 +2059,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 986.66675, y: 209.33334}
+      graphPosition: {x: 1184.6669, y: 208.66666}
       moveId: legacy-move-0-3
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -2074,38 +2136,55 @@ MonoBehaviour:
       fullChargeDamageMultiplier: 2
       fullChargeKnockbackMultiplier: 1.6
       autoReleaseAtFullCharge: 0
+      fullChargeHoldLimit: 1.5
+      chargeCountdownPrefab: {fileID: 0}
+      chargeCountdownOffset: {x: 0, y: 1.15}
     transitions:
     - id: legacy-link-0-0
       fromInstanceId: legacy-instance-0-0
       toInstanceId: legacy-instance-0-1
       input: 0
-      condition: 0
+      condition: 1
       windowStart: 0.1
       windowEnd: 1
       holdThreshold: 0.15
       requiresHit: 0
-    - id: legacy-link-0-1
-      fromInstanceId: legacy-instance-0-1
-      toInstanceId: legacy-instance-0-2
+    inputDecisions:
+    - id: decision-entry-0
+      name: "\u8D77\u624B\u70B9\u6309 / \u957F\u6309"
+      graphPosition: {x: 23.666664, y: 146}
+      enabled: 1
+      sourceInstanceId: 
       input: 0
-      condition: 1
-      windowStart: 0
-      windowEnd: 0.7
-      holdThreshold: 0.15
-      requiresHit: 0
-    - id: legacy-link-0-2
-      fromInstanceId: legacy-instance-0-1
-      toInstanceId: legacy-instance-0-3
+      listenStartFrame: 0
+      decisionFrame: 6
+      entryFrameRate: 60
+      tapTargetInstanceId: legacy-instance-0-0
+      holdTargetInstanceId: legacy-instance-0-3
+      noInputTargetInstanceId: 
+      tapRequiresHit: 0
+      holdRequiresHit: 0
+      noInputRequiresHit: 0
+    - id: decision-branch-0-0
+      name: "\u8FDE\u62DB\u70B9\u6309 / \u957F\u6309"
+      graphPosition: {x: 787.3334, y: 69.33334}
+      enabled: 1
+      sourceInstanceId: legacy-instance-0-1
       input: 0
-      condition: 2
-      windowStart: 0
-      windowEnd: 0.32
-      holdThreshold: 0.28
-      requiresHit: 1
+      listenStartFrame: 0
+      decisionFrame: 3
+      entryFrameRate: 60
+      tapTargetInstanceId: legacy-instance-0-2
+      holdTargetInstanceId: legacy-instance-0-3
+      noInputTargetInstanceId: 
+      tapRequiresHit: 0
+      holdRequiresHit: 1
+      noInputRequiresHit: 0
   - name: "\u62F3\u51FB\u4E09\u8FDE"
     weaponType: 0
     entryInput: 0
     entryInstanceId: legacy-instance-1-0
+    entryDecisionId: decision-entry-1
     instances:
     - id: legacy-instance-1-0
       name: "\u76F4\u62F3\u8D77\u624B"
@@ -2126,14 +2205,14 @@ MonoBehaviour:
           size: {x: 1, y: 0.8}
           interpolation: 0
         - frame: 1
-          enabled: 1
+          enabled: 0
           offset: {x: 0.52, y: 0.8916312}
           size: {x: 0.7199998, y: 0.6675694}
           interpolation: 1
         - frame: 2
           enabled: 1
-          offset: {x: 0.9656594, y: 0.8916312}
-          size: {x: 0.7199998, y: 0.6675694}
+          offset: {x: 0.8449293, y: 0.6865814}
+          size: {x: 0.5092002, y: 0.4414394}
           interpolation: 0
         - frame: 3
           enabled: 0
@@ -2174,7 +2253,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 35.66667, y: 80.5}
+      graphPosition: {x: 275, y: 137.16666}
       moveId: legacy-move-1-0
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -2250,6 +2329,9 @@ MonoBehaviour:
       fullChargeDamageMultiplier: 1.5
       fullChargeKnockbackMultiplier: 1.35
       autoReleaseAtFullCharge: 1
+      fullChargeHoldLimit: 1.5
+      chargeCountdownPrefab: {fileID: 0}
+      chargeCountdownOffset: {x: 0, y: 1.15}
     - id: legacy-instance-1-1
       name: "\u6446\u62F3\u8854\u63A5"
       move:
@@ -2270,9 +2352,14 @@ MonoBehaviour:
           interpolation: 0
         - frame: 1
           enabled: 1
-          offset: {x: 0.66854143, y: 0.84670067}
-          size: {x: 0.82, y: 0.58}
+          offset: {x: 0.5343965, y: 0.8505335}
+          size: {x: 0.5517099, y: 0.5723345}
           interpolation: 1
+        - frame: 2
+          enabled: 1
+          offset: {x: 0.5254365, y: 0.9217676}
+          size: {x: 0.7048805, y: 0.47421932}
+          interpolation: 0
         - frame: 3
           enabled: 0
           offset: {x: 0.65, y: 0}
@@ -2312,7 +2399,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 336, y: 73.16666}
+      graphPosition: {x: 506, y: 127.16666}
       moveId: legacy-move-1-1
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -2388,6 +2475,9 @@ MonoBehaviour:
       fullChargeDamageMultiplier: 1.5
       fullChargeKnockbackMultiplier: 1.35
       autoReleaseAtFullCharge: 1
+      fullChargeHoldLimit: 1.5
+      chargeCountdownPrefab: {fileID: 0}
+      chargeCountdownOffset: {x: 0, y: 1.15}
     - id: legacy-instance-1-2
       name: "\u84C4\u529B\u91CD\u51FB\u7EC8\u7ED3"
       move:
@@ -2407,10 +2497,15 @@ MonoBehaviour:
           size: {x: 1, y: 0.8}
           interpolation: 0
         - frame: 2
-          enabled: 1
+          enabled: 0
           offset: {x: 0.8436464, y: 0.8775339}
           size: {x: 1.380903, y: 1.1653467}
           interpolation: 1
+        - frame: 3
+          enabled: 1
+          offset: {x: 0.5849383, y: 1.0212606}
+          size: {x: 0.86348677, y: 0.8778934}
+          interpolation: 0
         - frame: 4
           enabled: 0
           offset: {x: 0.65, y: 0}
@@ -2431,8 +2526,8 @@ MonoBehaviour:
           mirrorHitEffectByDirection: 0
           hitEffectLifetime: 0.15
           enableHitStop: 1
-          useAttackTypeDefaultHitStop: 1
-          hitStopDuration: 0.035
+          useAttackTypeDefaultHitStop: 0
+          hitStopDuration: 0.2
           enableCameraFeedback: 1
           cameraPower: 1
           enableHitSound: 0
@@ -2450,7 +2545,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 739.6666, y: 31.666656}
+      graphPosition: {x: 929.6666, y: 31.666656}
       moveId: legacy-move-1-2
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -2527,6 +2622,9 @@ MonoBehaviour:
       fullChargeDamageMultiplier: 2
       fullChargeKnockbackMultiplier: 1.6
       autoReleaseAtFullCharge: 0
+      fullChargeHoldLimit: 1.5
+      chargeCountdownPrefab: {fileID: 0}
+      chargeCountdownOffset: {x: 0, y: 1.15}
     - id: legacy-quick-finisher-Unarmed
       name: "\u5FEB\u901F\u7EC8\u7ED3"
       move:
@@ -2546,10 +2644,15 @@ MonoBehaviour:
           size: {x: 1, y: 0.8}
           interpolation: 0
         - frame: 2
-          enabled: 1
+          enabled: 0
           offset: {x: 0.8436464, y: 0.8775339}
           size: {x: 1.380903, y: 1.1653467}
           interpolation: 1
+        - frame: 3
+          enabled: 1
+          offset: {x: 0.53885174, y: 1.1153195}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
         - frame: 4
           enabled: 0
           offset: {x: 0.65, y: 0}
@@ -2571,7 +2674,7 @@ MonoBehaviour:
           hitEffectLifetime: 0.15
           enableHitStop: 1
           useAttackTypeDefaultHitStop: 1
-          hitStopDuration: 0.035
+          hitStopDuration: 0.1
           enableCameraFeedback: 1
           cameraPower: 0.35
           enableHitSound: 0
@@ -2589,7 +2692,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 758.3334, y: 149.66666}
+      graphPosition: {x: 948.3334, y: 149.66666}
       moveId: legacy-move-1-2
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -2665,35 +2768,51 @@ MonoBehaviour:
       fullChargeDamageMultiplier: 1.5
       fullChargeKnockbackMultiplier: 1.35
       autoReleaseAtFullCharge: 1
+      fullChargeHoldLimit: 1.5
+      chargeCountdownPrefab: {fileID: 0}
+      chargeCountdownOffset: {x: 0, y: 1.15}
     transitions:
     - id: legacy-link-1-0
       fromInstanceId: legacy-instance-1-0
       toInstanceId: legacy-instance-1-1
       input: 0
-      condition: 0
+      condition: 1
       windowStart: 0
       windowEnd: 0.45
       holdThreshold: 0.28
       requiresHit: 0
-    - id: legacy-link-1-1
-      fromInstanceId: legacy-instance-1-1
-      toInstanceId: legacy-instance-1-2
+    inputDecisions:
+    - id: decision-entry-1
+      name: "\u8D77\u624B\u70B9\u6309 / \u957F\u6309"
+      graphPosition: {x: 45.66667, y: 80.5}
+      enabled: 1
+      sourceInstanceId: 
       input: 0
-      condition: 2
-      windowStart: 0
-      windowEnd: 0.46
-      holdThreshold: 0.28
-      requiresHit: 1
-    - id: legacy-tap-finisher-link-Unarmed
-      fromInstanceId: legacy-instance-1-1
-      toInstanceId: legacy-quick-finisher-Unarmed
+      listenStartFrame: 0
+      decisionFrame: 6
+      entryFrameRate: 60
+      tapTargetInstanceId: legacy-instance-1-0
+      holdTargetInstanceId: legacy-instance-1-2
+      noInputTargetInstanceId: 
+      tapRequiresHit: 0
+      holdRequiresHit: 0
+      noInputRequiresHit: 0
+    - id: decision-branch-1-0
+      name: "\u8FDE\u62DB\u70B9\u6309 / \u957F\u6309"
+      graphPosition: {x: 706, y: 73.16666}
+      enabled: 1
+      sourceInstanceId: legacy-instance-1-1
       input: 0
-      condition: 1
-      windowStart: 0
-      windowEnd: 0.46
-      holdThreshold: 0.28
-      requiresHit: 0
-  moveComboSchemaVersion: 6
+      listenStartFrame: 0
+      decisionFrame: 7
+      entryFrameRate: 60
+      tapTargetInstanceId: legacy-quick-finisher-Unarmed
+      holdTargetInstanceId: legacy-instance-1-2
+      noInputTargetInstanceId: 
+      tapRequiresHit: 0
+      holdRequiresHit: 1
+      noInputRequiresHit: 0
+  moveComboSchemaVersion: 7
 --- !u!114 &5090720824673183153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2873,6 +2992,16 @@ MonoBehaviour:
   standSkin: 0.03
   ledgeClimbDuration: 0.6666666
   recatchDelay: 0.15
+  ledgeJumpVelocity: {x: 2.5, y: 6.5}
+  climbableWallCheckDistance: 0.16
+  wallSlideSpeed: 1.2
+  wallGroundClearance: 0.12
+  wallJumpRecatchDelay: 0.14
+  wallJumpVelocity: {x: 5.5, y: 8}
+  ladderSpeed: 2.4
+  ladderGrabTime: 0.15
+  ladderFinishTime: 0.55
+  ladderJumpVelocity: {x: 2.5, y: 6.5}
 --- !u!114 &89275410039288737
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2886,6 +3015,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   current: 0
+  baseCapacity: 5
+  sessionCapacityBonus: 0
+  temporaryCapacityBonus: 0
 --- !u!114 &6472099761644701565
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2925,6 +3057,61 @@ MonoBehaviour:
   minimumRunSpeed: 0.35
   slowFootstepInterval: 0.46
   fastFootstepInterval: 0.27
+--- !u!114 &2545846301071119600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7253538297837963826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b98c206360feb0f4ab961c951685e9aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  profile: {fileID: 11400000, guid: ddc032710b1e44949a86467bf00ca4ae, type: 2}
+  fallbackResourcePath: Player/PlayerInitialStats
+--- !u!114 &5534295138115088618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7253538297837963826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 717c03aa2f2e4cb42a5238fdda934662, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealthBonus: 0
+  attackDamageBonus: 0
+  moveSpeedBonus: 0
+--- !u!114 &3141829786607232412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7253538297837963826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 285a864f0adfc7549bc0b6dd69b5a82f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6176927086389555720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7253538297837963826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcfcf19f2f6bff34196ccb3e65902d2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseDamageConversionRate: 0.2
+  playerConversionMultiplier: 1
 --- !u!1001 &8586523037403407614
 PrefabInstance:
   m_ObjectHideFlags: 0

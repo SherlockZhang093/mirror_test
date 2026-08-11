@@ -45,9 +45,6 @@ namespace MirrorTrial.Player
                 GUILayout.Label($"MoveX: {input.MoveX:F2}");
                 GUILayout.Label($"JumpPressed: {input.JumpPressed}");
                 GUILayout.Label($"AttackPressed: {input.AttackPressed}");
-                GUILayout.Label($"MirrorBlade: {input.MirrorBladePressed}");
-                GUILayout.Label($"WeaponSkill: {input.WeaponSkillPressed}");
-                GUILayout.Label($"MobilitySkill: {input.MobilitySkillPressed}");
                 GUILayout.Label($"CurrentWeapon: {(weapons ? weapons.CurrentWeapon.ToString() : "NOT FOUND")}");
                 GUILayout.Label($"WeaponSlot: {(weapons ? weapons.ActiveSlotIndex + 1 : 0)}");
                 GUILayout.Label($"BowBusy: {(bowCombat && bowCombat.IsBusy)}");

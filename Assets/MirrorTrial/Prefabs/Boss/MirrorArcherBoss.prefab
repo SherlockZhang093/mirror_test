@@ -113,6 +113,7 @@ GameObject:
   - component: {fileID: 2835539372737252912}
   - component: {fileID: 3068242874683099848}
   - component: {fileID: 2443328358335869754}
+  - component: {fileID: 7540805354143708543}
   m_Layer: 0
   m_Name: MirrorArcherBoss
   m_TagString: Untagged
@@ -332,7 +333,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7db163d7d18b204a8619d429cf5112e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  profile: {fileID: 11400000, guid: e8add4ffda48a4a488856c34d6ef009e, type: 2}
+  profile: {fileID: 11400000, guid: edffee12edff59c449e4009d0e10a45c, type: 2}
   swordHitbox: {fileID: 0}
   swordCollider: {fileID: 0}
   sprite: {fileID: 0}
@@ -396,12 +397,12 @@ MonoBehaviour:
     _translation: {x: 0, y: 0}
     _zoomFactor: 1
   _firstActivation: 0
-  _enableAction: 0
+  _enableAction: 1
   _disableAction: 0
   _lockBoundGraphPrefabOverrides: 1
   _preInitializeSubGraphs: 0
   _updateMode: 0
-  _graph: {fileID: 11400000, guid: d8ffd2f1ce221354186ead01d4fc7782, type: 2}
+  _graph: {fileID: 11400000, guid: b1d47f2e9c3a41f0a5e6d7c8b9a0f1e2, type: 2}
   _blackboard: {fileID: 6609300721642846714}
 --- !u!114 &9045947667650302427
 MonoBehaviour:
@@ -467,6 +468,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a54ebd38f3b6ab94d9b7d47a00fa505b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7540805354143708543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2457785708012118478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d7e83d8317f9004e812fb21483261ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  profile: {fileID: 11400000, guid: 3603e30bd43e20d4ba47177980801f1b, type: 2}
+  actor: {fileID: 4616386482382900380}
+  groundMeleeTree: {fileID: 11400000, guid: 15b85af57cfb4ccf8a2b1957a3237532, type: 2}
+  firstRockfallDelay: 3
+  rockfallInterval: 7
+  platformAnimationSheet: {fileID: 2800000, guid: ebf5cc48d1be30a48ac833bd0f0abb5d,
+    type: 3}
+  blockedHitSound: {fileID: 8300000, guid: 00bff0eab37148e39a6e36add8c3a887, type: 3}
+  platformLiftHeight: 2.2
+  platformFramesPerSecond: 12
+  platformPixelsPerUnit: 100
+  platformSurfaceOffset: 0.2
 --- !u!1 &6398127757430621622
 GameObject:
   m_ObjectHideFlags: 0

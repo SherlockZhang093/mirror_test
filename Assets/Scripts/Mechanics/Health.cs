@@ -24,6 +24,23 @@ namespace Platformer.Mechanics
         /// </summary>
         public bool IsAlive => currentHP > 0;
 
+        public void SetMaxHealth(int value, bool healIncrease)
+        {
+            var previousMax = maxHP;
+            maxHP = Mathf.Max(1, value);
+            if (healIncrease && maxHP > previousMax && currentHP > 0)
+                currentHP = Mathf.Min(maxHP, currentHP + maxHP - previousMax);
+            else
+                currentHP = Mathf.Clamp(currentHP, 0, maxHP);
+            Changed?.Invoke(currentHP, maxHP);
+        }
+
+        public void SetCurrentHealth(int value)
+        {
+            currentHP = Mathf.Clamp(value, 0, Mathf.Max(1, maxHP));
+            Changed?.Invoke(currentHP, maxHP);
+        }
+
         int currentHP;
 
         /// <summary>

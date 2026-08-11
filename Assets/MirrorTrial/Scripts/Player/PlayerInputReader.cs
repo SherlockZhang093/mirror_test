@@ -15,7 +15,8 @@ namespace MirrorTrial.Player
         WeaponSlot3,
         WeaponSlot4,
         Dodge,
-        Recover
+        Recover,
+        Interact
     }
 
     [Serializable]
@@ -64,13 +65,9 @@ namespace MirrorTrial.Player
         public bool JumpPressed { get; private set; }
         public bool JumpReleased { get; private set; }
         public bool AttackPressed => WasPressed(PlayerInputCommand.PrimaryAttack);
-        public bool SecondaryAttackPressed => WasPressed(PlayerInputCommand.SecondaryAttack);
-        public bool WeaponSkillPressed => WasPressed(PlayerInputCommand.WeaponSkill);
-        public bool MobilitySkillPressed => WasPressed(PlayerInputCommand.MobilitySkill);
-        public bool MirrorBladePressed => WeaponSkillPressed;
-        public bool EchoDashPressed => MobilitySkillPressed;
         public bool DodgePressed => WasPressed(PlayerInputCommand.Dodge);
         public bool RecoverPressed => WasPressed(PlayerInputCommand.Recover);
+        public bool InteractPressed => WasPressed(PlayerInputCommand.Interact);
 
         public IList<PlayerInputBinding> Bindings { get { return bindings; } }
 
@@ -123,11 +120,26 @@ namespace MirrorTrial.Player
                     isReleased |= Input.GetKeyUp(binding.key);
                     isHeld |= Input.GetKey(binding.key);
                 }
-                pressed[binding.command] = isPressed;
-                released[binding.command] = isReleased;
-                held[binding.command] = isHeld;
+                Accumulate(binding.command, isPressed, isReleased, isHeld);
             }
+
+            // Primary attack is part of the game's fixed keyboard/mouse contract
+            // (J / left mouse). Read the mouse button directly as well as through
+            // Fire1 so the action keeps working if the legacy Input Manager entry
+            // is missing or has been changed in a scene/project copy.
+            Accumulate(
+                PlayerInputCommand.PrimaryAttack,
+                Input.GetMouseButtonDown(0),
+                Input.GetMouseButtonUp(0),
+                Input.GetMouseButton(0));
             ApplyPreviewInput();
+        }
+
+        void Accumulate(PlayerInputCommand command, bool isPressed, bool isReleased, bool isHeld)
+        {
+            pressed[command] = WasPressed(command) || isPressed;
+            released[command] = WasReleased(command) || isReleased;
+            held[command] = IsHeld(command) || isHeld;
         }
 
         public void PreviewTap(PlayerInputCommand command)
@@ -219,6 +231,10 @@ namespace MirrorTrial.Player
             if (bindingSchemaVersion < 4)
                 RemoveBindingsCreatedByDodgePopupBug();
 
+            // Retain the enum values for serialized-data compatibility, but remove
+            // the retired player-facing actions from every existing binding list.
+            RemoveRetiredActionBindings();
+
             var defaults = CreateDefaultBindings();
             for (var i = 0; i < defaults.Count; i++)
             {
@@ -234,7 +250,22 @@ namespace MirrorTrial.Player
                 if (!exists)
                     bindings.Add(defaults[i]);
             }
-            bindingSchemaVersion = 5;
+            bindingSchemaVersion = 7;
+        }
+
+        void RemoveRetiredActionBindings()
+        {
+            for (var i = bindings.Count - 1; i >= 0; i--)
+            {
+                var binding = bindings[i];
+                if (binding == null)
+                    continue;
+
+                if (binding.command == PlayerInputCommand.SecondaryAttack ||
+                    binding.command == PlayerInputCommand.WeaponSkill ||
+                    binding.command == PlayerInputCommand.MobilitySkill)
+                    bindings.RemoveAt(i);
+            }
         }
 
         void RemoveBindingsCreatedByDodgePopupBug()
@@ -262,15 +293,13 @@ namespace MirrorTrial.Player
             return new List<PlayerInputBinding>
             {
                 new PlayerInputBinding(PlayerInputCommand.PrimaryAttack, "Fire1", KeyCode.J),
-                new PlayerInputBinding(PlayerInputCommand.SecondaryAttack, "Fire2", KeyCode.K),
-                new PlayerInputBinding(PlayerInputCommand.WeaponSkill, "Fire3", KeyCode.L),
-                new PlayerInputBinding(PlayerInputCommand.MobilitySkill, string.Empty, KeyCode.Q),
                 new PlayerInputBinding(PlayerInputCommand.WeaponSlot1, string.Empty, KeyCode.Alpha1),
                 new PlayerInputBinding(PlayerInputCommand.WeaponSlot2, string.Empty, KeyCode.Alpha2),
                 new PlayerInputBinding(PlayerInputCommand.WeaponSlot3, string.Empty, KeyCode.Alpha3),
                 new PlayerInputBinding(PlayerInputCommand.WeaponSlot4, string.Empty, KeyCode.Alpha4),
                 new PlayerInputBinding(PlayerInputCommand.Dodge, string.Empty, KeyCode.LeftShift),
-                new PlayerInputBinding(PlayerInputCommand.Recover, string.Empty, KeyCode.G)
+                new PlayerInputBinding(PlayerInputCommand.Recover, string.Empty, KeyCode.G),
+                new PlayerInputBinding(PlayerInputCommand.Interact, string.Empty, KeyCode.E)
             };
         }
     }

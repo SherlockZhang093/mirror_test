@@ -1,9 +1,10 @@
-using System.Collections;
 using System;
+using System.Collections;
 using MirrorTrial.Audio;
 using MirrorTrial.Combat;
-using MirrorTrial.Player;
+using MirrorTrial.Growth;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MirrorTrial.HealthResources
 {
@@ -18,8 +19,10 @@ namespace MirrorTrial.HealthResources
     public sealed class HealthResourceNode : MonoBehaviour
     {
         [Header("Resource")]
+        [SerializeField] string resourceNodeId;
         [SerializeField, Min(1)] int maxDurability = 30;
-        [SerializeField, Min(1)] int healthReward = 25;
+        [FormerlySerializedAs("healthReward")]
+        [SerializeField, Min(0)] int lifeEssenceReward = 25;
         [SerializeField] bool countHitsInsteadOfDamage;
 
         [Header("Reward Presentation")]
@@ -53,16 +56,17 @@ namespace MirrorTrial.HealthResources
         public event Action<int, int> DurabilityChanged;
         public event Action Depleted;
 
+        public string ResourceNodeId => resourceNodeId;
         public int CurrentDurability => currentDurability;
         public int MaxDurability => maxDurability;
-        public int HealthReward => healthReward;
+        public int LifeEssenceReward => lifeEssenceReward;
         public bool IsDestroyed => destroyed;
         public bool IsInitialized => initialized;
 
         void Awake()
         {
             maxDurability = Mathf.Max(1, maxDurability);
-            healthReward = Mathf.Max(1, healthReward);
+            lifeEssenceReward = Mathf.Max(0, lifeEssenceReward);
             currentDurability = maxDurability;
             if (flashRenderers == null || flashRenderers.Length == 0)
                 flashRenderers = GetComponentsInChildren<SpriteRenderer>(true);
@@ -79,7 +83,7 @@ namespace MirrorTrial.HealthResources
             Trace(
                 $"[接收层] Node={name}, Source={(payload.source ? payload.source.name : "<null>")}, " +
                 $"Damage={payload.damage}, IsPlayer={playerSource}, Destroyed={destroyed}, " +
-                $"Durability={currentDurability}/{maxDurability}");
+                $"Durability={currentDurability}/{maxDurability}, NodeId={resourceNodeId}");
 
             if (destroyed)
             {
@@ -102,19 +106,23 @@ namespace MirrorTrial.HealthResources
             Trace($"[耐久扣除] -{durabilityDamage}, 当前={currentDurability}/{maxDurability}");
             DurabilityChanged?.Invoke(currentDurability, maxDurability);
             PlayHitFeedback();
-            if (currentDurability <= 0) DestroyNode(payload.source);
+            if (currentDurability <= 0)
+                DestroyNode();
         }
 
         static bool IsPlayerSource(GameObject source)
         {
-            return source && source.GetComponentInParent<PlayerInputReader>();
+            return source && source.GetComponentInParent<MirrorTrial.Player.PlayerInputReader>();
         }
 
         void PlayHitFeedback()
         {
-            if (animator && !string.IsNullOrEmpty(hitTrigger)) animator.SetTrigger(hitTrigger);
-            if (flashRoutine != null) StopCoroutine(flashRoutine);
-            if (flashDuration > 0f && flashRenderers.Length > 0) flashRoutine = StartCoroutine(FlashRoutine());
+            if (animator && !string.IsNullOrEmpty(hitTrigger))
+                animator.SetTrigger(hitTrigger);
+            if (flashRoutine != null)
+                StopCoroutine(flashRoutine);
+            if (flashDuration > 0f && flashRenderers.Length > 0)
+                flashRoutine = StartCoroutine(FlashRoutine());
             var palette = GameAudioPalette.LoadDefault();
             var clip = hitSound;
             var audioVolume = 1f;
@@ -142,52 +150,61 @@ namespace MirrorTrial.HealthResources
         void SetFlashColors(Color color)
         {
             for (var i = 0; i < flashRenderers.Length; i++)
-                if (flashRenderers[i]) flashRenderers[i].color = color;
+                if (flashRenderers[i])
+                    flashRenderers[i].color = color;
         }
 
         void RestoreColors()
         {
             for (var i = 0; i < flashRenderers.Length; i++)
-                if (flashRenderers[i]) flashRenderers[i].color = originalColors[i];
+                if (flashRenderers[i])
+                    flashRenderers[i].color = originalColors[i];
         }
 
-        void DestroyNode(GameObject source)
+        void DestroyNode()
         {
-            if (destroyed) return;
+            if (destroyed)
+                return;
+
             destroyed = true;
-            var reserve = source ? source.GetComponentInParent<PlayerHealthReserve>() : null;
-            if (!reserve) reserve = FindObjectOfType<PlayerHealthReserve>();
-            if (reserve)
+            var resolvedNodeId = ResolveNodeId();
+            if (string.IsNullOrWhiteSpace(resourceNodeId))
+                Debug.LogWarning($"[HealthResourceNode] {name} 未配置 resourceNodeId，已临时使用层级路径作为会话内 ID：{resolvedNodeId}", this);
+            var session = GameSessionProgress.Ensure();
+            var claimed = session && session.TryClaimLifeEssence(resolvedNodeId, lifeEssenceReward);
+            if (claimed)
             {
-                // Gameplay state is committed immediately. The travelling orb is presentation only,
-                // so disabling the node, changing scenes, or losing the effect can never discard health.
-                var added = reserve.Add(healthReward);
                 Trace(
-                    $"[储备写入] 请求={healthReward}, 实际写入={added}, " +
-                    $"当前储备={reserve.Current}/{reserve.Capacity}, Player={reserve.name}");
-                if (added > 0)
-                    HealthResourceTransferEffect.TrySpawn(
+                    $"[精华写入] NodeId={resolvedNodeId}, 请求={lifeEssenceReward}, 当前精华={session.LifeEssence}");
+                if (lifeEssenceReward > 0)
+                    LifeEssenceTransferEffect.TrySpawn(
                         transform.position + rewardEffectOffset,
-                        reserve,
                         rewardOrbSprite,
                         rewardOrbColor,
                         rewardTravelDuration);
             }
-            else Debug.LogWarning("[HealthResourceNode] PlayerHealthReserve was not found; reward was discarded.", this);
+            else
+            {
+                Trace($"[精华写入][忽略] NodeId={resolvedNodeId}, Reward={lifeEssenceReward}");
+            }
 
             var hurtbox = GetComponent<Hurtbox>();
-            if (hurtbox) hurtbox.enabled = false;
+            if (hurtbox)
+                hurtbox.enabled = false;
             var collider = GetComponent<Collider2D>();
-            if (collider) collider.enabled = false;
+            if (collider)
+                collider.enabled = false;
             Depleted?.Invoke();
             if (depletedSound)
             {
                 var palette = GameAudioPalette.LoadDefault();
                 var audioVolume = palette ? palette.resourcePickupVolume : 1f;
-                AudioSource.PlayClipAtPoint(depletedSound, transform.position, GameAudioPalette.ScaleDefaultVolume(hitVolume, audioVolume));
+                AudioSource.PlayClipAtPoint(depletedSound, transform.position,
+                    GameAudioPalette.ScaleDefaultVolume(hitVolume, audioVolume));
             }
 
-            if (keepDepletedVisual) return;
+            if (keepDepletedVisual)
+                return;
             if (deactivateDelay <= 0f)
             {
                 gameObject.SetActive(false);
@@ -215,16 +232,35 @@ namespace MirrorTrial.HealthResources
                 StopCoroutine(deactivateRoutine);
                 deactivateRoutine = null;
             }
-            if (originalColors != null) RestoreColors();
+            if (originalColors != null)
+                RestoreColors();
+        }
+
+        string ResolveNodeId()
+        {
+            if (!string.IsNullOrWhiteSpace(resourceNodeId))
+                return resourceNodeId;
+
+            var current = transform;
+            var path = current.name + "[" + current.GetSiblingIndex() + "]";
+            while (current.parent != null)
+            {
+                current = current.parent;
+                path = current.name + "[" + current.GetSiblingIndex() + "]" + "/" + path;
+            }
+
+            var sceneName = gameObject.scene.IsValid() ? gameObject.scene.name : "UnloadedScene";
+            return sceneName + ":" + path;
         }
 
         void OnValidate()
         {
             maxDurability = Mathf.Max(1, maxDurability);
-            healthReward = Mathf.Max(1, healthReward);
+            lifeEssenceReward = Mathf.Max(0, lifeEssenceReward);
             deactivateDelay = Mathf.Max(0f, deactivateDelay);
             rewardTravelDuration = Mathf.Max(0.1f, rewardTravelDuration);
-            if (!animator) animator = GetComponentInChildren<Animator>();
+            if (!animator)
+                animator = GetComponentInChildren<Animator>();
             if (flashRenderers == null || flashRenderers.Length == 0)
                 flashRenderers = GetComponentsInChildren<SpriteRenderer>(true);
         }

@@ -15,7 +15,35 @@ namespace MirrorTrial.Editor
 
         static StructuralSupportPlacementSetup()
         {
-            EditorApplication.delayCall += TryAutomaticInstall;
+            // These supports used to be installed automatically whenever Unity
+            // reloaded editor scripts. Remove the legacy generated hierarchy
+            // instead, and leave the installer available only for explicit use.
+            EditorApplication.delayCall += RemoveLegacyGeneratedSupports;
+            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+        }
+
+        private static void OnPlayModeStateChanged(PlayModeStateChange state)
+        {
+            if (state == PlayModeStateChange.EnteredEditMode)
+                RemoveLegacyGeneratedSupports();
+        }
+
+        private static void RemoveLegacyGeneratedSupports()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                return;
+
+            Scene scene = SceneManager.GetActiveScene();
+            if (!scene.IsValid() || scene.name != "Level_Reality_01")
+                return;
+
+            GameObject root = GameObject.Find(RootName);
+            if (root == null)
+                return;
+
+            Object.DestroyImmediate(root);
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
         }
         public static void InstallFromMenu()
         {

@@ -25,7 +25,7 @@ namespace MirrorTrial.Level
         {
             TutorialRequested = playTutorial;
             MirrorTransitionBridge.Ensure().ResetForNewGame();
-            SceneManager.LoadScene(FirstRealitySceneName, LoadSceneMode.Single);
+            SceneTransitionController.LoadScene(FirstRealitySceneName);
         }
 
         public static void ReturnToEntry()
@@ -43,11 +43,15 @@ namespace MirrorTrial.Level
                 if (RealityScenes[i] != currentSceneName)
                     continue;
 
-                SceneManager.LoadScene(RealityScenes[i + 1], LoadSceneMode.Single);
-                return true;
+                return SceneTransitionController.LoadScene(RealityScenes[i + 1]);
             }
 
             return false;
+        }
+
+        public static bool LoadSceneWithTransition(string sceneName)
+        {
+            return SceneTransitionController.LoadScene(sceneName);
         }
     }
 }

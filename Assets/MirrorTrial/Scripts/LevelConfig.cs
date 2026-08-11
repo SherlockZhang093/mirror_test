@@ -45,6 +45,15 @@ namespace MirrorTrial.Level
         [ChineseLabel("触发器条目")] public List<TriggerEntry> triggers = new List<TriggerEntry>();
     }
 
+    public enum GeometryType
+    {
+        Unknown = 0,
+        Platform = 1,
+        Boundary = 2,
+        SolidBlock = 3,
+        ClimbableWall = 4
+    }
+
     [System.Serializable]
     public class GeometryEntry
     {
@@ -53,6 +62,7 @@ namespace MirrorTrial.Level
         public Vector2 size = Vector2.one;
         public bool isBoundary;
         public bool isPlatform;
+        public GeometryType geometryType;
         public int platformVisualIndex;
         public Color color = Color.white;
     }

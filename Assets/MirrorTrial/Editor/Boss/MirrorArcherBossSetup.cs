@@ -17,7 +17,7 @@ namespace MirrorTrial.Boss.Editor
         const string DefaultMinionPath = "Assets/MirrorTrial/Enemies/E001_NewEnemy/Prefabs/Enemy_E001_NewEnemy.prefab";
 
         [MenuItem("Mirror Trial/Boss/Build Mirror Archer Boss")]
-        public static void RebuildFromMenu() => Build(true);
+        public static void RebuildFromMenu() => MirrorArcherTwoStageSetup.RebuildFromMenu();
 
         static void Build(bool force)
         {

@@ -1,5 +1,6 @@
 using System.Collections;
 using MirrorTrial.Player;
+using Platformer.Mechanics;
 using UnityEngine;
 
 namespace MirrorTrial.Level
@@ -12,7 +13,8 @@ namespace MirrorTrial.Level
         EncounterCleared,
         MirrorSmashed,
         MirrorCompleted,
-        PreviousSequenceCompleted
+        PreviousSequenceCompleted,
+        PlayerHealthAtOrBelow
     }
 
     /// <summary>
@@ -30,13 +32,18 @@ namespace MirrorTrial.Level
         [SerializeField] StoryTutorialSequence previousSequence;
         [SerializeField] StoryTutorialSequence nextSequence;
         [SerializeField, Min(0f)] float nextSequenceDelay;
+        [SerializeField, Min(1)] int healthThreshold = 2;
+        [SerializeField] bool requireLifeEnergy = true;
 
         bool fired;
         bool subscribed;
+        Health playerHealth;
+        PlayerHealthReserve playerHealthReserve;
 
         public StoryTutorialSequence Sequence => sequence;
         public StorySequenceTriggerMode TriggerMode => triggerMode;
         public StoryTutorialSequence NextSequence => nextSequence;
+        public int HealthThreshold => healthThreshold;
 
         void Awake()
         {
@@ -57,11 +64,14 @@ namespace MirrorTrial.Level
             yield return null;
             if (triggerMode == StorySequenceTriggerMode.SceneStart)
                 Fire();
+            else if (triggerMode == StorySequenceTriggerMode.PlayerHealthAtOrBelow)
+                yield return BindPlayerHealth();
         }
 
         void OnDisable()
         {
             Unsubscribe();
+            UnsubscribePlayerHealth();
         }
 
         void OnTriggerEnter2D(Collider2D other)
@@ -149,6 +159,63 @@ namespace MirrorTrial.Level
         void OnSequenceCompleted()
         {
             if (nextSequence) StartCoroutine(PlayNextAfter(nextSequenceDelay));
+        }
+
+        IEnumerator BindPlayerHealth()
+        {
+            while (isActiveAndEnabled && triggerMode == StorySequenceTriggerMode.PlayerHealthAtOrBelow)
+            {
+                var bridge = MirrorTransitionBridge.Instance;
+                var player = bridge && bridge.PersistentPlayer
+                    ? bridge.PersistentPlayer
+                    : FindObjectOfType<PlayerInputReader>()?.gameObject;
+                if (player)
+                {
+                    playerHealth = player.GetComponent<Health>();
+                    playerHealthReserve = player.GetComponent<PlayerHealthReserve>();
+                    if (playerHealth)
+                    {
+                        playerHealth.Changed += OnPlayerHealthChanged;
+                        if (playerHealthReserve)
+                            playerHealthReserve.Changed += OnLifeEnergyChanged;
+                        EvaluateLowHealth(playerHealth.CurrentHP);
+                        yield break;
+                    }
+                }
+                yield return null;
+            }
+        }
+
+        void OnPlayerHealthChanged(int current, int maximum)
+        {
+            EvaluateLowHealth(current);
+        }
+
+        void OnLifeEnergyChanged(int current, int capacity)
+        {
+            if (playerHealth)
+                EvaluateLowHealth(playerHealth.CurrentHP);
+        }
+
+        void EvaluateLowHealth(int current)
+        {
+            if (current <= 0 || current > Mathf.Max(1, healthThreshold))
+                return;
+            if (requireLifeEnergy && (!playerHealthReserve || playerHealthReserve.Current <= 0))
+                return;
+            Fire();
+            if (oneShot && fired)
+                UnsubscribePlayerHealth();
+        }
+
+        void UnsubscribePlayerHealth()
+        {
+            if (playerHealth)
+                playerHealth.Changed -= OnPlayerHealthChanged;
+            if (playerHealthReserve)
+                playerHealthReserve.Changed -= OnLifeEnergyChanged;
+            playerHealth = null;
+            playerHealthReserve = null;
         }
 
         void OnDrawGizmos()

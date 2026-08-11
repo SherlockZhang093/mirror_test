@@ -19,6 +19,7 @@ namespace MirrorTrial.Editor.Level
             Level,
             Geometry,
             Gameplay,
+            Narrative,
             Enemies,
             Review
         }
@@ -38,9 +39,11 @@ namespace MirrorTrial.Editor.Level
 
         enum GeometryKind
         {
+            // Terrain choices exposed by the level editor.
             Platform,
             Boundary,
-            SolidBlock
+            SolidBlock,
+            ClimbableWall
         }
 
         GeometryKind geometryKind = GeometryKind.Platform;
@@ -72,6 +75,7 @@ namespace MirrorTrial.Editor.Level
         void OnEnable()
         {
             manager = target as MirrorTrial.Level.LevelManager;
+            EnsureClimbableWallMarkers(manager ? manager.GeometryRoot : null);
             levelConfig = serializedObject.FindProperty("levelConfig");
             levelId = serializedObject.FindProperty("levelId");
             levelDisplayName = serializedObject.FindProperty("levelDisplayName");
@@ -89,6 +93,22 @@ namespace MirrorTrial.Editor.Level
                 HealthResourceCatalogEditorUtility.Rebuild();
             SelectFirstAvailableHealthResource();
             SceneView.duringSceneGui += OnSceneGUI;
+        }
+
+        static void EnsureClimbableWallMarkers(Transform root)
+        {
+            if (!root) return;
+            foreach (Transform child in root)
+            {
+                if (!child.name.StartsWith("ClimbWall_"))
+                    continue;
+
+                GameObjectUtility.RemoveMonoBehavioursWithMissingScript(child.gameObject);
+                if (child.GetComponent<ClimbableWall>())
+                    continue;
+                child.gameObject.AddComponent<ClimbableWall>();
+                EditorUtility.SetDirty(child.gameObject);
+            }
         }
 
         void OnDisable()
@@ -131,6 +151,9 @@ namespace MirrorTrial.Editor.Level
                     EditorGUILayout.Space(12);
                     DrawCollections();
                     break;
+                case EditorTab.Narrative:
+                    DrawNarrativeTools();
+                    break;
                 case EditorTab.Enemies:
                     DrawEnemyPlacementTools();
                     break;
@@ -149,6 +172,45 @@ namespace MirrorTrial.Editor.Level
             }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        void DrawNarrativeTools()
+        {
+            EditorGUILayout.LabelField("剧情与新手指引", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox("在同一个段落里组合新手指引、内心独白、系统提示和镜头演出。触发方式可以选择玩家进入区域。", MessageType.Info);
+            EditorGUILayout.Space(6);
+
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("打开剧情指引编辑器", GUILayout.Height(32)))
+                StoryNarrativeEditorWindow.Open();
+            if (GUILayout.Button("检查当前关卡", GUILayout.Height(32)))
+                StoryNarrativeValidator.ValidateCurrentSceneFromMenu();
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Space(12);
+            var storySequences = FindObjectsOfType<StoryTutorialSequence>(true)
+                .Where(item => item.gameObject.scene == manager.gameObject.scene)
+                .OrderBy(item => item.transform.GetSiblingIndex())
+                .ToArray();
+            EditorGUILayout.LabelField($"当前场景段落（{storySequences.Length}）", EditorStyles.boldLabel);
+            if (storySequences.Length == 0)
+            {
+                EditorGUILayout.HelpBox("还没有剧情段落。打开剧情指引编辑器后，点击“新增剧情段落”即可创建。", MessageType.None);
+                return;
+            }
+
+            foreach (var sequence in storySequences)
+            {
+                EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
+                if (GUILayout.Button(sequence.DisplayName, EditorStyles.label))
+                {
+                    Selection.activeGameObject = sequence.gameObject;
+                    EditorGUIUtility.PingObject(sequence.gameObject);
+                }
+                GUILayout.FlexibleSpace();
+                GUILayout.Label($"{sequence.Steps.Count} 步", EditorStyles.miniLabel);
+                EditorGUILayout.EndHorizontal();
+            }
         }
 
         void DrawLevelSettings()
@@ -431,7 +493,13 @@ namespace MirrorTrial.Editor.Level
             Undo.RegisterCreatedObjectUndo(created, "放置生命资源");
             created.transform.SetParent(parent);
             created.transform.position = position;
-            created.name = manager.GetUniqueName(healthResourcePrefab.name + "_01");
+            var node = created.GetComponent<HealthResourceNode>();
+            var stableId = LifeEssenceNodeIdValidator.AssignStableId(node);
+            var typeKey = LifeEssenceNodeIdValidator.GetTypeKey(node);
+            var sequence = string.IsNullOrEmpty(stableId)
+                ? "001"
+                : stableId.Substring(stableId.LastIndexOf('.') + 1);
+            created.name = $"{typeKey}_{sequence}";
             EditorUtility.SetDirty(created);
             EditorSceneManager.MarkSceneDirty(created.scene);
             Selection.activeGameObject = created;
@@ -457,7 +525,17 @@ namespace MirrorTrial.Editor.Level
 
         void DrawGeometryTools()
         {
-            geometryKind = (GeometryKind)EditorGUILayout.Popup("地形类型", (int)geometryKind, new[] { "平台", "边界", "实体块" });
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("可攀爬墙", GUILayout.Height(26f)))
+            {
+                geometryKind = GeometryKind.ClimbableWall;
+                geometrySize = new Vector2(1f, 6f);
+            }
+            if (geometryKind == GeometryKind.ClimbableWall)
+                EditorGUILayout.LabelField("当前：可攀爬墙", EditorStyles.boldLabel);
+            EditorGUILayout.EndHorizontal();
+
+            geometryKind = (GeometryKind)EditorGUILayout.Popup("地形类型", (int)geometryKind, new[] { "平台", "边界", "实体块", "可攀爬墙" });
             geometrySize = EditorGUILayout.Vector2Field("默认尺寸", geometrySize);
             showAllPlatforms = EditorGUILayout.Toggle(
                 new GUIContent("显示当前所有平台", "在 Scene 视图中显示平台碰撞范围和位置"),
@@ -500,6 +578,9 @@ namespace MirrorTrial.Editor.Level
             var col = go.AddComponent<BoxCollider2D>();
             col.size = geometrySize;
             col.isTrigger = false;
+
+            if (kind == GeometryKind.ClimbableWall)
+                go.AddComponent<ClimbableWall>();
 
             ApplyGroundLayerRecursive(go);
 
@@ -577,6 +658,7 @@ namespace MirrorTrial.Editor.Level
             {
                 case GeometryKind.Boundary: return "Boundary_";
                 case GeometryKind.SolidBlock: return "Block_";
+                case GeometryKind.ClimbableWall: return "ClimbWall_";
                 default: return "Platform_";
             }
         }
@@ -587,6 +669,7 @@ namespace MirrorTrial.Editor.Level
             {
                 case GeometryKind.Boundary: return new Color(1f, 0.25f, 0.25f, 0.35f);
                 case GeometryKind.SolidBlock: return new Color(0.7f, 0.7f, 0.7f, 0.8f);
+                case GeometryKind.ClimbableWall: return new Color(0.2f, 1f, 0.65f, 0.8f);
                 default: return Color.white;
             }
         }
@@ -630,7 +713,7 @@ namespace MirrorTrial.Editor.Level
             if (currentTab == EditorTab.Geometry && geometryPlacementActive)
             {
                 var position = GetSceneMousePosition(e);
-                DrawPlacementPreview(position, new Color(0.65f, 0.45f, 1f, 1f));
+                DrawPlacementPreview(position, GetGeometryColor(geometryKind));
                 if (HandlePlacementClick(e, () => AddGeometryObject(geometryKind, position), () => geometryPlacementActive = false))
                     return;
             }

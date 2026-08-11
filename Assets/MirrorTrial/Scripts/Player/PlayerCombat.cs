@@ -404,9 +404,9 @@ namespace MirrorTrial.Player
             motor.ApplyForcedVelocity(-payload.direction * speed, duration);
         }
 
-        void OnAttackConnected(DamagePayload payload)
+        void OnAttackConnected(GameObject target)
         {
-            if (acceptingComboHitConfirm && payload.source == gameObject)
+            if (acceptingComboHitConfirm && target)
                 currentComboMoveHitConfirmed = true;
         }
 
@@ -508,6 +508,8 @@ namespace MirrorTrial.Player
         public void CancelCurrentAction(PlayerActionCancelReason reason)
         {
             actionVersion++;
+            runtimeCurrentDecisionId = string.Empty;
+            runtimeDecisionProgress = 0f;
             CancelChargePresentation(reason == PlayerActionCancelReason.Hit
                 ? ChargeTelegraphEndReason.Interrupted
                 : ChargeTelegraphEndReason.Cancelled);

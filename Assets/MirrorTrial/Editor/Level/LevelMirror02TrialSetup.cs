@@ -293,7 +293,7 @@ namespace MirrorTrial.Editor.Level
         static void ValidateMirrorScene(Scene scene)
         {
             var manager = FindInScene<LevelManager>(scene);
-            var battleArea = FindInScene<MirrorBossBattleAreaV3>(scene);
+            var battleArea = FindInScene<MirrorArcherTwoStageCoordinator>(scene);
             var encounter = FindInScene<CombatEncounter>(scene);
             var returnOnClear = FindInScene<MirrorReturnOnClear>(scene);
             var floor = scene.GetRootGameObjects()

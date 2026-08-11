@@ -7,7 +7,7 @@ namespace MirrorTrial.Editor.Level
 {
     public class LevelEditorWindow : EditorWindow
     {
-        static readonly string[] TabNames = { "关卡", "地形", "玩法", "敌人", "检查导出" };
+        static readonly string[] TabNames = { "关卡", "地形", "玩法", "剧情指引", "敌人", "检查导出" };
 
         [SerializeField] MirrorTrial.Level.LevelManager manager;
         [SerializeField] int selectedTab;

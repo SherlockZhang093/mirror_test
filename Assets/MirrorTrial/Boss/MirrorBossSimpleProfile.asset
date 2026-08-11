@@ -141,7 +141,7 @@ MonoBehaviour:
     hitStop: 0.1
     interruptPower: 3
     poiseDamage: 4
-    playerHitReaction: 4
+    playerHitReaction: 3
     breaksSuperArmor: 1
     advanceSpeed: 0
     windupFrame: 2
@@ -151,7 +151,7 @@ MonoBehaviour:
     allowFeint: 0
     feintChanceOverride: -1
     animationFrameRate: 12
-    animationFrameCount: 12
+    animationFrameCount: 9
     mirrorHitboxByFacing: 1
     hitboxKeysMigratedToClip: 0
     hitboxKeys:
@@ -160,15 +160,10 @@ MonoBehaviour:
       offset: {x: 0.95, y: 0}
       size: {x: 1.55, y: 1.15}
       interpolation: 0
-    - frame: 4
+    - frame: 3
       enabled: 1
-      offset: {x: 0.95, y: 0}
-      size: {x: 1.55, y: 1.15}
-      interpolation: 1
-    - frame: 7
-      enabled: 0
-      offset: {x: 0.95, y: 0}
-      size: {x: 1.55, y: 1.15}
+      offset: {x: 0.63446414, y: 0.5737007}
+      size: {x: 1.55, y: 0.96791613}
       interpolation: 0
   phaseOneCombo:
   - animationState: ComboAttackA
@@ -203,7 +198,7 @@ MonoBehaviour:
       size: {x: 1.3, y: 0.9}
       interpolation: 0
     - frame: 2
-      enabled: 1
+      enabled: 0
       offset: {x: -0.29534638, y: 1.0138552}
       size: {x: 0.9486191, y: 1.0840178}
       interpolation: 1

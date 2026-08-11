@@ -22,7 +22,7 @@ MonoBehaviour:
   forwardDetectionAngle: 90
   patrolWaitTime: 1
   enablePatrol: 0
-  attackWindup: 1
+  attackWindup: 1.25
   attackCooldown: 1.2
   attackRange: 1
   attackDamage: 1
@@ -30,7 +30,7 @@ MonoBehaviour:
   poiseDamage: 1
   playerHitReaction: 1
   breaksSuperArmor: 0
-  damageDelay: 0.1
+  damageDelay: 1
   projectilePrefab: {fileID: 0}
   projectileSpawnOffset: {x: 0.4, y: 0.2}
   lockMovementWhileAttacking: 1

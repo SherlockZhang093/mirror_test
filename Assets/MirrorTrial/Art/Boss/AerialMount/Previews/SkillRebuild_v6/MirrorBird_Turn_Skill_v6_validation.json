@@ -1,0 +1,234 @@
+{
+  "frame_count": 8,
+  "target_cell": [
+    192,
+    128
+  ],
+  "target_anchor": [
+    96,
+    66
+  ],
+  "invariant_mismatch_pixels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "consecutive_action_changed_pixels": [
+    2604,
+    2218,
+    2676,
+    2706,
+    2586,
+    2172,
+    2296
+  ],
+  "frames": [
+    {
+      "frame": 0,
+      "alpha_bbox": [
+        22,
+        11,
+        126,
+        87
+      ],
+      "touches_edge": false
+    },
+    {
+      "frame": 1,
+      "alpha_bbox": [
+        18,
+        38,
+        119,
+        87
+      ],
+      "touches_edge": false
+    },
+    {
+      "frame": 2,
+      "alpha_bbox": [
+        29,
+        51,
+        124,
+        104
+      ],
+      "touches_edge": false
+    },
+    {
+      "frame": 3,
+      "alpha_bbox": [
+        59,
+        11,
+        132,
+        95
+      ],
+      "touches_edge": false
+    },
+    {
+      "frame": 4,
+      "alpha_bbox": [
+        60,
+        10,
+        132,
+        97
+      ],
+      "touches_edge": false
+    },
+    {
+      "frame": 5,
+      "alpha_bbox": [
+        70,
+        51,
+        162,
+        102
+      ],
+      "touches_edge": false
+    },
+    {
+      "frame": 6,
+      "alpha_bbox": [
+        67,
+        35,
+        164,
+        81
+      ],
+      "touches_edge": false
+    },
+    {
+      "frame": 7,
+      "alpha_bbox": [
+        67,
+        11,
+        170,
+        86
+      ],
+      "touches_edge": false
+    }
+  ],
+  "passed": true,
+  "source_pose_intervals": [
+    [
+      27,
+      231
+    ],
+    [
+      316,
+      516
+    ],
+    [
+      601,
+      790
+    ],
+    [
+      868,
+      1011
+    ],
+    [
+      1146,
+      1288
+    ],
+    [
+      1351,
+      1525
+    ],
+    [
+      1643,
+      1823
+    ],
+    [
+      1928,
+      2131
+    ]
+  ],
+  "source_anchors": [
+    [
+      157.947,
+      397.079
+    ],
+    [
+      170.765,
+      389.176
+    ],
+    [
+      152.9,
+      391.833
+    ],
+    [
+      111.5,
+      387.15
+    ],
+    [
+      115.5,
+      391.05
+    ],
+    [
+      79.05,
+      392.15
+    ],
+    [
+      77.267,
+      401.333
+    ],
+    [
+      67.9,
+      400.333
+    ]
+  ],
+  "final_alpha_bboxes": [
+    [
+      22,
+      11,
+      126,
+      87
+    ],
+    [
+      18,
+      38,
+      119,
+      87
+    ],
+    [
+      29,
+      51,
+      124,
+      104
+    ],
+    [
+      59,
+      11,
+      132,
+      95
+    ],
+    [
+      60,
+      10,
+      132,
+      97
+    ],
+    [
+      70,
+      51,
+      162,
+      102
+    ],
+    [
+      67,
+      35,
+      164,
+      81
+    ],
+    [
+      67,
+      11,
+      170,
+      86
+    ]
+  ],
+  "unique_frames": 8,
+  "no_edge_clipping": true,
+  "green_like_pixels": 0,
+  "passed_final": true
+}

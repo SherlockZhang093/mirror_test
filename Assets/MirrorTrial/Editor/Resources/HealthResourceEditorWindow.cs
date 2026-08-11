@@ -36,7 +36,7 @@ namespace MirrorTrial.Editor.HealthResources
             selectedPrefab = (GameObject)EditorGUILayout.ObjectField("当前 Prefab", selectedPrefab, typeof(GameObject), false);
             EditorGUILayout.Space();
             durability = EditorGUILayout.IntField("最大耐久", Mathf.Max(1, durability));
-            reward = EditorGUILayout.IntField("生命产量", Mathf.Max(1, reward));
+            reward = EditorGUILayout.IntField("生命精华产量", Mathf.Max(0, reward));
             hitTrigger = EditorGUILayout.TextField("受击 Trigger", hitTrigger);
             flashColor = EditorGUILayout.ColorField("闪烁颜色", flashColor);
             flashDuration = EditorGUILayout.FloatField("闪烁时间", Mathf.Max(0f, flashDuration));
@@ -50,7 +50,7 @@ namespace MirrorTrial.Editor.HealthResources
                     ConfigurePrefab(selectedPrefab, durability, reward, hitTrigger, flashColor, flashDuration, hitSound, hitVolume);
                 if (GUILayout.Button("验证配置")) ValidatePrefab(selectedPrefab, true);
             }
-            EditorGUILayout.HelpBox("一次处理一个 Project 中的 Prefab。必需组件会自动安装，现有美术层级不会被改动。", MessageType.Info);
+            EditorGUILayout.HelpBox("一次处理一个 Project 中的 Prefab。必需组件会自动安装，现有美术层级不会被改动。resourceNodeId 需要在场景实例上单独配置，Prefab 本体保持为空。", MessageType.Info);
         }
 
         void ReadCurrentValues()
@@ -60,7 +60,7 @@ namespace MirrorTrial.Editor.HealthResources
             if (!node) return;
             var data = new SerializedObject(node);
             durability = data.FindProperty("maxDurability").intValue;
-            reward = data.FindProperty("healthReward").intValue;
+            reward = data.FindProperty("lifeEssenceReward").intValue;
             hitTrigger = data.FindProperty("hitTrigger").stringValue;
             flashColor = data.FindProperty("flashColor").colorValue;
             flashDuration = data.FindProperty("flashDuration").floatValue;
@@ -84,7 +84,7 @@ namespace MirrorTrial.Editor.HealthResources
                 if (!node) node = root.AddComponent<HealthResourceNode>();
                 var data = new SerializedObject(node);
                 data.FindProperty("maxDurability").intValue = Mathf.Max(1, durability);
-                data.FindProperty("healthReward").intValue = Mathf.Max(1, reward);
+                data.FindProperty("lifeEssenceReward").intValue = Mathf.Max(0, reward);
                 data.FindProperty("animator").objectReferenceValue = root.GetComponentInChildren<Animator>(true);
                 data.FindProperty("hitTrigger").stringValue = trigger;
                 data.FindProperty("flashColor").colorValue = color;

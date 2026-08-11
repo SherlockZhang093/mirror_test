@@ -30,7 +30,7 @@ MonoBehaviour:
   poiseDamage: 1
   playerHitReaction: 1
   breaksSuperArmor: 0
-  damageDelay: 0.22
+  damageDelay: 0.75
   projectilePrefab: {fileID: 7301010000000000001, guid: 0f101e10100000000000000000000002,
     type: 3}
   projectileSpawnOffset: {x: 0.8, y: 0.25}

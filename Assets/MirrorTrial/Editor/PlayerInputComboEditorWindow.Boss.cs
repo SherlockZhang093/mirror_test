@@ -1,8 +1,6 @@
 #if UNITY_EDITOR
 using System.Linq;
 using MirrorTrial.Boss;
-using MirrorTrial.Combat;
-using MirrorTrial.Player;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,672 +8,441 @@ namespace MirrorTrial.Editor
 {
     public sealed partial class PlayerInputComboEditorWindow
     {
-        const string BossProfilePath = "Assets/MirrorTrial/Boss/MirrorBossSimpleProfile.asset";
-        const string BossPrefabPath = "Assets/MirrorTrial/Prefabs/Boss/MirrorBoss.prefab";
+        const string TwoStageProfilePath = "Assets/MirrorTrial/Boss/MirrorArcherTwoStageProfile.asset";
 
-        MirrorBossSimpleProfile bossProfile;
+        MirrorArcherTwoStageProfile bossProfile;
         GameObject bossPreview;
+        GameObject bossSkillPrefabPreview;
         Animator bossPreviewAnimator;
-        Transform bossPreviewHitbox;
-        GameObject bossWindupEffectPreview;
-        ChargeTelegraphPresentation bossWindupEffectPresentation;
-        int bossPhase;
-        int bossHeavyPreviewPhase;
-        int bossStepIndex;
+        int bossStage;
+        int bossSkillIndex;
         bool bossFacingLeft;
-        bool bossPreviewWindupConsumed;
-        double bossPreviewWindupHoldUntil;
+        MirrorArcherSkillType previewSkillType = (MirrorArcherSkillType)(-1);
+        GameObject previewActionPrefab;
 
         void DrawBossModeGUI()
         {
             EnsureBossResources();
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                bossProfile = (MirrorBossSimpleProfile)EditorGUILayout.ObjectField(bossProfile, typeof(MirrorBossSimpleProfile), false, GUILayout.MinWidth(250f));
-                if (GUILayout.Button("创建/重建预览角色", EditorStyles.toolbarButton, GUILayout.Width(125f))) RebuildBossPreview();
-                if (GUILayout.Button("聚焦预览角色", EditorStyles.toolbarButton, GUILayout.Width(100f))) FocusBossPreview();
-                if (GUILayout.Button("保存 Profile", EditorStyles.toolbarButton, GUILayout.Width(100f))) SaveBossProfile();
+                EditorGUI.BeginChangeCheck();
+                bossProfile = (MirrorArcherTwoStageProfile)EditorGUILayout.ObjectField(
+                    bossProfile, typeof(MirrorArcherTwoStageProfile), false, GUILayout.MinWidth(280f));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    bossSkillIndex = 0;
+                    RebuildBossPreview();
+                }
+                if (GUILayout.Button("重建两阶段资源", EditorStyles.toolbarButton, GUILayout.Width(120f)))
+                    MirrorTrial.Boss.Editor.MirrorArcherTwoStageSetup.RebuildFromMenu();
+                if (GUILayout.Button("重建真实预览", EditorStyles.toolbarButton, GUILayout.Width(105f))) RebuildBossPreview();
+                if (GUILayout.Button("保存 Profile", EditorStyles.toolbarButton, GUILayout.Width(95f))) SaveBossProfile();
             }
 
             if (!bossProfile)
             {
-                EditorGUILayout.HelpBox("未找到 MirrorBossSimpleProfile。", MessageType.Warning);
+                EditorGUILayout.HelpBox("未找到 MirrorArcherTwoStageProfile。请点击“重建两阶段资源”。", MessageType.Warning);
                 return;
             }
-
-            DrawBossFeintSettings();
+            bossProfile.EnsureDefaults();
 
             EditorGUI.BeginChangeCheck();
-            bossPhase = GUILayout.Toolbar(bossPhase, new[] { "阶段 1", "阶段 2", "阶段 3", "蓄力重斩" });
+            bossStage = GUILayout.Toolbar(bossStage, new[] { "空中阶段（独立坐骑血量）", "地面阶段（最终 Boss 血量）" }, GUILayout.Height(25f));
             if (EditorGUI.EndChangeCheck())
             {
-                bossStepIndex = 0;
+                bossSkillIndex = 0;
                 currentFrame = 0;
                 animationPlaying = false;
-                StopBossWindupEffectPreview();
-                if (bossPhase < 3) bossHeavyPreviewPhase = bossPhase;
+                RebuildBossPreview();
             }
 
-            if (IsEditingBossHeavySlash())
+            var profileObject = new SerializedObject(bossProfile);
+            profileObject.Update();
+            DrawStageContract(profileObject);
+            var list = profileObject.FindProperty(bossStage == 0 ? "airSkills" : "groundSkills");
+            if (list == null || list.arraySize == 0)
             {
-                DrawBossHeavySlashSettings();
-                EditorGUILayout.LabelField("当前剑招", "蓄力重斩（独立直接攻击）");
-            }
-            var combo = GetBossCombo();
-            if (combo == null || combo.Length == 0)
-            {
-                EditorGUILayout.HelpBox("当前阶段没有剑招。", MessageType.Info);
+                EditorGUILayout.HelpBox("当前阶段没有技能。", MessageType.Warning);
+                profileObject.ApplyModifiedProperties();
                 return;
             }
 
-            bossStepIndex = Mathf.Clamp(bossStepIndex, 0, combo.Length - 1);
-            if (!IsEditingBossHeavySlash())
+            bossSkillIndex = Mathf.Clamp(bossSkillIndex, 0, list.arraySize - 1);
+            var names = Enumerable.Range(0, list.arraySize).Select(index =>
             {
-                var names = combo.Select((step, index) => $"{index + 1}. {(step == null ? "空剑招" : step.animationState)}").ToArray();
-                bossStepIndex = EditorGUILayout.Popup("当前剑招", bossStepIndex, names);
+                var item = list.GetArrayElementAtIndex(index);
+                var name = item.FindPropertyRelative("displayName").stringValue;
+                var type = (MirrorArcherSkillType)item.FindPropertyRelative("type").enumValueIndex;
+                return $"{index + 1}. {name} ({type})";
+            }).ToArray();
+            EditorGUI.BeginChangeCheck();
+            bossSkillIndex = EditorGUILayout.Popup("当前技能", bossSkillIndex, names);
+            if (EditorGUI.EndChangeCheck())
+            {
+                currentFrame = 0;
+                animationPlaying = false;
+                RebuildBossSkillPrefabPreview();
             }
-            var step = combo[bossStepIndex];
-            if (step == null) return;
 
-            var clip = GetBossClip(step.animationState);
-            EnsureBossStepForClip(step, clip);
-            var frameRate = Mathf.Max(1, step.animationFrameRate);
-            var maxFrame = Mathf.Max(1, step.animationFrameCount - 1);
-            currentFrame = Mathf.Clamp(currentFrame, 0, maxFrame);
+            var skill = list.GetArrayElementAtIndex(bossSkillIndex);
+            DrawSkillEditor(skill);
+            profileObject.ApplyModifiedProperties();
+            EditorUtility.SetDirty(bossProfile);
+
+            var runtimeSkill = GetBossSkill();
+            if (runtimeSkill != null && (runtimeSkill.type != previewSkillType || runtimeSkill.projectilePrefab != previewActionPrefab))
+                RebuildBossSkillPrefabPreview();
+            SceneView.RepaintAll();
+        }
+
+        void DrawStageContract(SerializedObject profileObject)
+        {
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField(bossStage == 0 ? "空中阶段 Prefab / 美术契约" : "地面阶段 Prefab / 共享近战数据", EditorStyles.boldLabel);
+                if (bossStage == 0)
+                {
+                    EditorGUILayout.PropertyField(profileObject.FindProperty("mountedBossPrefab"), new GUIContent("骑乘 Boss Prefab"));
+                    EditorGUILayout.HelpBox("最终坐骑美术只替换 VisualRoot。必须保留 MountRoot、RiderSocket、ProjectileSocket、ImpactSocket，并实现 MountedIdle / MountedBowFire / MountedDive / MountedFall / MountedImpact 状态。", MessageType.Info);
+                }
+                else
+                {
+                    EditorGUILayout.PropertyField(profileObject.FindProperty("groundBossPrefab"), new GUIContent("地面 Boss Prefab"));
+                    EditorGUILayout.PropertyField(profileObject.FindProperty("sharedGroundMeleeProfile"), new GUIContent("共享第一个 Boss 近战 Profile"));
+                    EditorGUILayout.HelpBox("基础连招、蓄力重斩和假动作直接引用第一个 Boss 的 Profile；这里不保存第二份近战数值。远距落石的绿色圆是强制安全区。", MessageType.Info);
+                }
+            }
+        }
+
+        void DrawSkillEditor(SerializedProperty skill)
+        {
+            var type = (MirrorArcherSkillType)skill.FindPropertyRelative("type").enumValueIndex;
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField("独立动画与时序", EditorStyles.boldLabel);
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("displayName"), new GUIContent("技能名称"));
+                using (new EditorGUI.DisabledScope(true))
+                    EditorGUILayout.PropertyField(skill.FindPropertyRelative("type"), new GUIContent("技能类型"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("animationClip"), new GUIContent("独立动画 Clip"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("animatorState"), new GUIContent("Animator 状态"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("windup"), new GUIContent("前摇（秒）"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("recovery"), new GUIContent("后摇（秒）"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("lockMoment"), new GUIContent("锁定时刻（秒）"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("releaseMoment"), new GUIContent("发射/生效时刻（秒）"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("windupEffectPrefab"), new GUIContent("独立前摇特效"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("effectOffset"), new GUIContent("特效 Offset"));
+            }
 
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
-                EditorGUILayout.LabelField("动画逐帧预览与攻击框", EditorStyles.boldLabel);
-                EditorGUILayout.LabelField("动画片段", clip ? $"{clip.name}　{clip.length:0.###} 秒　{frameRate} FPS" : "未找到匹配 AnimationClip");
+                EditorGUILayout.LabelField("真实 Prefab 与战斗数值", EditorStyles.boldLabel);
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("projectilePrefab"), new GUIContent(type == MirrorArcherSkillType.SkyRockfall ? "落石 Prefab" : "箭/行动 Prefab"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("impactPrefab"), new GUIContent("命中特效 Prefab"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("arrowCount"), new GUIContent("箭数量"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("initialAngleOffset"),
+                    new GUIContent("初始角度 Offset", "在瞄准方向上额外旋转；正数逆时针，负数顺时针。箭的视觉会自动对齐最终飞行方向。"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("arrowAngle"), new GUIContent("扇形总角度"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("arrowSpeed"), new GUIContent("箭速度"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("arrowRange"), new GUIContent("箭射程"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("damage"), new GUIContent("伤害"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("knockback"), new GUIContent("击退"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("movementOffset"), new GUIContent("移动 Offset"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("movementDuration"), new GUIContent("移动时长"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("effectRadius"), new GUIContent("命中/落石半径"));
+                EditorGUILayout.PropertyField(skill.FindPropertyRelative("range"), new GUIContent(type == MirrorArcherSkillType.SkyRockfall ? "落石外圈范围" : "行动/箭雨范围"));
+                if (type == MirrorArcherSkillType.SkyRockfall)
+                {
+                    EditorGUILayout.PropertyField(skill.FindPropertyRelative("safeRadius"), new GUIContent("Boss 周围安全区"));
+                    EditorGUILayout.PropertyField(skill.FindPropertyRelative("waveCount"), new GUIContent("落石波数"));
+                    EditorGUILayout.PropertyField(skill.FindPropertyRelative("impactsPerWave"), new GUIContent("每波落点数"));
+                    EditorGUILayout.PropertyField(skill.FindPropertyRelative("waveInterval"), new GUIContent("波间隔"));
+                }
+            }
 
+            DrawSharedMeleeSource(type);
+            DrawBossAnimationPreview();
+            if (!skill.FindPropertyRelative("projectilePrefab").objectReferenceValue &&
+                type != MirrorArcherSkillType.SharedBaseCombo && type != MirrorArcherSkillType.SharedHeavySlash &&
+                type != MirrorArcherSkillType.SharedFeint && type != MirrorArcherSkillType.AirReposition &&
+                type != MirrorArcherSkillType.MountedDive)
+                EditorGUILayout.HelpBox("请绑定真实箭或落石 Prefab；运行时虽有后备临时视觉，但编辑器无法验证最终轨迹资源。", MessageType.Error);
+        }
+
+        void DrawSharedMeleeSource(MirrorArcherSkillType type)
+        {
+            if (bossStage != 1 || !bossProfile.sharedGroundMeleeProfile) return;
+            var source = new SerializedObject(bossProfile.sharedGroundMeleeProfile);
+            source.Update();
+            SerializedProperty property = null;
+            string title = null;
+            if (type == MirrorArcherSkillType.SharedBaseCombo)
+            {
+                title = "共享来源：第一个 Boss 基础连招";
+                property = source.FindProperty("phaseOneCombo");
+            }
+            else if (type == MirrorArcherSkillType.SharedHeavySlash)
+            {
+                title = "共享来源：第一个 Boss 蓄力重斩";
+                property = source.FindProperty("heavySlash");
+            }
+            else if (type == MirrorArcherSkillType.SharedFeint)
+            {
+                title = "共享来源：第一个 Boss 假动作";
+            }
+            if (title == null) return;
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
+                if (property != null) EditorGUILayout.PropertyField(property, true);
+                else
+                {
+                    EditorGUILayout.PropertyField(source.FindProperty("phaseOneFeintChance"), new GUIContent("地面假动作概率"));
+                    EditorGUILayout.PropertyField(source.FindProperty("feintHoldDuration"), new GUIContent("假动作停留"));
+                    EditorGUILayout.PropertyField(source.FindProperty("feintResetDuration"), new GUIContent("重新出招间隔"));
+                    EditorGUILayout.PropertyField(source.FindProperty("maxFeintsPerCombo"), new GUIContent("每套最多次数"));
+                }
+            }
+            if (source.ApplyModifiedProperties()) EditorUtility.SetDirty(bossProfile.sharedGroundMeleeProfile);
+        }
+
+        void DrawBossAnimationPreview()
+        {
+            var clip = GetBossClip();
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField("真实 Prefab 动画与 Scene 轨迹预览", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("动画", clip ? $"{clip.name} · {clip.length:0.###} 秒 · {clip.frameRate:0.#} FPS" : "未绑定/未找到动画");
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    if (GUILayout.Button("|<", GUILayout.Width(32f))) { animationPlaying = false; currentFrame = 0; SampleBossFrame(clip); }
-                    if (GUILayout.Button(animationPlaying ? "暂停" : "播放", GUILayout.Width(52f)))
+                    if (GUILayout.Button("|<", GUILayout.Width(34f))) { animationPlaying = false; currentFrame = 0; SampleBossFrame(); }
+                    if (GUILayout.Button(animationPlaying ? "暂停" : "播放", GUILayout.Width(58f)))
                     {
                         animationPlaying = !animationPlaying;
                         lastAnimationUpdate = EditorApplication.timeSinceStartup;
-                        bossPreviewWindupConsumed = false;
-                        bossPreviewWindupHoldUntil = 0d;
-                        SampleBossFrame(clip);
                     }
-                    if (GUILayout.Button("<", GUILayout.Width(32f))) { animationPlaying = false; currentFrame = Mathf.Max(0, currentFrame - 1); SampleBossFrame(clip); }
-                    if (GUILayout.Button(">", GUILayout.Width(32f))) { animationPlaying = false; currentFrame = Mathf.Min(maxFrame, currentFrame + 1); SampleBossFrame(clip); }
-                    EditorGUI.BeginChangeCheck();
+                    var maxFrame = clip ? Mathf.Max(1, Mathf.FloorToInt(clip.length * clip.frameRate)) : 1;
                     currentFrame = EditorGUILayout.IntSlider("当前帧", currentFrame, 0, maxFrame);
-                    if (EditorGUI.EndChangeCheck()) { animationPlaying = false; SampleBossFrame(clip); }
+                    bossFacingLeft = EditorGUILayout.ToggleLeft("向左", bossFacingLeft, GUILayout.Width(52f));
                 }
-
-                bossFacingLeft = EditorGUILayout.Toggle("预览向左攻击", bossFacingLeft);
-                DrawBossFrameTimeline(step, maxFrame);
-                DrawBossWindupEditor(step);
-                DrawBossCurrentKeyEditor(step);
+                EditorGUILayout.HelpBox("Scene 视图使用当前阶段的真实 Boss Prefab；黄色线为箭轨迹/移动路径，绿色圆为安全区，红圈为落点或伤害区。", MessageType.None);
             }
-
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                EditorGUILayout.LabelField("剑招其他参数", EditorStyles.boldLabel);
-                step.playbackSpeed = EditorGUILayout.FloatField("动画速度", step.playbackSpeed);
-                step.gapAfter = EditorGUILayout.FloatField("招式后间隔", step.gapAfter);
-                step.advanceSpeed = EditorGUILayout.FloatField("攻击推进速度", step.advanceSpeed);
-                step.damage = Mathf.Max(1, EditorGUILayout.IntField("伤害", step.damage));
-                step.knockback = EditorGUILayout.Vector2Field("击退", step.knockback);
-                step.hitStop = EditorGUILayout.FloatField("顿帧", step.hitStop);
-                step.interruptPower = Mathf.Max(0, EditorGUILayout.IntField("打断强度", step.interruptPower));
-                step.poiseDamage = Mathf.Max(0f, EditorGUILayout.FloatField("韧性伤害", step.poiseDamage));
-                step.playerHitReaction = (HitReactionType)EditorGUILayout.EnumPopup("玩家受击反应", step.playerHitReaction);
-                step.breaksSuperArmor = EditorGUILayout.Toggle("击破霸体", step.breaksSuperArmor);
-                step.mirrorHitboxByFacing = EditorGUILayout.Toggle("攻击框随朝向镜像", step.mirrorHitboxByFacing);
-                EditorGUILayout.Space(3f);
-                EditorGUILayout.LabelField("前摇表现与假动作", EditorStyles.miniBoldLabel);
-                step.allowFeint = EditorGUILayout.Toggle("允许假动作", step.allowFeint);
-                if (step.allowFeint)
-                    step.feintChanceOverride = EditorGUILayout.Slider(
-                        new GUIContent("本招概率覆盖", "-1 使用当前阶段概率；0~1 覆盖该招式概率。"),
-                        step.feintChanceOverride, -1f, 1f);
-            }
-
-            EditorGUILayout.HelpBox("Scene 视图：红/蓝框是当前帧攻击框。拖中心移动，拖四角缩放；修改会写入当前帧 Key。橙色时间格表示该帧攻击框开启。", MessageType.Info);
-            if (GUI.changed)
-            {
-                EditorUtility.SetDirty(bossProfile);
-                SceneView.RepaintAll();
-            }
-        }
-
-        void DrawBossHeavySlashSettings()
-        {
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                EditorGUILayout.LabelField("蓄力重斩规则", EditorStyles.boldLabel);
-                Undo.RecordObject(bossProfile, "编辑 Boss 蓄力重斩规则");
-                bossProfile.heavySlashChance = EditorGUILayout.Slider("触发概率", bossProfile.heavySlashChance, 0f, 1f);
-                bossProfile.heavySlashCooldown = Mathf.Max(0f, EditorGUILayout.FloatField("冷却时间（秒）", bossProfile.heavySlashCooldown));
-                bossProfile.heavySlashRecovery = Mathf.Max(0f, EditorGUILayout.FloatField("攻击后硬直（秒）", bossProfile.heavySlashRecovery));
-                EditorGUILayout.Space(2f);
-                EditorGUILayout.LabelField("特效预览所用阶段", EditorStyles.miniBoldLabel);
-                EditorGUI.BeginChangeCheck();
-                bossHeavyPreviewPhase = GUILayout.Toolbar(Mathf.Clamp(bossHeavyPreviewPhase, 0, 2), new[] { "阶段 1", "阶段 2", "阶段 3" });
-                if (EditorGUI.EndChangeCheck()) StopBossWindupEffectPreview();
-                EditorGUILayout.HelpBox("重斩招式数据由三个阶段共用；这里只选择预览和编辑哪一阶段的前摇特效 Prefab。", MessageType.None);
-            }
-        }
-
-        void DrawBossFeintSettings()
-        {
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                EditorGUILayout.LabelField("Boss 假动作规则", EditorStyles.boldLabel);
-                Undo.RecordObject(bossProfile, "编辑 Boss 假动作规则");
-                bossProfile.phaseOneFeintChance = EditorGUILayout.Slider("阶段 1 假动作概率", bossProfile.phaseOneFeintChance, 0f, 1f);
-                bossProfile.phaseTwoFeintChance = EditorGUILayout.Slider("阶段 2 假动作概率", bossProfile.phaseTwoFeintChance, 0f, 1f);
-                bossProfile.phaseThreeFeintChance = EditorGUILayout.Slider("阶段 3 假动作概率", bossProfile.phaseThreeFeintChance, 0f, 1f);
-                bossProfile.maxFeintsPerCombo = Mathf.Max(1, EditorGUILayout.IntField("每套连招最多假动作", bossProfile.maxFeintsPerCombo));
-                bossProfile.feintHoldDuration = Mathf.Max(0.05f, EditorGUILayout.FloatField("假动作蓄力停留", bossProfile.feintHoldDuration));
-                bossProfile.feintResetDuration = Mathf.Max(0.05f, EditorGUILayout.FloatField("卸力后重新出招间隔", bossProfile.feintResetDuration));
-                var serializedProfile = new SerializedObject(bossProfile);
-                serializedProfile.Update();
-                EditorGUILayout.PropertyField(serializedProfile.FindProperty("windupEffectPrefab"),
-                    new GUIContent("默认前摇特效 Prefab", "某个阶段没有单独指定特效时，使用这个默认 Prefab。"));
-                serializedProfile.ApplyModifiedProperties();
-                EditorGUILayout.HelpBox("颜色、光点、脉冲和音效请直接在该 Prefab 的 ChargeTelegraphPresentation 组件中调整。", MessageType.None);
-                EditorGUILayout.HelpBox("假动作后，同一招将重新蓄力并强制真实释放。每个招式还可以单独禁用或覆盖概率。", MessageType.Info);
-            }
-        }
-
-        void DrawBossFrameTimeline(MirrorBossComboStepV2 step, int maxFrame)
-        {
-            EditorGUILayout.LabelField("逐帧攻击框（● = Key）", EditorStyles.miniBoldLabel);
-            var columns = Mathf.Max(6, Mathf.FloorToInt((position.width - 60f) / 42f));
-            var old = GUI.backgroundColor;
-            for (var frame = 0; frame <= maxFrame; frame++)
-            {
-                if (frame % columns == 0) EditorGUILayout.BeginHorizontal();
-                var exact = FindBossKey(step, frame);
-                PlayerAttackHitboxKey evaluated;
-                var enabled = EvaluateBossKey(step, frame, out evaluated) && evaluated.enabled;
-                var windup = step.windupFrame == frame && GetBossWindupHoldDuration(step) > 0f;
-                GUI.backgroundColor = frame == currentFrame ? new Color(0.25f, 0.9f, 0.55f) :
-                    windup ? new Color(1f, 0.82f, 0.12f) :
-                    enabled ? new Color(1f, 0.58f, 0.16f) : new Color(0.48f, 0.48f, 0.48f);
-                if (GUILayout.Button((windup ? "▲" : exact != null ? "●" : "") + frame, EditorStyles.miniButton, GUILayout.Width(38f)))
-                {
-                    currentFrame = frame;
-                    animationPlaying = false;
-                    SampleBossFrame(GetBossClip(step.animationState));
-                }
-                GUI.backgroundColor = old;
-                if (frame % columns == columns - 1 || frame == maxFrame) EditorGUILayout.EndHorizontal();
-            }
-        }
-
-        void DrawBossWindupEditor(MirrorBossComboStepV2 step)
-        {
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                EditorGUILayout.LabelField("定帧前摇（黄色 ▲）", EditorStyles.boldLabel);
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    if (GUILayout.Button("将当前帧设为前摇帧", GUILayout.Width(155f)))
-                    {
-                        Undo.RecordObject(bossProfile, "设置 Boss 前摇帧");
-                        step.windupFrame = currentFrame;
-                        if (GetBossWindupHoldDuration(step) <= 0f) step.windupHoldDuration = 0.5f;
-                        bossPreviewWindupConsumed = false;
-                        bossPreviewWindupHoldUntil = 0d;
-                    }
-                    EditorGUI.BeginDisabledGroup(step.windupFrame < 0);
-                    if (GUILayout.Button("取消前摇", GUILayout.Width(90f)))
-                    {
-                        Undo.RecordObject(bossProfile, "取消 Boss 前摇帧");
-                        step.windupFrame = -1;
-                    }
-                    EditorGUI.EndDisabledGroup();
-                }
-
-                EditorGUI.BeginChangeCheck();
-                var nextWindupFrame = EditorGUILayout.IntSlider("前摇定格帧", step.windupFrame, -1, Mathf.Max(0, step.animationFrameCount - 1));
-                var overridesPhaseDuration = step.windupHoldDuration > 0f;
-                var nextOverridesPhaseDuration = EditorGUILayout.Toggle(
-                    new GUIContent("本招覆盖阶段时长", "开启时运行时优先使用本招时长；关闭时使用所选阶段的默认时长。"),
-                    overridesPhaseDuration);
-                var nextHoldDuration = Mathf.Max(0f, EditorGUILayout.FloatField(
-                    nextOverridesPhaseDuration ? "本招前摇定格时间（秒）" : $"阶段 {GetBossPreviewPhase() + 1} 默认前摇时间（秒）",
-                    nextOverridesPhaseDuration
-                        ? (overridesPhaseDuration ? step.windupHoldDuration : GetBossPhaseWindupHoldDuration())
-                        : GetBossPhaseWindupHoldDuration()));
-                var currentPhaseWindupPrefab = GetBossPhaseWindupPrefab();
-                var nextWindupPrefab = (GameObject)EditorGUILayout.ObjectField(
-                    new GUIContent($"阶段 {GetBossPreviewPhase() + 1} 前摇特效 Prefab", "只影响当前预览阶段。留空时使用 Profile 顶部的默认前摇特效。"),
-                    currentPhaseWindupPrefab, typeof(GameObject), false);
-                var nextEffectOffset = EditorGUILayout.Vector2Field(
-                    new GUIContent("前摇特效位置 Offset", "相对 Boss 根节点的局部坐标；X 控制左右，Y 控制上下，转向时 X 会自动镜像。"),
-                    step.windupEffectOffset);
-                var nextEffectAngle = EditorGUILayout.FloatField(
-                    new GUIContent("前摇特效角度", "以度为单位；正数逆时针，负数顺时针，Boss 转向时会自动镜像。"),
-                    step.windupEffectAngle);
-                if (EditorGUI.EndChangeCheck())
-                {
-                    Undo.RecordObject(bossProfile, "编辑 Boss 定帧前摇");
-                    step.windupFrame = nextWindupFrame;
-                    if (nextOverridesPhaseDuration)
-                        step.windupHoldDuration = Mathf.Max(0.01f, nextHoldDuration);
-                    else
-                    {
-                        step.windupHoldDuration = 0f;
-                        SetBossPhaseWindupHoldDuration(nextHoldDuration);
-                    }
-                    var prefabChanged = currentPhaseWindupPrefab != nextWindupPrefab;
-                    SetBossPhaseWindupPrefab(nextWindupPrefab);
-                    step.windupEffectOffset = nextEffectOffset;
-                    step.windupEffectAngle = nextEffectAngle;
-                    bossPreviewWindupConsumed = false;
-                    bossPreviewWindupHoldUntil = 0d;
-                    if (prefabChanged)
-                        StopBossWindupEffectPreview();
-                }
-
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    EditorGUI.BeginDisabledGroup(!GetEffectiveBossPhaseWindupPrefab() || !bossPreview);
-                    if (GUILayout.Button(bossWindupEffectPreview ? "停止预览前摇特效" : "直接预览前摇特效", GUILayout.Height(24f)))
-                    {
-                        if (bossWindupEffectPreview) StopBossWindupEffectPreview();
-                        else ShowBossWindupEffectPreview(step);
-                    }
-                    EditorGUI.EndDisabledGroup();
-                    if (GUILayout.Button("聚焦预览角色", GUILayout.Width(110f), GUILayout.Height(24f)))
-                        FocusBossPreview();
-                }
-                if (!GetEffectiveBossPhaseWindupPrefab())
-                    EditorGUILayout.HelpBox("请先选择当前阶段或 Profile 默认的前摇特效 Prefab。", MessageType.Warning);
-                else if (!bossPreview)
-                    EditorGUILayout.HelpBox("请先点击顶部“创建/重建预览角色”。", MessageType.Info);
-
-                if (bossWindupEffectPresentation)
-                    bossWindupEffectPresentation.EditorSetPreview(true, 0.9f, !bossFacingLeft,
-                        step.windupEffectOffset, step.windupEffectAngle);
-
-                var firstActiveFrame = int.MaxValue;
-                for (var frame = 0; frame < step.animationFrameCount; frame++)
-                {
-                    PlayerAttackHitboxKey evaluated;
-                    if (EvaluateBossKey(step, frame, out evaluated) && evaluated.enabled)
-                    {
-                        firstActiveFrame = frame;
-                        break;
-                    }
-                }
-
-                var effectiveWindupDuration = GetBossWindupHoldDuration(step);
-                if (step.windupFrame >= 0 && effectiveWindupDuration > 0f && step.windupFrame >= firstActiveFrame)
-                    EditorGUILayout.HelpBox("前摇帧必须早于第一个攻击框开启帧。", MessageType.Error);
-                else if (step.windupFrame >= 0 && effectiveWindupDuration > 0f)
-                    EditorGUILayout.HelpBox($"动画播放到第 {step.windupFrame} 帧后冻结 {effectiveWindupDuration:0.##} 秒，再从该帧继续。", MessageType.Info);
-            }
-        }
-        void DrawBossCurrentKeyEditor(MirrorBossComboStepV2 step)
-        {
-            var exact = FindBossKey(step, currentFrame);
-            PlayerAttackHitboxKey evaluated;
-            EvaluateBossKey(step, currentFrame, out evaluated);
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                if (GUILayout.Button(exact == null ? "在当前帧添加 Key" : "更新当前帧 Key", GUILayout.Width(130f)))
-                    exact = EnsureBossKey(step, currentFrame, evaluated);
-                EditorGUI.BeginDisabledGroup(exact == null);
-                if (GUILayout.Button("删除当前帧 Key", GUILayout.Width(120f)) && exact != null)
-                {
-                    Undo.RecordObject(bossProfile, "删除 Boss 攻击框 Key");
-                    step.hitboxKeys.Remove(exact);
-                    exact = null;
-                }
-                EditorGUI.EndDisabledGroup();
-            }
-
-            if (exact == null)
-            {
-                EditorGUILayout.LabelField("当前帧沿用上一枚 Key；拖动 Scene 攻击框会自动在本帧创建 Key。", EditorStyles.miniLabel);
-                return;
-            }
-
-            Undo.RecordObject(bossProfile, "编辑 Boss 攻击框 Key");
-            exact.enabled = EditorGUILayout.Toggle("本帧攻击框开启", exact.enabled);
-            exact.offset = EditorGUILayout.Vector2Field("位置 Offset", exact.offset);
-            exact.size = ClampHitboxSize(EditorGUILayout.Vector2Field("尺寸 Size", exact.size));
-            exact.interpolation = (AttackHitboxInterpolation)EditorGUILayout.EnumPopup("到下一 Key 的插值", exact.interpolation);
         }
 
         void EnsureBossResources()
         {
-            if (!bossProfile) bossProfile = AssetDatabase.LoadAssetAtPath<MirrorBossSimpleProfile>(BossProfilePath);
+            if (!bossProfile) bossProfile = AssetDatabase.LoadAssetAtPath<MirrorArcherTwoStageProfile>(TwoStageProfilePath);
             if (!bossPreview && !Application.isPlaying) RebuildBossPreview();
         }
 
         void RebuildBossPreview()
         {
             DisposeBossPreview();
-            if (Application.isPlaying) return;
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(BossPrefabPath);
+            if (Application.isPlaying || !bossProfile) return;
+            var prefab = bossStage == 0 ? bossProfile.mountedBossPrefab : bossProfile.groundBossPrefab;
             if (!prefab) return;
             bossPreview = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
             if (!bossPreview) return;
-            bossPreview.name = "MirrorBoss_HitboxPreview";
+            bossPreview.name = bossStage == 0 ? "MountedBoss_SkillPreview" : "GroundBoss_SkillPreview";
             bossPreview.hideFlags = HideFlags.HideAndDontSave;
             bossPreview.transform.position = Vector3.zero;
             bossPreviewAnimator = bossPreview.GetComponentInChildren<Animator>(true);
-            var hitbox = bossPreview.GetComponentInChildren<Hitbox>(true);
-            bossPreviewHitbox = hitbox ? hitbox.transform : null;
+            RebuildBossSkillPrefabPreview();
             FocusBossPreview();
-            SampleBossFrame(GetBossClip(GetBossStep()?.animationState));
+            SampleBossFrame();
+        }
+
+        void RebuildBossSkillPrefabPreview()
+        {
+            if (bossSkillPrefabPreview) DestroyImmediate(bossSkillPrefabPreview);
+            bossSkillPrefabPreview = null;
+            var skill = GetBossSkill();
+            previewSkillType = skill == null ? (MirrorArcherSkillType)(-1) : skill.type;
+            previewActionPrefab = skill == null ? null : skill.projectilePrefab;
+            if (!bossPreview || skill == null || !skill.projectilePrefab) return;
+            bossSkillPrefabPreview = PrefabUtility.InstantiatePrefab(skill.projectilePrefab) as GameObject;
+            if (!bossSkillPrefabPreview) return;
+            bossSkillPrefabPreview.name = "SkillPrefab_RealPreview";
+            bossSkillPrefabPreview.hideFlags = HideFlags.HideAndDontSave;
+            bossSkillPrefabPreview.transform.SetParent(bossPreview.transform, false);
+            bossSkillPrefabPreview.transform.localPosition = skill.effectOffset;
         }
 
         void FocusBossPreview()
         {
             if (!bossPreview || !SceneView.lastActiveSceneView) return;
-            var renderer = bossPreview.GetComponentInChildren<Renderer>(true);
-            var bounds = renderer ? renderer.bounds : new Bounds(bossPreview.transform.position, new Vector3(3f, 3f, 0f));
+            var renderers = bossPreview.GetComponentsInChildren<Renderer>(true);
+            var bounds = renderers.Length > 0 ? renderers[0].bounds : new Bounds(Vector3.zero, new Vector3(8f, 5f, 0f));
+            foreach (var renderer in renderers) bounds.Encapsulate(renderer.bounds);
+            bounds.Expand(4f);
             SceneView.lastActiveSceneView.Frame(bounds, false);
             SceneView.RepaintAll();
         }
 
         void DisposeBossPreview()
         {
-            StopBossWindupEffectPreview();
+            if (bossSkillPrefabPreview) DestroyImmediate(bossSkillPrefabPreview);
             if (bossPreview) DestroyImmediate(bossPreview);
+            bossSkillPrefabPreview = null;
             bossPreview = null;
             bossPreviewAnimator = null;
-            bossPreviewHitbox = null;
-        }
-
-        void ShowBossWindupEffectPreview(MirrorBossComboStepV2 step)
-        {
-            StopBossWindupEffectPreview();
-            var windupPrefab = GetEffectiveBossPhaseWindupPrefab();
-            if (!bossPreview || !bossProfile || !windupPrefab || step == null) return;
-
-            var clip = GetBossClip(step.animationState);
-            if (clip && step.windupFrame >= 0)
-            {
-                currentFrame = Mathf.Clamp(step.windupFrame, 0, Mathf.Max(0, step.animationFrameCount - 1));
-                animationPlaying = false;
-                SampleBossFrame(clip);
-            }
-
-            bossWindupEffectPreview = PrefabUtility.InstantiatePrefab(windupPrefab) as GameObject;
-            if (!bossWindupEffectPreview) return;
-            bossWindupEffectPreview.name = "Boss_WindupEffectPreview";
-            bossWindupEffectPreview.hideFlags = HideFlags.HideAndDontSave;
-            bossWindupEffectPreview.transform.SetParent(bossPreview.transform, false);
-            bossWindupEffectPreview.transform.localPosition = Vector3.zero;
-            bossWindupEffectPresentation = bossWindupEffectPreview.GetComponent<ChargeTelegraphPresentation>();
-            if (!bossWindupEffectPresentation)
-            {
-                ShowNotification(new GUIContent("选择的 Prefab 没有 ChargeTelegraphPresentation 组件。"));
-                StopBossWindupEffectPreview();
-                return;
-            }
-
-            var visual = bossPreview.GetComponentInChildren<SpriteRenderer>(true);
-            bossWindupEffectPresentation.Bind(visual);
-            bossWindupEffectPresentation.EditorSetPreview(true, 0.9f, !bossFacingLeft,
-                step.windupEffectOffset, step.windupEffectAngle);
-            FocusBossPreview();
-            SceneView.RepaintAll();
-        }
-
-        void StopBossWindupEffectPreview()
-        {
-            if (bossWindupEffectPresentation)
-                bossWindupEffectPresentation.EditorSetPreview(false, 0f, !bossFacingLeft);
-            if (bossWindupEffectPreview)
-                DestroyImmediate(bossWindupEffectPreview);
-            bossWindupEffectPresentation = null;
-            bossWindupEffectPreview = null;
-            SceneView.RepaintAll();
-        }
-
-        GameObject GetBossPhaseWindupPrefab()
-        {
-            if (!bossProfile) return null;
-            var previewPhase = GetBossPreviewPhase();
-            return previewPhase == 0 ? bossProfile.phaseOneWindupEffectPrefab
-                : previewPhase == 1 ? bossProfile.phaseTwoWindupEffectPrefab
-                : bossProfile.phaseThreeWindupEffectPrefab;
-        }
-
-        GameObject GetEffectiveBossPhaseWindupPrefab()
-        {
-            return bossProfile ? bossProfile.GetWindupEffectPrefab(GetBossPreviewPhase() + 1) : null;
-        }
-
-        void SetBossPhaseWindupPrefab(GameObject prefab)
-        {
-            if (!bossProfile) return;
-            var previewPhase = GetBossPreviewPhase();
-            if (previewPhase == 0) bossProfile.phaseOneWindupEffectPrefab = prefab;
-            else if (previewPhase == 1) bossProfile.phaseTwoWindupEffectPrefab = prefab;
-            else bossProfile.phaseThreeWindupEffectPrefab = prefab;
-        }
-
-        float GetBossPhaseWindupHoldDuration()
-        {
-            return bossProfile ? bossProfile.GetWindupHoldDuration(GetBossPreviewPhase() + 1) : 0f;
-        }
-
-        float GetBossWindupHoldDuration(MirrorBossComboStepV2 step)
-        {
-            return step != null && step.windupHoldDuration > 0f
-                ? step.windupHoldDuration
-                : GetBossPhaseWindupHoldDuration();
-        }
-
-        void SetBossPhaseWindupHoldDuration(float duration)
-        {
-            if (!bossProfile) return;
-            duration = Mathf.Max(0f, duration);
-            var previewPhase = GetBossPreviewPhase();
-            if (previewPhase == 0) bossProfile.phaseOneWindupHoldDuration = duration;
-            else if (previewPhase == 1) bossProfile.phaseTwoWindupHoldDuration = duration;
-            else bossProfile.phaseThreeWindupHoldDuration = duration;
-        }
-
-        int GetBossPreviewPhase()
-        {
-            return IsEditingBossHeavySlash() ? Mathf.Clamp(bossHeavyPreviewPhase, 0, 2) : Mathf.Clamp(bossPhase, 0, 2);
-        }
-
-        bool IsEditingBossHeavySlash()
-        {
-            return bossPhase == 3;
         }
 
         void TickBossAnimationPreview()
         {
             if (!animationPlaying || Application.isPlaying) return;
-            var step = GetBossStep();
-            var clip = step == null ? null : GetBossClip(step.animationState);
+            var clip = GetBossClip();
             if (!clip) { animationPlaying = false; return; }
-
             var now = EditorApplication.timeSinceStartup;
-            var windupDuration = GetBossWindupHoldDuration(step);
-            if (!bossPreviewWindupConsumed && step.windupFrame >= 0 && windupDuration > 0f &&
-                currentFrame >= step.windupFrame)
-            {
-                if (bossPreviewWindupHoldUntil <= 0d)
-                    bossPreviewWindupHoldUntil = now + windupDuration;
-                if (now < bossPreviewWindupHoldUntil)
-                {
-                    SampleBossFrame(clip);
-                    Repaint();
-                    return;
-                }
-
-                bossPreviewWindupConsumed = true;
-                bossPreviewWindupHoldUntil = 0d;
-                lastAnimationUpdate = now;
-            }
-
-            var frameRate = Mathf.Max(1, step.animationFrameRate);
-            var advance = Mathf.FloorToInt(Mathf.Max(0f, (float)(now - lastAnimationUpdate)) * frameRate);
-            if (advance <= 0) return;
-            lastAnimationUpdate += advance / (double)frameRate;
-            var previousFrame = currentFrame;
-            currentFrame = (currentFrame + advance) % Mathf.Max(2, step.animationFrameCount);
-            if (currentFrame < previousFrame)
-            {
-                bossPreviewWindupConsumed = false;
-                bossPreviewWindupHoldUntil = 0d;
-            }
-            SampleBossFrame(clip);
+            var elapsed = now - lastAnimationUpdate;
+            if (elapsed <= 0d) return;
+            lastAnimationUpdate = now;
+            var maxFrame = Mathf.Max(1, Mathf.FloorToInt(clip.length * clip.frameRate));
+            currentFrame = (currentFrame + Mathf.Max(1, Mathf.FloorToInt((float)elapsed * clip.frameRate))) % (maxFrame + 1);
+            SampleBossFrame();
             Repaint();
         }
 
-        void SampleBossFrame(AnimationClip clip)
+        void SampleBossFrame()
         {
+            var clip = GetBossClip();
             if (Application.isPlaying || !bossPreviewAnimator || !clip) return;
             if (!AnimationMode.InAnimationMode()) AnimationMode.StartAnimationMode();
-            var step = GetBossStep();
-            var time = Mathf.Min(clip.length, currentFrame / (float)Mathf.Max(1, step.animationFrameRate));
+            var time = Mathf.Min(clip.length, currentFrame / Mathf.Max(1f, clip.frameRate));
             AnimationMode.BeginSampling();
             AnimationMode.SampleAnimationClip(bossPreviewAnimator.gameObject, clip, time);
             AnimationMode.EndSampling();
             SceneView.RepaintAll();
         }
 
-        void DrawBossScenePreview(SceneView sceneView)
+        AnimationClip GetBossClip()
         {
-            if (!bossProfile || !bossPreview || !bossPreviewHitbox || Application.isPlaying) return;
-            var step = GetBossStep();
-            if (step == null) return;
-            PlayerAttackHitboxKey key;
-            if (!EvaluateBossKey(step, currentFrame, out key) || key == null) return;
-
-            var localOffset = key.offset;
-            if (step.mirrorHitboxByFacing && bossFacingLeft) localOffset.x = -Mathf.Abs(localOffset.x);
-            var center = bossPreviewHitbox.TransformPoint(localOffset);
-            var size = ClampHitboxSize(key.size);
-            var fill = key.enabled ? new Color(1f, 0.2f, 0.08f, 0.18f) : new Color(0.2f, 0.65f, 1f, 0.1f);
-            var outline = key.enabled ? new Color(1f, 0.25f, 0.08f, 1f) : new Color(0.2f, 0.65f, 1f, 0.9f);
-            Handles.DrawSolidRectangleWithOutline(GetRectCorners(center, size), fill, outline);
-            Handles.Label(center + Vector3.up * (size.y * 0.5f + 0.15f), $"{step.animationState} / Frame {currentFrame} / {(key.enabled ? "攻击开启" : "攻击关闭")}");
-
-            EditorGUI.BeginChangeCheck();
-            var nextCenter = Handles.PositionHandle(center, Quaternion.identity);
-            var nextSize = DrawSizeHandles(ref nextCenter, size);
-            if (!EditorGUI.EndChangeCheck()) return;
-            Undo.RecordObject(bossProfile, "拖动 Boss 攻击框");
-            var writable = EnsureBossKey(step, currentFrame, key);
-            var nextLocal = (Vector2)bossPreviewHitbox.InverseTransformPoint(nextCenter);
-            if (step.mirrorHitboxByFacing && bossFacingLeft) nextLocal.x = Mathf.Abs(nextLocal.x);
-            writable.offset = nextLocal;
-            writable.size = ClampHitboxSize(nextSize);
-            writable.enabled = true;
-            EditorUtility.SetDirty(bossProfile);
-            Repaint();
+            var skill = GetBossSkill();
+            if (skill == null) return null;
+            if (skill.animationClip) return skill.animationClip;
+            if (!bossPreviewAnimator || !bossPreviewAnimator.runtimeAnimatorController || string.IsNullOrEmpty(skill.animatorState)) return null;
+            return bossPreviewAnimator.runtimeAnimatorController.animationClips.FirstOrDefault(clip => clip && clip.name == skill.animatorState);
         }
 
-        void EnsureBossStepForClip(MirrorBossComboStepV2 step, AnimationClip clip)
-        {
-            if (clip)
-            {
-                var frameRate = Mathf.Max(1, Mathf.RoundToInt(clip.frameRate));
-                var frameCount = Mathf.Max(2, Mathf.FloorToInt(clip.length * frameRate) + 1);
-                if (!step.hitboxKeysMigratedToClip)
-                {
-                    Undo.RecordObject(bossProfile, "迁移 Boss 攻击框到动画帧");
-                    step.animationFrameRate = frameRate;
-                    step.animationFrameCount = frameCount;
-                    step.hitboxKeys.Clear();
-                    var last = frameCount - 1;
-                    var start = Mathf.Clamp(Mathf.RoundToInt(step.activeStart * last), 1, last);
-                    var end = Mathf.Clamp(Mathf.RoundToInt(step.activeEnd * last), start + 1, frameCount);
-                    step.hitboxKeys.Add(new PlayerAttackHitboxKey { frame = 0, enabled = false, offset = step.hitboxOffset, size = step.hitboxSize });
-                    step.hitboxKeys.Add(new PlayerAttackHitboxKey { frame = start, enabled = true, offset = step.hitboxOffset, size = step.hitboxSize, interpolation = AttackHitboxInterpolation.Linear });
-                    step.hitboxKeys.Add(new PlayerAttackHitboxKey { frame = end, enabled = false, offset = step.hitboxOffset, size = step.hitboxSize });
-                    step.hitboxKeysMigratedToClip = true;
-                    EditorUtility.SetDirty(bossProfile);
-                }
-            }
-            step.EnsureHitboxKeys();
-        }
-
-        MirrorBossComboStepV2[] GetBossCombo()
+        MirrorArcherSkillConfig GetBossSkill()
         {
             if (!bossProfile) return null;
-            if (IsEditingBossHeavySlash()) return bossProfile.heavySlash == null ? null : new[] { bossProfile.heavySlash };
-            return bossPhase == 0 ? bossProfile.phaseOneCombo : bossPhase == 1 ? bossProfile.phaseTwoCombo : bossProfile.phaseThreeCombo;
+            var list = bossStage == 0 ? bossProfile.airSkills : bossProfile.groundSkills;
+            return list != null && list.Count > 0 ? list[Mathf.Clamp(bossSkillIndex, 0, list.Count - 1)] : null;
         }
 
-        MirrorBossComboStepV2 GetBossStep()
+        void DrawBossScenePreview(SceneView sceneView)
         {
-            var combo = GetBossCombo();
-            return combo != null && combo.Length > 0 ? combo[Mathf.Clamp(bossStepIndex, 0, combo.Length - 1)] : null;
-        }
+            if (!bossPreview || !bossProfile || Application.isPlaying) return;
+            var skill = GetBossSkill();
+            if (skill == null) return;
+            var origin = FindPreviewSocket("ProjectileSocket");
+            var facing = bossFacingLeft ? -1f : 1f;
+            var start = origin ? origin.position : bossPreview.transform.position + (Vector3)skill.effectOffset;
+            Handles.color = new Color(1f, 0.78f, 0.2f, 1f);
 
-        AnimationClip GetBossClip(string stateName)
-        {
-            if (!bossPreviewAnimator || !bossPreviewAnimator.runtimeAnimatorController || string.IsNullOrEmpty(stateName)) return null;
-            return bossPreviewAnimator.runtimeAnimatorController.animationClips.FirstOrDefault(clip => clip && clip.name == stateName);
-        }
-
-        static PlayerAttackHitboxKey FindBossKey(MirrorBossComboStepV2 step, int frame)
-        {
-            return step.hitboxKeys?.FirstOrDefault(key => key != null && key.frame == frame);
-        }
-
-        PlayerAttackHitboxKey EnsureBossKey(MirrorBossComboStepV2 step, int frame, PlayerAttackHitboxKey source)
-        {
-            var key = FindBossKey(step, frame);
-            if (key != null) return key;
-            Undo.RecordObject(bossProfile, "添加 Boss 攻击框 Key");
-            key = new PlayerAttackHitboxKey
+            switch (skill.type)
             {
-                frame = frame,
-                enabled = source != null && source.enabled,
-                offset = source != null ? source.offset : step.hitboxOffset,
-                size = source != null ? source.size : step.hitboxSize,
-                interpolation = source != null ? source.interpolation : AttackHitboxInterpolation.Step
-            };
-            step.hitboxKeys.Add(key);
-            step.hitboxKeys.Sort((a, b) => a.frame.CompareTo(b.frame));
-            EditorUtility.SetDirty(bossProfile);
-            return key;
-        }
-
-        static bool EvaluateBossKey(MirrorBossComboStepV2 step, int frame, out PlayerAttackHitboxKey result)
-        {
-            result = null;
-            if (step.hitboxKeys == null || step.hitboxKeys.Count == 0) return false;
-            PlayerAttackHitboxKey previous = null;
-            PlayerAttackHitboxKey next = null;
-            foreach (var key in step.hitboxKeys)
-            {
-                if (key == null) continue;
-                if (key.frame <= frame && (previous == null || key.frame >= previous.frame)) previous = key;
-                if (key.frame > frame && (next == null || key.frame < next.frame)) next = key;
+                case MirrorArcherSkillType.LockedShot:
+                case MirrorArcherSkillType.FanShot:
+                    DrawArrowTrajectories(start, skill, facing);
+                    break;
+                case MirrorArcherSkillType.GroundArrowRain:
+                    DrawArrowRain(start, skill);
+                    break;
+                case MirrorArcherSkillType.MountedDive:
+                    DrawDivePath(start, skill, facing);
+                    break;
+                case MirrorArcherSkillType.AirReposition:
+                    DrawReposition(start, skill, facing);
+                    break;
+                case MirrorArcherSkillType.SkyRockfall:
+                    DrawRockfall(skill);
+                    break;
             }
-            if (previous == null) return false;
-            result = previous;
-            if (next == null || previous.interpolation != AttackHitboxInterpolation.Linear || !previous.enabled || !next.enabled || next.frame <= previous.frame) return true;
-            var t = Mathf.InverseLerp(previous.frame, next.frame, frame);
-            result = new PlayerAttackHitboxKey
+            Handles.color = new Color(0.3f, 0.85f, 1f, 1f);
+            Handles.DrawWireDisc((Vector2)bossPreview.transform.position + skill.effectOffset, Vector3.forward, 0.18f);
+            Handles.Label((Vector2)bossPreview.transform.position + skill.effectOffset + Vector2.up * 0.25f, "独立前摇特效 Offset");
+        }
+
+        void DrawArrowTrajectories(Vector3 start, MirrorArcherSkillConfig skill, float facing)
+        {
+            var count = Mathf.Max(1, skill.arrowCount);
+            for (var i = 0; i < count; i++)
             {
-                frame = frame,
-                enabled = true,
-                offset = Vector2.Lerp(previous.offset, next.offset, t),
-                size = Vector2.Lerp(previous.size, next.size, t),
-                interpolation = previous.interpolation
-            };
-            return true;
+                var spreadAngle = count <= 1 ? 0f : Mathf.Lerp(-skill.arrowAngle * 0.5f, skill.arrowAngle * 0.5f, i / (float)(count - 1));
+                var angle = skill.initialAngleOffset * facing + spreadAngle;
+                var direction = Quaternion.Euler(0f, 0f, angle) * new Vector3(facing, -0.08f, 0f);
+                Handles.DrawAAPolyLine(3f, start, start + direction.normalized * skill.arrowRange);
+            }
+            Handles.Label(start + Vector3.up * 0.3f, $"{skill.arrowCount} 箭 · {skill.arrowSpeed:0.#} 速 · {skill.damage} 伤害");
+        }
+
+        void DrawArrowRain(Vector3 start, MirrorArcherSkillConfig skill)
+        {
+            var count = Mathf.Max(1, skill.arrowCount);
+            for (var i = 0; i < count; i++)
+            {
+                var t = count <= 1 ? 0.5f : i / (float)(count - 1);
+                var x = Mathf.Lerp(-skill.range * 0.5f, skill.range * 0.5f, t);
+                var top = start + new Vector3(x, 2f, 0f);
+                var direction = Quaternion.Euler(0f, 0f, skill.initialAngleOffset) * Vector3.down;
+                Handles.DrawAAPolyLine(3f, top, top + direction.normalized * Mathf.Min(skill.arrowRange, 7f));
+            }
+        }
+
+        void DrawDivePath(Vector3 start, MirrorArcherSkillConfig skill, float facing)
+        {
+            var end = start + new Vector3(facing * Mathf.Abs(skill.movementOffset.x), -Mathf.Abs(skill.movementOffset.y), 0f);
+            var control = (start + end) * 0.5f + Vector3.down * Mathf.Max(1f, skill.movementOffset.y);
+            var points = new Vector3[25];
+            for (var i = 0; i < points.Length; i++)
+            {
+                var t = i / (float)(points.Length - 1);
+                points[i] = Vector3.Lerp(Vector3.Lerp(start, control, t), Vector3.Lerp(control, end, t), t);
+            }
+            Handles.DrawAAPolyLine(4f, points);
+            Handles.color = Color.red;
+            Handles.DrawWireDisc(end, Vector3.forward, skill.effectRadius);
+        }
+
+        void DrawReposition(Vector3 start, MirrorArcherSkillConfig skill, float facing)
+        {
+            var end = start + new Vector3(facing * skill.movementOffset.x, skill.movementOffset.y, 0f);
+            Handles.DrawAAPolyLine(4f, start, end);
+            Handles.ConeHandleCap(0, end, Quaternion.LookRotation(Vector3.forward, end - start), 0.35f, EventType.Repaint);
+        }
+
+        void DrawRockfall(MirrorArcherSkillConfig skill)
+        {
+            var center = bossPreview.transform.position;
+            Handles.color = new Color(0.2f, 1f, 0.45f, 1f);
+            Handles.DrawWireDisc(center, Vector3.forward, skill.safeRadius);
+            Handles.Label(center + Vector3.up * skill.safeRadius, "清楚安全区 / 真实输出窗口");
+            Handles.color = new Color(1f, 0.22f, 0.12f, 0.9f);
+            Handles.DrawWireDisc(center, Vector3.forward, skill.range);
+            var count = Mathf.Max(1, skill.impactsPerWave);
+            for (var i = 0; i < count; i++)
+            {
+                var angle = i / (float)count * Mathf.PI * 2f;
+                var radius = Mathf.Lerp(skill.safeRadius + skill.effectRadius, skill.range, (i + 1f) / count);
+                var point = center + new Vector3(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius * 0.38f, 0f);
+                Handles.DrawWireDisc(point, Vector3.forward, skill.effectRadius);
+            }
+        }
+
+        Transform FindPreviewSocket(string socketName)
+        {
+            if (!bossPreview) return null;
+            return bossPreview.GetComponentsInChildren<Transform>(true).FirstOrDefault(value => value.name == socketName);
         }
 
         void SaveBossProfile()
         {
             if (!bossProfile) return;
             EditorUtility.SetDirty(bossProfile);
+            if (bossProfile.sharedGroundMeleeProfile) EditorUtility.SetDirty(bossProfile.sharedGroundMeleeProfile);
             AssetDatabase.SaveAssets();
-            ShowNotification(new GUIContent("Boss 攻击框已保存"));
+            ShowNotification(new GUIContent("两阶段 Boss 技能已保存"));
         }
     }
 }
