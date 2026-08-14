@@ -1,5 +1,6 @@
 using System.Collections;
 using MirrorTrial.Combat;
+using MirrorTrial.Growth;
 using MirrorTrial.Player;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -139,11 +140,18 @@ namespace MirrorTrial.Level
             if (delay > 0f)
                 yield return new WaitForSecondsRealtime(delay);
 
-            UnlockPlayerInput();
             var playerObject = player ? player.gameObject : FindPlayer();
+            enterMirrorRoutine = null;
+
+            if (!LevelEndGrowthController.TryShow(playerObject, () => CompleteEnterMirror(playerObject)))
+                CompleteEnterMirror(playerObject);
+        }
+
+        void CompleteEnterMirror(GameObject playerObject)
+        {
+            UnlockPlayerInput();
             var bridge = MirrorTransitionBridge.Ensure();
             bridge.EnterMirror(gateId, mirrorSceneName, playerObject);
-            enterMirrorRoutine = null;
         }
 
         void FinalizeCompletion()

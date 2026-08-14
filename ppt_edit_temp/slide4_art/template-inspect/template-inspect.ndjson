@@ -1,0 +1,32 @@
+{"kind":"slide","id":"sl/y90nupkv","slide":1,"title":"腾讯游戏魔方工作室群","textShapes":3}
+{"kind":"textbox","id":"sh/65g3298r","slide":1,"name":"文本框 4","text":"腾讯游戏魔方工作室群","textPreview":"腾讯游戏魔方工作室群","textChars":10,"textLines":1,"bbox":[71.19,595.95,818.99,96.94]}
+{"kind":"textbox","id":"sh/ts7md4r2","slide":1,"name":"文本框 5","text":"——校招宣讲会","textPreview":"——校招宣讲会","textChars":7,"textLines":1,"bbox":[858.41,619.44,389.4,67.86]}
+{"kind":"textbox","id":"sh/547294r6","slide":1,"name":"副标题 2","placeholder":"subtitle","text":"答辩人：张聪\n岗位：技术策划\n实习小组：火影忍者项目组\n导师：phynoluo（罗斯颖）\n直接leader：loynliu（刘荃）\n入职时间：2026-06-09","textPreview":"答辩人：张聪 | 岗位：技术策划 | 实习小组：火影忍者项目组 | 导师：phynoluo（罗斯颖） | 直接leader：loynliu（刘荃） | 入职时间：2026-06-09","textChars":81,"textLines":6,"bbox":[43.28,279.48,952.49,262.01]}
+{"kind":"image","id":"im/dkb2xcfy","slide":1,"name":"图片 2","bbox":[0,0,1280,720]}
+{"kind":"slide","id":"sl/hwbqtkby","slide":2,"title":"目录","textShapes":1}
+{"kind":"textbox","id":"sh/9072xkry","slide":2,"name":"文本框 1","text":"\n目录\n\n自我介绍\n\n命题研究展示\n\n项目组实习成果展示","textPreview":"| 目录 |  | 自我介绍 |  | 命题研究展示 |  | 项目组实习成果展示","textChars":28,"textLines":8,"bbox":[84.03,96.67,1162.76,371.59]}
+{"kind":"image","id":"im/lczil8jm","slide":2,"name":"图片 3","bbox":[0,0,1280,720]}
+{"kind":"slide","id":"sl/ofy9wn61","slide":3,"title":"莉莉丝｜Unity 技术策划（关卡）","textShapes":4}
+{"kind":"textbox","id":"sh/d0jax03i","slide":3,"name":"文本框 2","text":"莉莉丝｜Unity 技术策划（关卡）\n\n• 推动关卡 / NPC 编辑器与动物玩法工具链落地\n• 建设资源检索、配置 ID 与对话内容生产流程\n\n腾讯 天美J1｜Unity 客户端 → UE 技术策划（战斗）\n\n• 负责 3C 镜头、物理交互与 UI 开发\n• 搭建英雄 Ability Pipeline，推进技能配置自动化","textPreview":"莉莉丝｜Unity 技术策划（关卡） |  | • 推动关卡 / NPC 编辑器与动物玩法工具链落地 | • 建设资源检索、配置 ID 与对话内容生产流程 |  | 腾讯 天美J1｜Unity 客户端 → UE 技术策划（战斗） |  | • 负责 3C 镜头、物理交互与 ...","textChars":162,"textLines":9,"bbox":[87.67,360,1018.29,271.42]}
+{"kind":"textbox","id":"sh/298ryl4v","slide":3,"name":"文本框 3","text":"学历背景：","textPreview":"学历背景：","textChars":5,"textLines":1,"bbox":[87.67,88.16,831.67,54.93]}
+{"kind":"textbox","id":"sh/3ah8rqlg","slide":3,"name":"文本框 4","text":"清华大学｜互动媒体设计与技术硕士\n华中科技大学｜自动化学士","textPreview":"清华大学｜互动媒体设计与技术硕士 | 华中科技大学｜自动化学士","textChars":29,"textLines":2,"bbox":[87.67,161,644.48,67.86]}
+{"kind":"textbox","id":"sh/m5cra54z","slide":3,"name":"文本框 7","text":"实习背景：","textPreview":"实习背景：","textChars":5,"textLines":1,"bbox":[92.08,278.38,640.07,54.93]}
+{"kind":"image","id":"im/qpon6hgj","slide":3,"name":"图片 1","bbox":[0,0,1280,720]}
+{"kind":"slide","id":"sl/jyx0ra1s","slide":4,"title":"破映","textShapes":2}
+{"kind":"textbox","id":"sh/0ba143al","slide":4,"name":"文本框 2","text":"破映","textPreview":"破映","textChars":2,"textLines":1,"bbox":[83.32,27.94,1091.77,61.39]}
+{"kind":"textbox","id":"sh/rm1k7yt4","slide":4,"name":"矩形 3","text":"【游戏类型】2D 横版动作冒险\n类银河城式能力成长｜轻度 Roguelite｜《丝之歌》式高机动战斗参考\n\n【核心玩法】现实层推进 → 镜像挑战 → 击败镜像自我 → 夺回能力\n【成长路径】击败 Boss，永久解锁镜刃、冲刺等核心能力\n收集生命精华，关末选择生命、攻击或移速强化\n组合已有能力，挑战更强敌人与最终 Boss","textPreview":"【游戏类型】2D 横版动作冒险 | 类银河城式能力成长｜轻度 Roguelite｜《丝之歌》式高机动战斗参考 |  | 【核心玩法】现实层推进 → 镜像挑战 → 击败镜像自我 → 夺回能力 | 【成长路径】击败 Boss，永久解锁镜刃、冲刺等核心能力 | 收集生命精华，关末...","textChars":161,"textLines":7,"bbox":[94.26,130.04,1035.87,478.22]}
+{"kind":"image","id":"im/b2lc3q1s","slide":4,"name":"图片 1","bbox":[0,0,1280,720]}
+{"kind":"slide","id":"sl/i107q5of","slide":5,"title":"战斗编辑器：连招、参数、预览一体化","textShapes":2}
+{"kind":"textbox","id":"sh/yhkbe1o7","slide":5,"name":"combat-editor-title","text":"战斗编辑器：连招、参数、预览一体化","textPreview":"战斗编辑器：连招、参数、预览一体化","textChars":17,"textLines":1,"bbox":[74.81,28,1120,72]}
+{"kind":"textbox","id":"sh/l4bupwny","slide":5,"name":"combat-editor-capabilities","text":"节点编排连招｜逐帧配置判定与反馈｜TestGym 运行时预览","textPreview":"节点编排连招｜逐帧配置判定与反馈｜TestGym 运行时预览","textChars":30,"textLines":1,"bbox":[74.81,646,1130,44]}
+{"kind":"image","id":"im/h8juxg7q","slide":5,"name":"图片 7","bbox":[74.81,136.95,756.26,425.39]}
+{"kind":"slide","id":"sl/x8f69ofe","slide":6,"title":"【看得懂】AI 可执行的 PRD","textShapes":2}
+{"kind":"textbox","id":"sh/yhg7epsj","slide":6,"name":"文本框 1","text":"【看得懂】AI 可执行的 PRD\n工具卡 PRD：写清目标、边界、规则、职责与验收，让 AI 按设计实现\n【接得上】项目上下文管理\n索引、大纲、专项文档与交接记录全部沉淀在项目仓库\nWorkBuddy 与 Codex 可以随时读档接手\n【做得出】AI 动画生产 Skill\n固定骨架、根节点、比例与调色板，生成后完成对齐、验证、切片与 Unity 接入\n","textPreview":"【看得懂】AI 可执行的 PRD | 工具卡 PRD：写清目标、边界、规则、职责与验收，让 AI 按设计实现 | 【接得上】项目上下文管理 | 索引、大纲、专项文档与交接记录全部沉淀在项目仓库 | WorkBuddy 与 Codex 可以随时读档接手 | 【做得出】AI 动...","textChars":177,"textLines":8,"bbox":[74.81,120.87,1011.92,507.31]}
+{"kind":"textbox","id":"sh/zi98nu94","slide":6,"name":"文本框 2","text":"3 . AI 在游戏项目中的应用\n","textPreview":"3 . AI 在游戏项目中的应用 |","textChars":17,"textLines":2,"bbox":[74.81,35.23,895.84,113.09]}
+{"kind":"image","id":"im/9k7m1w3i","slide":6,"name":"图片 3","bbox":[0,0,1280,720]}
+{"kind":"image","id":"im/8jyl8rmd","slide":6,"name":"图片 5","bbox":[767.62,256.29,503.28,216.22]}
+{"kind":"slide","id":"sl/gnmp4jqx","slide":7,"title":"THANKS","textShapes":1}
+{"kind":"shape","id":"sh/cbq1sv25","slide":7,"name":"Rectangle 2","bbox":[16,16,1280,0]}
+{"kind":"textbox","id":"sh/zedcfa9g","slide":7,"name":"文本框 4","text":"THANKS","textPreview":"THANKS","textChars":6,"textLines":1,"bbox":[457.33,345.2,306.68,80.78]}
+{"kind":"image","id":"im/k36xo3i5","slide":7,"name":"图片 5","bbox":[0,0,1280,720]}
+{"kind":"image","id":"im/lozex8zq","slide":7,"name":"图片 2","bbox":[878.87,513.27,292.13,136.13]}

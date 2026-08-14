@@ -1,0 +1,11 @@
+Primary source:
+- C:/Users/zharkzhang/Documents/xwechat_files/wxid_0jzf9thd5iir22_e374/msg/file/2026-07/张聪_简历_游戏开发.pdf (user-provided resume, 2 pages)
+
+Resume facts selected for slide 3:
+- 清华大学电子信息（互动媒体设计与技术）硕士，2024-2027。
+- 华中科技大学自动化学士，2020-2024。
+- 技术栈：Unity、UE、C++、C#、Python。
+- 经历主线：腾讯 Unity 客户端、UE 战斗技术策划、火影忍者战斗技术策划；莉莉丝策划工具链。
+- 研究成果：感知与反馈融合的交互设备；IROS 2025 一作中稿；发明专利申请。
+
+No web research or third-party assets were used.

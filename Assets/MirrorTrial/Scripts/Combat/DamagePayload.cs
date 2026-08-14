@@ -8,6 +8,12 @@ namespace MirrorTrial.Combat
         [InspectorName("\u91cd\u51fb")] Heavy
     }
 
+    public enum HitFlashType
+    {
+        [InspectorName("\u95ea\u767d")] White,
+        [InspectorName("\u95ea\u7ea2")] Red
+    }
+
     public enum HitReactionType
     {
         [InspectorName("\u65e0\u53d7\u51fb\u53cd\u5e94")] None,
@@ -69,12 +75,14 @@ namespace MirrorTrial.Combat
         public readonly HitReactionType reaction;
         public readonly bool breaksSuperArmor;
         public readonly SkillAttackType attackType;
+        public readonly HitFlashType hitFlashType;
         public readonly HitFeedbackRequest feedback;
 
         public DamagePayload(GameObject source, int damage, Vector2 knockback, Vector2 direction, float hitStop,
             int interruptPower = 1, float poiseDamage = 1f,
             HitReactionType reaction = HitReactionType.LightHurt, bool breaksSuperArmor = false,
             SkillAttackType attackType = SkillAttackType.Normal,
+            HitFlashType hitFlashType = HitFlashType.White,
             HitFeedbackRequest feedback = default(HitFeedbackRequest))
         {
             this.source = source;
@@ -87,6 +95,7 @@ namespace MirrorTrial.Combat
             this.reaction = reaction;
             this.breaksSuperArmor = breaksSuperArmor;
             this.attackType = attackType;
+            this.hitFlashType = hitFlashType;
             this.feedback = feedback;
         }
     }

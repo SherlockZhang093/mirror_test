@@ -24,7 +24,8 @@ namespace MirrorTrial.Level
         Wait = 7,
         [Obsolete("Use Tutorial with a completion condition.")] HealthResourceObjective = 8,
         SystemMessage = 9,
-        Tutorial = 10
+        Tutorial = 10,
+        ProximityHud = 11
     }
 
     public enum StoryTutorialCompletionType
@@ -64,6 +65,7 @@ namespace MirrorTrial.Level
         public Transform objectiveTarget;
         public bool requireTargetProximity;
         [Min(0.1f)] public float targetDistance = 2f;
+        public Vector2 hudOffset = new Vector2(0f, 110f);
         [Min(1f)] public float cameraSize = 5.5f;
         [Min(0f)] public float blendIn = 0.6f;
         [Min(0f)] public float blendOut = 0.5f;
@@ -167,8 +169,14 @@ namespace MirrorTrial.Level
         Image objectiveMarker;
         TMP_Text titleText;
         TMP_Text skipText;
+        GameObject proximityHudPanel;
+        RectTransform proximityHudRect;
+        CanvasGroup proximityHudGroup;
+        TMP_Text proximityHudTitle;
+        TMP_Text proximityHudHint;
 
         public bool IsPlaying => routine != null;
+        public bool IsCompleted => !ShouldPlay();
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
         public string SequenceId => sequenceId;
         public IReadOnlyList<StoryTutorialStep> Steps => steps;
@@ -320,6 +328,9 @@ namespace MirrorTrial.Level
 #pragma warning restore CS0618
                 case StoryTutorialStepType.Tutorial:
                     yield return PlayObjective(step);
+                    break;
+                case StoryTutorialStepType.ProximityHud:
+                    yield return PlayProximityHud(step);
                     break;
                 case StoryTutorialStepType.Wait:
                     SetAllPresentationVisible(false);
@@ -490,6 +501,55 @@ namespace MirrorTrial.Level
             objectivePanel.SetActive(false);
         }
 
+        IEnumerator PlayProximityHud(StoryTutorialStep step)
+        {
+            SetAllPresentationVisible(false);
+            ResolvePlayer();
+            ApplyInputLock(false);
+            var hasTitle = !string.IsNullOrWhiteSpace(step.text);
+            var hasHint = !string.IsNullOrWhiteSpace(step.hint);
+            proximityHudTitle.text = hasTitle ? step.text : string.Empty;
+            proximityHudHint.text = hasHint ? step.hint : string.Empty;
+            proximityHudTitle.gameObject.SetActive(hasTitle);
+            proximityHudHint.gameObject.SetActive(hasHint);
+            if (hasTitle && !hasHint)
+                SetRect(proximityHudTitle.rectTransform, new Vector2(0.1f, 0.18f), new Vector2(0.94f, 0.82f), Vector2.zero, Vector2.zero);
+            else if (!hasTitle && hasHint)
+                SetRect(proximityHudHint.rectTransform, new Vector2(0.1f, 0.18f), new Vector2(0.94f, 0.82f), Vector2.zero, Vector2.zero);
+            else
+            {
+                SetRect(proximityHudTitle.rectTransform, new Vector2(0.1f, 0.48f), new Vector2(0.94f, 0.88f), Vector2.zero, Vector2.zero);
+                SetRect(proximityHudHint.rectTransform, new Vector2(0.1f, 0.12f), new Vector2(0.94f, 0.5f), Vector2.zero, Vector2.zero);
+            }
+            proximityHudPanel.SetActive(hasTitle || hasHint);
+            proximityHudGroup.alpha = 0f;
+            var alpha = 0f;
+            var completed = false;
+            while (!completed)
+            {
+                if (!playerInput || !player) ResolvePlayer();
+                var inRange = player && step.objectiveTarget && Vector2.Distance(player.position, step.objectiveTarget.position) <= Mathf.Max(0.1f, step.targetDistance);
+                alpha = Mathf.MoveTowards(alpha, inRange ? 1f : 0f, Time.unscaledDeltaTime * 7f);
+                proximityHudGroup.alpha = alpha;
+                UpdateProximityHudPosition(step.hudOffset);
+                completed = inRange && TutorialInputPressed(step.inputAction);
+                yield return null;
+            }
+            proximityHudGroup.alpha = 0f;
+            proximityHudPanel.SetActive(false);
+        }
+
+        void UpdateProximityHudPosition(Vector2 offset)
+        {
+            if (!player || !proximityHudRect || !rootGroup) return;
+            var camera = Camera.main;
+            if (!camera) return;
+            var screenPoint = (Vector2)camera.WorldToScreenPoint(player.position);
+            var canvasRect = rootGroup.transform as RectTransform;
+            if (canvasRect && RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPoint, null, out var localPoint))
+                proximityHudRect.anchoredPosition = localPoint + offset;
+        }
+
         void CompleteSequence()
         {
             ApplyInputLock(false);
@@ -655,6 +715,7 @@ namespace MirrorTrial.Level
             if (!rootGroup) return;
             dialoguePanel.SetActive(visible);
             objectivePanel.SetActive(visible);
+            proximityHudPanel.SetActive(visible);
             fadeImage.gameObject.SetActive(visible);
             titleText.gameObject.SetActive(visible);
             SetCinematicBars(visible);
@@ -723,6 +784,25 @@ namespace MirrorTrial.Level
             objectiveHint = CreateText(objectivePanel.transform, "Hint", 21f, FontStyles.Normal, TextAlignmentOptions.Left);
             objectiveHint.color = new Color(0.7f, 0.84f, 0.92f, 1f);
             SetRect(objectiveHint.rectTransform, new Vector2(0.085f, 0.12f), new Vector2(0.94f, 0.48f), Vector2.zero, Vector2.zero);
+
+            var proximityHudPrefab = Resources.Load<GameObject>("UI/Story/ProximityInteractionHud");
+            proximityHudPanel = proximityHudPrefab
+                ? Instantiate(proximityHudPrefab, root.transform, false)
+                : CreatePanel(root.transform, "ProximityInteractionHud", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            proximityHudRect = proximityHudPanel.GetComponent<RectTransform>();
+            proximityHudGroup = proximityHudPanel.GetComponent<CanvasGroup>() ?? proximityHudPanel.AddComponent<CanvasGroup>();
+            proximityHudTitle = proximityHudPanel.transform.Find("Title")?.GetComponent<TMP_Text>();
+            proximityHudHint = proximityHudPanel.transform.Find("Hint")?.GetComponent<TMP_Text>();
+            if (!proximityHudTitle)
+                proximityHudTitle = CreateText(proximityHudPanel.transform, "Title", 23f, FontStyles.Bold, TextAlignmentOptions.Left);
+            if (!proximityHudHint)
+                proximityHudHint = CreateText(proximityHudPanel.transform, "Hint", 19f, FontStyles.Normal, TextAlignmentOptions.Left);
+            var proximityHudFont = ResolvePresentationFont();
+            if (proximityHudFont)
+            {
+                proximityHudTitle.font = proximityHudFont;
+                proximityHudHint.font = proximityHudFont;
+            }
         }
 
         GameObject CreatePanel(Transform parent, string objectName, Vector2 anchorMin, Vector2 anchorMax)

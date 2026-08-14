@@ -27,6 +27,10 @@ namespace MirrorTrial.Editor.Enemies
                     profileObject.FindProperty("launchSettings"),
                     new GUIContent("击飞动画与落地表现"),
                     true);
+                EditorGUILayout.PropertyField(
+                    profileObject.FindProperty("getUpProtection"),
+                    new GUIContent("起身无敌"),
+                    true);
                 if (profileObject.ApplyModifiedProperties())
                     EditorUtility.SetDirty(profile);
             }

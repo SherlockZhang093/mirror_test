@@ -1,0 +1,15 @@
+Source deck: 2026超新星P族答辩_张聪_实习经历版.pptx
+Slides: 7, 16:9, 1280 x 720 render space.
+
+Reusable pattern selected:
+- Slide 6 provides a full-slide image background plus inherited title and body text boxes.
+- The pattern is duplicated for slide 5 so the combat-editor screenshot can replace the inherited background image without adding overlays.
+
+Visual contract:
+- Preserve inherited title/body typography.
+- Use the supplied Unity editor screenshot as the full-slide visual evidence.
+- Keep visible copy to one title and one concise capability line.
+
+Narrative contract:
+- The page should communicate node-based combo design, frame-level move configuration, and runtime preview.
+- The core value is configuration-driven iteration without repeated code edits.

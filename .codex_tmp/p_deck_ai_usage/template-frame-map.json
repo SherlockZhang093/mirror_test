@@ -1,0 +1,61 @@
+{
+  "outputSlides": [
+    {
+      "outputSlide": 1,
+      "sourceSlide": 1,
+      "narrativeRole": "opening identity",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "sourceElementId": "sh/547294r6", "action": "rewrite" }
+      ]
+    },
+    {
+      "outputSlide": 2,
+      "sourceSlide": 2,
+      "narrativeRole": "directory",
+      "reuseMode": "duplicate-slide",
+      "editTargets": []
+    },
+    {
+      "outputSlide": 3,
+      "sourceSlide": 3,
+      "narrativeRole": "personal introduction",
+      "reuseMode": "duplicate-slide",
+      "editTargets": []
+    },
+    {
+      "outputSlide": 4,
+      "sourceSlide": 4,
+      "narrativeRole": "game positioning and loop",
+      "reuseMode": "duplicate-slide",
+      "editTargets": []
+    },
+    {
+      "outputSlide": 5,
+      "sourceSlide": 5,
+      "narrativeRole": "section spacer",
+      "reuseMode": "duplicate-slide",
+      "editTargets": []
+    },
+    {
+      "outputSlide": 6,
+      "sourceSlide": 6,
+      "narrativeRole": "AI application in the game project",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "sourceElementId": "sh/zi98nu94", "action": "rewrite" },
+        { "sourceElementId": "sh/yhg7epsj", "action": "rewrite" }
+      ]
+    },
+    {
+      "outputSlide": 7,
+      "sourceSlide": 7,
+      "narrativeRole": "closing bumper",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "sourceElementId": "sh/zedcfa9g", "action": "rewrite" }
+      ]
+    }
+  ],
+  "omittedSourceSlides": []
+}

@@ -87,6 +87,7 @@ namespace MirrorTrial.Combat
         ChargeTelegraphSettings settings;
         Vector2 localChargeOffset;
         float localEffectAngle;
+        float rotationSpeedOverride = float.NaN;
         bool facingRight = true;
         bool active;
         bool fullCuePlayed;
@@ -133,7 +134,8 @@ namespace MirrorTrial.Combat
 
         public void Begin(ChargeTelegraphSettings visualSettings, Vector2 chargeOffset, bool pointsRight, Sprite coreSprite = null,
             float effectAngle = 0f, float readyThresholdOverride = -1f,
-            AudioClip loopOverride = null, AudioClip fullCueOverride = null, bool loopChargingAudio = true)
+            AudioClip loopOverride = null, AudioClip fullCueOverride = null, bool loopChargingAudio = true,
+            float effectRotationSpeedOverride = float.NaN)
         {
             settings = visualSettings ?? defaultSettings ?? new ChargeTelegraphSettings();
             chargingLoopOverride = loopOverride;
@@ -141,6 +143,7 @@ namespace MirrorTrial.Combat
             loopChargingAudioOverride = loopChargingAudio;
             localChargeOffset = chargeOffset;
             localEffectAngle = effectAngle;
+            rotationSpeedOverride = effectRotationSpeedOverride;
             facingRight = pointsRight;
             active = true;
             fullCuePlayed = false;
@@ -438,7 +441,8 @@ namespace MirrorTrial.Combat
             var scale = Mathf.Lerp(settings.coreStartScale, settings.coreFullScale, progress) * pulse;
             coreGlow.transform.localScale = Vector3.one * scale;
             var mirroredAngle = facingRight ? localEffectAngle : -localEffectAngle;
-            coreGlow.transform.localRotation = Quaternion.Euler(0f, 0f, mirroredAngle + Time.unscaledTime * settings.rotationSpeed);
+            var rotationSpeed = float.IsNaN(rotationSpeedOverride) ? settings.rotationSpeed : rotationSpeedOverride;
+            coreGlow.transform.localRotation = Quaternion.Euler(0f, 0f, mirroredAngle + Time.unscaledTime * rotationSpeed);
             var glowColor = settings.bodyGlowColor;
             glowColor.a = Mathf.Lerp(0.04f, settings.bodyGlowMaxAlpha, progress) * Mathf.Lerp(1f, 1.35f, finalT);
             bodyGlow.color = glowColor;
@@ -559,7 +563,8 @@ namespace MirrorTrial.Combat
             var offset = localChargeOffset;
             offset.x *= facingRight ? 1f : -1f;
             swordRoot.localPosition = offset;
-            var combinedAngle = settings.swordAngle + localEffectAngle;
+            var rotationSpeed = float.IsNaN(rotationSpeedOverride) ? settings.rotationSpeed : rotationSpeedOverride;
+            var combinedAngle = settings.swordAngle + localEffectAngle + Time.unscaledTime * rotationSpeed;
             swordRoot.localRotation = Quaternion.Euler(0f, 0f, facingRight ? combinedAngle : -combinedAngle);
             if (!source) return;
             var layer = source.sortingLayerID;
@@ -822,7 +827,7 @@ namespace MirrorTrial.Combat
         }
 
         public void EditorSetPreview(bool visible, float normalizedProgress, bool pointsRight, Vector2 chargeOffset,
-            float effectAngle)
+            float effectAngle, float effectRotationSpeedOverride = float.NaN)
         {
             editorPreviewActive = visible;
             if (!visible)
@@ -837,6 +842,7 @@ namespace MirrorTrial.Combat
             facingRight = pointsRight;
             localChargeOffset = chargeOffset;
             localEffectAngle = effectAngle;
+            rotationSpeedOverride = effectRotationSpeedOverride;
             jitterOffset = progress >= settings.swordJitterStart ? settings.swordJitterAmount : 0f;
             readyThreshold = Mathf.Clamp01(settings.readyChargeThreshold);
             EnsureVisuals();

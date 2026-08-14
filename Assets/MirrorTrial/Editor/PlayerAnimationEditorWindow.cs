@@ -52,7 +52,7 @@ namespace MirrorTrial.Editor
             PlayerActionState.Dead, PlayerActionState.BowDraw, PlayerActionState.BowAim, PlayerActionState.BowFull,
             PlayerActionState.BowFire, PlayerActionState.ComboAttackA, PlayerActionState.ComboAttackB,
             PlayerActionState.ComboAttackC, PlayerActionState.ComboAttackD, PlayerActionState.PunchA,
-            PlayerActionState.PunchB, PlayerActionState.PunchC, PlayerActionState.KickA, PlayerActionState.KickB,
+            PlayerActionState.PunchB, PlayerActionState.PunchC, PlayerActionState.PunchD, PlayerActionState.KickA, PlayerActionState.KickB,
             PlayerActionState.KickC, PlayerActionState.SwordStandingSlash, PlayerActionState.SwordRunSlash,
             PlayerActionState.SwordGuard, PlayerActionState.SwordGuardImpact, PlayerActionState.SwordSprintSlash,
             PlayerActionState.CrouchSlash
@@ -531,6 +531,7 @@ namespace MirrorTrial.Editor
                 case PlayerActionState.PunchA:
                 case PlayerActionState.PunchB:
                 case PlayerActionState.PunchC:
+                case PlayerActionState.PunchD:
                 case PlayerActionState.KickA:
                 case PlayerActionState.KickB:
                 case PlayerActionState.KickC:
@@ -573,6 +574,7 @@ namespace MirrorTrial.Editor
                 case PlayerActionState.PunchA: return "\u51fa\u62f3 A";
                 case PlayerActionState.PunchB: return "\u51fa\u62f3 B";
                 case PlayerActionState.PunchC: return "\u51fa\u62f3 C";
+                case PlayerActionState.PunchD: return "\u51fa\u62f3 D";
                 case PlayerActionState.KickA: return "\u8e22\u51fb A";
                 case PlayerActionState.KickB: return "\u8e22\u51fb B";
                 case PlayerActionState.KickC: return "\u8e22\u51fb C";

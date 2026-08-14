@@ -22,6 +22,8 @@ namespace MirrorTrial.Player
         PlayerStateMachine stateMachine;
         PlayerAnimationDriver animationDriver;
         PlayerDamageReceiver damageReceiver;
+        PlayerCombat combat;
+        PlayerBowCombat bowCombat;
 
         Coroutine dodgeRoutine;
         float bufferedUntil;
@@ -40,6 +42,8 @@ namespace MirrorTrial.Player
             stateMachine = GetComponent<PlayerStateMachine>();
             animationDriver = GetComponent<PlayerAnimationDriver>();
             damageReceiver = GetComponent<PlayerDamageReceiver>();
+            combat = GetComponent<PlayerCombat>();
+            bowCombat = GetComponent<PlayerBowCombat>();
         }
 
         void OnEnable()
@@ -74,11 +78,19 @@ namespace MirrorTrial.Player
 
         bool CanStartDodge()
         {
-            if (!input.InputEnabled || Time.time < readyTime || stateMachine.IsInActionState)
+            if (!input.InputEnabled || Time.time < readyTime)
                 return false;
-            if (motor.IsGrounded)
-                return true;
-            return tuning.dodge.allowAirDodge && !airDodgeUsed;
+
+            var locationAllowsDodge = motor.IsGrounded ||
+                (tuning.dodge.allowAirDodge && !airDodgeUsed);
+            if (!locationAllowsDodge)
+                return false;
+
+            if (combat && combat.IsAttacking)
+                return combat.TryCancelForDodge();
+            if (bowCombat && bowCombat.IsBusy)
+                return bowCombat.TryCancelForDodge();
+            return !stateMachine.IsInActionState;
         }
 
         IEnumerator DodgeRoutine()

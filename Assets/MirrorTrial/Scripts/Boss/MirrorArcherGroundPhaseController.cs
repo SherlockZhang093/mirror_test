@@ -32,7 +32,6 @@ namespace MirrorTrial.Boss
         public AudioClip BlockedHitSound => blockedHitSound;
         public float PlatformLiftHeight => rockfallArea ? rockfallArea.PlatformLiftHeight : 2.2f;
         public float PlatformPixelsPerUnit => rockfallArea ? rockfallArea.PlatformPixelsPerUnit : 100f;
-        public float PlatformSurfaceOffset => rockfallArea ? rockfallArea.PlatformSurfaceOffset : 0.2f;
         public float PlatformAnimationDuration => rockfallArea ? rockfallArea.PlatformAnimationDuration : 2f;
 
         public void Configure(MirrorArcherTwoStageProfile nextProfile,

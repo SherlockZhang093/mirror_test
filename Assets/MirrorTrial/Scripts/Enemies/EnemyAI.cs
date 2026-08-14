@@ -562,7 +562,7 @@ namespace MirrorTrial.Enemies
             if (actualDamage > 0)
                 DamageDealtEvents.RaisePlayerDamageDealt(new DamageDealtResult(payload.source, gameObject, requestedDamage, actualDamage));
             if (damageVisual)
-                damageVisual.PlayDamage(actualDamage, MaxHitPoints);
+                damageVisual.PlayDamage(payload.hitFlashType, actualDamage);
 
             pendingDeath = currentHitPoints <= 0;
             if (pendingDeath)
@@ -645,7 +645,22 @@ namespace MirrorTrial.Enemies
             if (bodyCollider) bodyCollider.enabled = false;
             var hurtbox = GetComponent<Hurtbox>();
             if (hurtbox) hurtbox.enabled = false;
-            StartCoroutine(DeathBlinkRoutine());
+
+            if (EnemyDeathBurstEffect.TrySpawn(spriteRenderer))
+            {
+                if (spriteRenderer) spriteRenderer.enabled = false;
+                StartCoroutine(DeathBurstRoutine());
+            }
+            else
+            {
+                StartCoroutine(DeathBlinkRoutine());
+            }
+        }
+
+        IEnumerator DeathBurstRoutine()
+        {
+            yield return new WaitForSecondsRealtime(EnemyDeathBurstEffect.DefaultLifetime);
+            Destroy(gameObject);
         }
 
         IEnumerator DeathBlinkRoutine()

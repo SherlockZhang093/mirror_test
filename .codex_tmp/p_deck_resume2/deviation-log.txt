@@ -1,0 +1,2 @@
+Slide 3: Removed research-paper and patent content. Expanded the Lilith tool-planning internship and prior Tencent J1 client/UE combat technical-planning experience.
+Slides 1 and 7: Structural placeholders rewritten with identical visible copy; no visible deviation intended.

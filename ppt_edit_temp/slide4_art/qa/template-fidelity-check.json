@@ -1,0 +1,13 @@
+{
+  "status": "pass",
+  "checkedAt": "2026-08-14T06:20:19.171Z",
+  "workspace": "G:\\mirror_test\\ppt_edit_temp\\slide4_art",
+  "finalPptx": "G:\\mirror_test\\ppt_edit_temp\\slide4_art\\final.pptx",
+  "starterPptx": "G:\\mirror_test\\ppt_edit_temp\\slide4_art\\template-starter.pptx",
+  "mapPath": "G:\\mirror_test\\ppt_edit_temp\\slide4_art\\template-frame-map.json",
+  "starterLayoutDir": "G:\\mirror_test\\ppt_edit_temp\\slide4_art\\template-starter-layout",
+  "finalLayoutDir": "G:\\mirror_test\\ppt_edit_temp\\slide4_art\\final-layout\\final",
+  "editDir": "G:\\mirror_test\\ppt_edit_temp\\slide4_art",
+  "issueCount": 0,
+  "issues": []
+}

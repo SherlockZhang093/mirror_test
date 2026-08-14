@@ -55,6 +55,7 @@ namespace MirrorTrial.Player
         LadderClimbDownLeft = 42,
         LadderClimbDownRight = 43,
         LadderClimbFinish = 44,
-        LadderJumpPrepare = 45
+        LadderJumpPrepare = 45,
+        PunchD = 46
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using MirrorTrial.Abilities;
 using MirrorTrial.Combat;
+using MirrorTrial.Enemies;
 using UnityEngine;
 
 namespace MirrorTrial.Boss
@@ -33,9 +34,12 @@ namespace MirrorTrial.Boss
 
         Rigidbody2D body;
         Hurtbox hurtbox;
+        EnemyDamageVisual damageVisual;
         Collider2D bodyCollider;
         Transform target;
+        Transform groundContactAnchor;
         Rect airBounds;
+        bool airBoundsConfigured;
         Coroutine loop;
         Coroutine crashVisual;
         Coroutine hitVisual;
@@ -64,20 +68,40 @@ namespace MirrorTrial.Boss
             if (!visualRoot) visualRoot = transform.Find(VisualRootName);
             if (!projectileSocket) projectileSocket = FindDeep(transform, ProjectileSocketName);
             if (!impactSocket) impactSocket = FindDeep(transform, ImpactSocketName);
+            groundContactAnchor = FindDeep(transform, "GroundContactAnchor");
             if (!animator) animator = GetComponentInChildren<Animator>(true);
+            damageVisual = GetComponent<EnemyDamageVisual>();
+            if (!damageVisual) damageVisual = gameObject.AddComponent<EnemyDamageVisual>();
+            var visualRenderers = visualRoot
+                ? visualRoot.GetComponentsInChildren<SpriteRenderer>(true)
+                : GetComponentsInChildren<SpriteRenderer>(true);
+            damageVisual.Bind(visualRenderers);
             body.gravityScale = 0f;
             body.freezeRotation = true;
             body.interpolation = RigidbodyInterpolation2D.Interpolate;
             hitPoints = MaxHitPoints;
         }
 
-        public void Configure(MirrorArcherTwoStageProfile nextProfile, Bounds arenaBounds)
+        public void Configure(MirrorArcherTwoStageProfile nextProfile, Bounds arenaBounds,
+            float minimumVisibleFlightY)
         {
             profile = nextProfile;
             hitPoints = MaxHitPoints;
             var padding = profile ? profile.airPadding : Vector2.zero;
-            airBounds = Rect.MinMaxRect(arenaBounds.min.x + padding.x, arenaBounds.min.y + padding.y,
-                arenaBounds.max.x - padding.x, arenaBounds.max.y - padding.y);
+            var maximumFlightY = arenaBounds.max.y - padding.y;
+            var contactOffsetY = groundContactAnchor
+                ? groundContactAnchor.position.y - transform.position.y
+                : 0f;
+            var minimumRootY = Mathf.Max(arenaBounds.min.y + padding.y,
+                minimumVisibleFlightY - contactOffsetY);
+            maximumFlightY = Mathf.Max(minimumRootY, maximumFlightY);
+            airBounds = Rect.MinMaxRect(arenaBounds.min.x + padding.x, minimumRootY,
+                arenaBounds.max.x - padding.x, maximumFlightY);
+            airBoundsConfigured = true;
+
+            // The spawn point is scene-authored and can also sit below a newly adjusted
+            // RockfallArea. Clamp it immediately so every combat trajectory starts valid.
+            SetAirPosition(ClampToAir(transform.position));
         }
 
         public void Activate(Transform playerTarget)
@@ -347,7 +371,7 @@ namespace MirrorTrial.Boss
                 var t = Mathf.Clamp01(elapsed / Mathf.Max(0.01f, duration));
                 var a = Vector2.Lerp(start, control, t);
                 var b = Vector2.Lerp(control, end, t);
-                body.MovePosition(Vector2.Lerp(a, b, t));
+                body.MovePosition(ClampToAir(Vector2.Lerp(a, b, t)));
             }
         }
 
@@ -360,7 +384,8 @@ namespace MirrorTrial.Boss
                 yield return fixedWait;
                 if (CurrentState == MountedState.Crashing) yield break;
                 elapsed += Time.fixedDeltaTime;
-                body.MovePosition(Vector2.Lerp(start, end, Mathf.Clamp01(elapsed / Mathf.Max(0.01f, duration))));
+                body.MovePosition(ClampToAir(Vector2.Lerp(start, end,
+                    Mathf.Clamp01(elapsed / Mathf.Max(0.01f, duration)))));
             }
         }
 
@@ -400,7 +425,10 @@ namespace MirrorTrial.Boss
             hitPoints = Mathf.Max(0, hitPoints - requestedDamage);
             var actualDamage = beforeDamage - hitPoints;
             if (actualDamage > 0)
+            {
                 DamageDealtEvents.RaisePlayerDamageDealt(new DamageDealtResult(payload.source, gameObject, requestedDamage, actualDamage));
+                if (damageVisual) damageVisual.PlayDamage(payload.hitFlashType, actualDamage);
+            }
             HealthChanged?.Invoke(this, hitPoints, MaxHitPoints);
             if (hitPoints > 0)
             {
@@ -448,8 +476,17 @@ namespace MirrorTrial.Boss
 
         Vector2 ClampToAir(Vector2 value)
         {
+            if (!airBoundsConfigured) return value;
             return new Vector2(Mathf.Clamp(value.x, airBounds.xMin, airBounds.xMax),
                 Mathf.Clamp(value.y, airBounds.yMin, airBounds.yMax));
+        }
+
+        void SetAirPosition(Vector2 position)
+        {
+            if (body && body.simulated)
+                body.position = position;
+            else
+                transform.position = position;
         }
 
         IEnumerator FaceTargetAnimated()

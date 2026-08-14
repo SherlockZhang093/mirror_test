@@ -1,0 +1,9 @@
+Slide 5 sources:
+- User-provided screenshot: codex-clipboard-3af23637-e6c0-47fe-ab61-bc9a3b1338bc.png
+- G:/mirror_test/Docs/Combat/CODEX_SKILL_EDITOR_HANDOFF.md
+
+Talking points:
+- Combo graph: moves are nodes; point, hold, release, and state decisions are transitions.
+- Move configuration: animation, startup/active/recovery, hitbox frames, damage, knockback, charge, and hit feedback.
+- Runtime preview: TestGym input simulation, live data sync, and current-node/transition highlighting.
+- Value: designers can tune and validate combat through configuration instead of repeated code changes.

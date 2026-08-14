@@ -17,6 +17,7 @@ namespace MirrorTrial.Editor.Level
 
         static readonly StoryTutorialStepType[] StepTypes =
         {
+            StoryTutorialStepType.ProximityHud,
             StoryTutorialStepType.Tutorial,
             StoryTutorialStepType.Monologue,
             StoryTutorialStepType.SystemMessage,
@@ -27,6 +28,7 @@ namespace MirrorTrial.Editor.Level
 
         static readonly string[] StepNames =
         {
+            "靠近交互 HUD",
             "新手指引",
             "内心独白",
             "系统提示",
@@ -242,6 +244,7 @@ namespace MirrorTrial.Editor.Level
             var mode = triggerObject.FindProperty("triggerMode");
             EditorGUILayout.PropertyField(mode, new GUIContent("触发方式"));
             DrawTriggerTarget((StorySequenceTriggerMode)mode.enumValueIndex);
+            DrawTriggerProperty("prerequisiteSequence", "\u524d\u7f6e\u5267\u60c5\u6bb5\u843d\uff08\u53ef\u9009\uff09");
             EditorGUILayout.BeginHorizontal();
             DrawTriggerProperty("oneShot", "只触发一次");
             DrawTriggerProperty("delay", "触发延迟");
@@ -362,6 +365,7 @@ namespace MirrorTrial.Editor.Level
                 case StoryTutorialStepType.SystemMessage: return 120f;
                 case StoryTutorialStepType.TitleCard: return 112f;
                 case StoryTutorialStepType.Tutorial: return 222f;
+                case StoryTutorialStepType.ProximityHud: return 182f;
                 default: return 72f;
             }
         }
@@ -407,6 +411,14 @@ namespace MirrorTrial.Editor.Level
                     break;
                 case StoryTutorialStepType.Tutorial:
                     DrawTutorialStep(element, ref inner);
+                    break;
+                case StoryTutorialStepType.ProximityHud:
+                    DrawStepField(element, "text", "HUD 标题", ref inner);
+                    DrawStepField(element, "hint", "操作提示", ref inner);
+                    DrawStepField(element, "inputAction", "触发操作", ref inner);
+                    DrawStepField(element, "objectiveTarget", "靠近物品", ref inner);
+                    DrawStepField(element, "targetDistance", "显示距离", ref inner);
+                    DrawStepField(element, "hudOffset", "玩家旁偏移", ref inner);
                     break;
                 case StoryTutorialStepType.Wait:
                     DrawStepField(element, "duration", "等待时间", ref inner);
@@ -503,6 +515,7 @@ namespace MirrorTrial.Editor.Level
             element.FindPropertyRelative("objectiveTarget").objectReferenceValue = null;
             element.FindPropertyRelative("requireTargetProximity").boolValue = false;
             element.FindPropertyRelative("targetDistance").floatValue = 2f;
+            element.FindPropertyRelative("hudOffset").vector2Value = new Vector2(0f, 110f);
             element.FindPropertyRelative("cameraSize").floatValue = 5.5f;
             element.FindPropertyRelative("blendIn").floatValue = 0.6f;
             element.FindPropertyRelative("blendOut").floatValue = 0.5f;
@@ -596,6 +609,7 @@ namespace MirrorTrial.Editor.Level
                 case StoryTutorialStepType.Monologue: return "在这里输入第一人称独白……";
                 case StoryTutorialStepType.SystemMessage: return "在这里输入玩法说明……";
                 case StoryTutorialStepType.Tutorial: return "完成新手指引";
+                case StoryTutorialStepType.ProximityHud: return "旋转镜子";
                 default: return string.Empty;
             }
         }
@@ -605,6 +619,7 @@ namespace MirrorTrial.Editor.Level
             switch (type)
             {
                 case StoryTutorialStepType.Tutorial: return "E  交互";
+                case StoryTutorialStepType.ProximityHud: return "E  交互";
                 default: return string.Empty;
             }
         }

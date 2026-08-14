@@ -1,0 +1,13 @@
+{
+  "status": "pass",
+  "checkedAt": "2026-08-13T07:49:36.353Z",
+  "workspace": "G:\\mirror_test\\.codex_tmp\\p_deck_game_intro",
+  "finalPptx": "G:\\mirror_test\\.codex_tmp\\p_deck_game_intro\\candidate.pptx",
+  "starterPptx": "G:\\mirror_test\\.codex_tmp\\p_deck_game_intro\\template-starter.pptx",
+  "mapPath": "G:\\mirror_test\\.codex_tmp\\p_deck_game_intro\\template-frame-map.json",
+  "starterLayoutDir": "G:\\mirror_test\\.codex_tmp\\p_deck_game_intro\\template-starter-layout",
+  "finalLayoutDir": "G:\\mirror_test\\.codex_tmp\\p_deck_game_intro\\final-layout\\final",
+  "editDir": "G:\\mirror_test\\.codex_tmp\\p_deck_game_intro",
+  "issueCount": 0,
+  "issues": []
+}

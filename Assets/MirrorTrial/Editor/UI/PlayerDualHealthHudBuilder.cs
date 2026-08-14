@@ -13,6 +13,10 @@ namespace MirrorTrial.Editor.UI
         const string FallbackHudPrefabPath = "Assets/MirrorTrial/Resources/UI/PlayerHealthBarUI.prefab";
         const string Reality01HudPrefabPath = "Assets/MirrorTrial/Resources/UI/PlayerHealthBarUI_Reality01.prefab";
         const string Reality02HudPrefabPath = "Assets/MirrorTrial/Resources/UI/PlayerHealthBarUI_Reality02.prefab";
+        const string Reality01SixSlotHudPrefabPath = "Assets/MirrorTrial/Resources/UI/PlayerHealthBarUI_Reality01_6Slot.prefab";
+        const string Reality02SixSlotHudPrefabPath = "Assets/MirrorTrial/Resources/UI/PlayerHealthBarUI_Reality02_6Slot.prefab";
+        const string Reality01SevenSlotHudPrefabPath = "Assets/MirrorTrial/Resources/UI/PlayerHealthBarUI_Reality01_7Slot.prefab";
+        const string Reality02SevenSlotHudPrefabPath = "Assets/MirrorTrial/Resources/UI/PlayerHealthBarUI_Reality02_7Slot.prefab";
         const string Reality01ConfigPath = "Assets/MirrorTrial/LevelConfigs/Level_Reality_01.asset";
         const string Reality02ConfigPath = "Assets/MirrorTrial/LevelConfigs/Level_Reality_02.asset";
         const string Reality01ScenePath = "Assets/MirrorTrial/Scenes/Level_Reality_01.unity";
@@ -55,9 +59,10 @@ namespace MirrorTrial.Editor.UI
             EnsureHudPrefabExists(Reality01HudPrefabPath);
             EnsureHudPrefabExists(Reality02HudPrefabPath);
 
-            BuildHudPrefab(Reality01HudPrefabPath, "UnifiedHealthHud_Reality01", Reality01Palette);
-            BuildHudPrefab(Reality02HudPrefabPath, "UnifiedHealthHud_Reality02", Reality02Palette);
-            BuildHudPrefab(FallbackHudPrefabPath, "UnifiedHealthHud_Reality02", Reality02Palette);
+            BuildHudPrefab(Reality01HudPrefabPath, "UnifiedHealthHud_Reality01", Reality01Palette, 5);
+            BuildHudPrefab(Reality02HudPrefabPath, "UnifiedHealthHud_Reality02", Reality02Palette, 5);
+            BuildHudPrefab(FallbackHudPrefabPath, "UnifiedHealthHud_Reality02", Reality02Palette, 5);
+            BuildUpgradeSlotPrefabs();
 
             AssignHudToConfigAndScene(Reality01ConfigPath, Reality01ScenePath, Reality01HudPrefabPath);
             AssignHudToConfigAndScene(Reality02ConfigPath, Reality02ScenePath, Reality02HudPrefabPath);
@@ -73,6 +78,63 @@ namespace MirrorTrial.Editor.UI
             Rebuild();
         }
 
+        [MenuItem("Tools/Mirror Trial/UI/生成 Reality02 六格生命条 Prefab")]
+        public static void BuildReality02SixSlotPrefab()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                Debug.LogWarning("[PlayerDualHealthHudBuilder] 请退出运行模式后再生成六格生命条 Prefab。");
+                return;
+            }
+
+            BuildSlotPrefab(Reality02HudPrefabPath, Reality02SixSlotHudPrefabPath,
+                "UnifiedHealthHud_Reality02_6Slot", Reality02Palette, 6);
+        }
+
+        [MenuItem("Tools/Mirror Trial/UI/生成 Reality01 六格生命条 Prefab")]
+        public static void BuildReality01SixSlotPrefab()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                Debug.LogWarning("[PlayerDualHealthHudBuilder] 请退出运行模式后再生成六格生命条 Prefab。");
+                return;
+            }
+
+            BuildSlotPrefab(Reality01HudPrefabPath, Reality01SixSlotHudPrefabPath,
+                "UnifiedHealthHud_Reality01_6Slot", Reality01Palette, 6);
+        }
+
+        [MenuItem("Tools/Mirror Trial/UI/生成六格和七格生命条 Prefab")]
+        public static void BuildUpgradeSlotPrefabs()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                Debug.LogWarning("[PlayerDualHealthHudBuilder] 请退出运行模式后再生成生命条 Prefab。");
+                return;
+            }
+
+            BuildSlotPrefab(Reality01HudPrefabPath, Reality01SixSlotHudPrefabPath,
+                "UnifiedHealthHud_Reality01_6Slot", Reality01Palette, 6);
+            BuildSlotPrefab(Reality02HudPrefabPath, Reality02SixSlotHudPrefabPath,
+                "UnifiedHealthHud_Reality02_6Slot", Reality02Palette, 6);
+            BuildSlotPrefab(Reality01HudPrefabPath, Reality01SevenSlotHudPrefabPath,
+                "UnifiedHealthHud_Reality01_7Slot", Reality01Palette, 7);
+            BuildSlotPrefab(Reality02HudPrefabPath, Reality02SevenSlotHudPrefabPath,
+                "UnifiedHealthHud_Reality02_7Slot", Reality02Palette, 7);
+        }
+
+        static void BuildSlotPrefab(string sourcePath, string targetPath, string hudName, HudPalette palette,
+            int slotCount)
+        {
+            if (!AssetDatabase.LoadAssetAtPath<GameObject>(targetPath))
+                AssetDatabase.CopyAsset(sourcePath, targetPath);
+
+            BuildHudPrefab(targetPath, hudName, palette, slotCount);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log($"[PlayerDualHealthHudBuilder] 已生成独立 {slotCount} 格生命条：{targetPath}");
+        }
+
         static void EnsureHudPrefabExists(string path)
         {
             if (AssetDatabase.LoadAssetAtPath<GameObject>(path))
@@ -82,8 +144,11 @@ namespace MirrorTrial.Editor.UI
                 Debug.LogError($"[PlayerDualHealthHudBuilder] 无法创建 UI Prefab：{path}");
         }
 
-        static void BuildHudPrefab(string path, string hudName, HudPalette palette)
+        static void BuildHudPrefab(string path, string hudName, HudPalette palette, int lifeBlockCount)
         {
+            lifeBlockCount = Mathf.Max(1, lifeBlockCount);
+            var healthBarWidth = 350f + (lifeBlockCount - 5) * 63f;
+
             var root = PrefabUtility.LoadPrefabContents(path);
             try
             {
@@ -110,21 +175,21 @@ namespace MirrorTrial.Editor.UI
                 var view = GetOrAdd<PlayerHealthBarView>(root);
 
                 var hud = CreateRect(hudName, root.transform,
-                    new Vector2(18f, -18f), new Vector2(350f, 67f), new Vector2(0f, 1f));
+                    new Vector2(18f, -18f), new Vector2(healthBarWidth, 67f), new Vector2(0f, 1f));
 
                 var outer = CreateImage("SharedOuterFrame", hud, LoadSprite(HealthOuterPath), palette.frame);
-                SetRect(outer.rectTransform, Vector2.zero, new Vector2(350f, 52f), new Vector2(0f, 1f));
+                SetRect(outer.rectTransform, Vector2.zero, new Vector2(healthBarWidth, 52f), new Vector2(0f, 1f));
                 outer.preserveAspect = false;
 
                 var lives = CreateRect("HealthSegments", hud,
-                    Vector2.zero, new Vector2(350f, 52f), new Vector2(0f, 1f));
-                var fills = new Image[5];
-                var flashes = new Image[5];
-                for (var i = 0; i < 5; i++)
+                    Vector2.zero, new Vector2(healthBarWidth, 52f), new Vector2(0f, 1f));
+                var fills = new Image[lifeBlockCount];
+                var flashes = new Image[lifeBlockCount];
+                for (var i = 0; i < lifeBlockCount; i++)
                     CreateHealthBlock(lives, i, palette, out fills[i], out flashes[i]);
 
                 var reserveRoot = CreateRect("HealthReserve", hud,
-                    new Vector2(28f, -47f), new Vector2(294f, 17f), new Vector2(0f, 1f));
+                    new Vector2(28f, -47f), new Vector2(healthBarWidth - 56f, 17f), new Vector2(0f, 1f));
                 var reserveGroup = reserveRoot.gameObject.AddComponent<CanvasGroup>();
 
                 var reserveEmpty = CreateImage("Empty", reserveRoot, LoadSprite(EnergyEmptyPath), palette.empty);
@@ -141,7 +206,7 @@ namespace MirrorTrial.Editor.UI
                 Stretch(reserveFrame.rectTransform, 0f, 0f, 0f, 0f);
 
                 var badge = CreateImage("RecoverKeyBadge", hud, LoadSprite(OrnamentPath), palette.frame);
-                SetRect(badge.rectTransform, new Vector2(324f, -45f), new Vector2(27f, 27f), new Vector2(0f, 1f));
+                SetRect(badge.rectTransform, new Vector2(healthBarWidth - 26f, -45f), new Vector2(27f, 27f), new Vector2(0f, 1f));
                 var keyText = CreateText("Key", badge.transform, "G", 12, FontStyle.Bold, palette.reserve);
                 Stretch(keyText.rectTransform, 0f, 0f, 1f, 1f);
 

@@ -19,6 +19,7 @@ namespace MirrorTrial.Editor
         int draggingNodeIndex = -1;
         Vector2 nodeDragOffset;
         int connectingFromNodeIndex = -1;
+        int connectingChargeBranch = -1;
         int selectedTransitionIndex = -1;
         Rect lastGraphCanvasRect;
 
@@ -77,6 +78,7 @@ namespace MirrorTrial.Editor
             var moves = graph.FindPropertyRelative("instances");
             var links = graph.FindPropertyRelative("transitions");
             var decisions = graph.FindPropertyRelative("inputDecisions");
+            DrawStateDecisionSettings(graph, moves, decisions);
             DrawComboComposition(graph, moves, links, decisions);
             if (moves.arraySize > 0)
             {
@@ -136,8 +138,10 @@ namespace MirrorTrial.Editor
         {
             var layouts = BuildComboLayouts(moves);
             var decisionLayouts = BuildDecisionLayouts(decisions);
+            var stateDecision = graph.FindPropertyRelative("stateDecision");
             var maxX = 620f;
             var maxY = 190f;
+            ExpandStateDecisionCanvas(stateDecision, ref maxX, ref maxY);
             for (var i = 0; i < layouts.Count; i++)
             {
                 maxX = Mathf.Max(maxX, layouts[i].rect.xMax + 45f);
@@ -154,10 +158,13 @@ namespace MirrorTrial.Editor
             lastGraphCanvasRect = canvas;
             EditorGUI.DrawRect(canvas, new Color(0.12f, 0.13f, 0.15f, 1f));
             DrawComboEdges(canvas, layouts, moves, links);
-            DrawDecisionEdges(canvas, layouts, decisionLayouts, moves, decisions);
+            DrawChargeResultEdges(canvas, layouts, moves);
+            DrawDecisionEdges(canvas, layouts, decisionLayouts, moves, decisions, stateDecision);
+            DrawStateDecisionEdges(canvas, stateDecision, layouts, decisionLayouts, moves, decisions);
             DrawConnectionPreview(canvas, layouts, decisionLayouts);
             DrawComboNodes(canvas, layouts, moves, entryId, labels);
             DrawDecisionNodes(canvas, decisionLayouts, decisions, graph.FindPropertyRelative("entryDecisionId").stringValue);
+            DrawStateDecisionNode(canvas, stateDecision);
             HandleCanvasContextMenu(canvas, layouts, decisionLayouts);
             HandleGraphDeleteShortcut();
             EditorGUILayout.EndScrollView();
@@ -188,8 +195,14 @@ namespace MirrorTrial.Editor
             {
                 if (connectingFromNodeIndex < 0 || connectingFromNodeIndex >= layouts.Count) return;
                 var from = OffsetRect(layouts[connectingFromNodeIndex].rect, canvas.position);
-                start = new Vector3(from.xMax, from.center.y);
-                color = new Color(0.3f, 0.9f, 1f);
+                start = connectingChargeBranch >= 0
+                    ? ChargeOutputCenter(from, connectingChargeBranch)
+                    : new Vector3(from.xMax, from.center.y);
+                color = connectingChargeBranch == 0
+                    ? new Color(1f, 0.68f, 0.2f)
+                    : connectingChargeBranch == 1
+                        ? new Color(0.35f, 1f, 0.45f)
+                        : new Color(0.3f, 0.9f, 1f);
             }
             var end = (Vector3)Event.current.mousePosition;
             Handles.BeginGUI();
@@ -298,6 +311,49 @@ namespace MirrorTrial.Editor
             }
         }
 
+        static Vector3 ChargeOutputCenter(Rect rect, int branch)
+        {
+            return new Vector3(rect.xMax, branch == 0 ? rect.y + 20f : rect.y + 46f);
+        }
+
+        void DrawChargeResultEdges(Rect canvas, List<ComboNodeLayout> layouts, SerializedProperty moves)
+        {
+            var indexById = new Dictionary<string, int>();
+            for (var i = 0; i < moves.arraySize; i++)
+                indexById[moves.GetArrayElementAtIndex(i).FindPropertyRelative("id").stringValue] = i;
+
+            Handles.BeginGUI();
+            for (var i = 0; i < moves.arraySize; i++)
+            {
+                var node = moves.GetArrayElementAtIndex(i);
+                if (!node.FindPropertyRelative("enableCharge").boolValue ||
+                    !node.FindPropertyRelative("enableChargeResultBranch").boolValue)
+                    continue;
+                var sourceRect = OffsetRect(layouts[i].rect, canvas.position);
+                for (var branch = 0; branch < 2; branch++)
+                {
+                    var targetId = node.FindPropertyRelative(branch == 0
+                        ? "incompleteChargeTargetId"
+                        : "completeChargeTargetId").stringValue;
+                    if (!indexById.TryGetValue(targetId, out var targetIndex)) continue;
+                    var targetRect = OffsetRect(layouts[targetIndex].rect, canvas.position);
+                    var start = ChargeOutputCenter(sourceRect, branch);
+                    var end = new Vector3(targetRect.xMin, targetRect.center.y);
+                    var tangent = Mathf.Max(45f, Mathf.Abs(end.x - start.x) * 0.42f);
+                    var color = branch == 0 ? new Color(1f, 0.68f, 0.2f) : new Color(0.35f, 1f, 0.45f);
+                    var runtimeId = node.FindPropertyRelative("id").stringValue +
+                        (branch == 0 ? ":charge-incomplete" : ":charge-complete");
+                    var active = IsRuntimePreviewTransition(runtimeId);
+                    Handles.DrawBezier(start, end, start + Vector3.right * tangent,
+                        end + Vector3.left * tangent, active ? new Color(0.35f, 1f, 0.38f) : color,
+                        null, active ? 5f : 3f);
+                    Handles.color = color;
+                    Handles.DrawAAConvexPolygon(end, end + new Vector3(-10f, -5f), end + new Vector3(-10f, 5f));
+                }
+            }
+            Handles.EndGUI();
+        }
+
         void DrawComboNodes(Rect canvas, List<ComboNodeLayout> layouts, SerializedProperty moves, string entryId, string[] labels)
         {
             var evt = Event.current;
@@ -309,22 +365,37 @@ namespace MirrorTrial.Editor
                 var rect = OffsetRect(layout.rect, canvas.position);
                 var inputPort = new Rect(rect.x - 7f, rect.center.y - 7f, 14f, 14f);
                 var outputPort = new Rect(rect.xMax - 7f, rect.center.y - 7f, 14f, 14f);
+                var incompletePort = new Rect(rect.xMax - 7f, rect.y + 13f, 14f, 14f);
+                var completePort = new Rect(rect.xMax - 7f, rect.y + 39f, 14f, 14f);
                 var nodeId = node.FindPropertyRelative("id").stringValue;
                 var isEntry = nodeId == entryId;
                 var isRuntime = IsRuntimePreviewMove(nodeId);
                 var isSelected = layout.index == selectedGraphMoveIndex && selectedTransitionIndex < 0 && selectedDecisionIndex < 0;
                 var charge = node.FindPropertyRelative("enableCharge").boolValue;
+                var chargeBranch = charge && node.FindPropertyRelative("enableChargeResultBranch").boolValue;
+                var bow = node.FindPropertyRelative("bowShot") != null &&
+                    node.FindPropertyRelative("bowShot").FindPropertyRelative("enabled").boolValue;
                 var heavy = move != null && move.FindPropertyRelative("attackType").enumValueIndex == 1;
 
-                HandleNodeMouse(evt, canvas, rect, outputPort, layout.index, node);
+                HandleNodeMouse(evt, canvas, rect, outputPort, incompletePort, completePort, chargeBranch, layout.index, node);
 
                 var old = GUI.backgroundColor;
-                GUI.backgroundColor = charge ? new Color(0.72f, 0.46f, 0.95f) : heavy ? new Color(1f, 0.63f, 0.25f) : new Color(0.42f, 0.66f, 0.84f);
-                var subtitle = charge ? "蓄力" : heavy ? "重击" : "普通";
+                GUI.backgroundColor = bow ? new Color(0.34f, 0.72f, 0.46f) : charge ? new Color(0.72f, 0.46f, 0.95f) : heavy ? new Color(1f, 0.63f, 0.25f) : new Color(0.42f, 0.66f, 0.84f);
+                var subtitle = bow ? "\u84c4\u529b\u5c04\u7bad" : charge ? "\u84c4\u529b" : heavy ? "\u91cd\u51fb" : "\u666e\u901a";
                 GUI.Box(rect, (isEntry ? "起手  " : string.Empty) + labels[layout.index] + "\n" + subtitle, GUI.skin.button);
                 GUI.backgroundColor = old;
                 EditorGUI.DrawRect(inputPort, new Color(0.75f, 0.82f, 0.9f));
-                EditorGUI.DrawRect(outputPort, connectingFromNodeIndex == layout.index ? new Color(0.2f, 1f, 1f) : new Color(0.35f, 0.85f, 1f));
+                if (chargeBranch)
+                {
+                    EditorGUI.DrawRect(incompletePort, connectingFromNodeIndex == layout.index && connectingChargeBranch == 0
+                        ? Color.white : new Color(1f, 0.68f, 0.2f));
+                    EditorGUI.DrawRect(completePort, connectingFromNodeIndex == layout.index && connectingChargeBranch == 1
+                        ? Color.white : new Color(0.35f, 1f, 0.45f));
+                    GUI.Label(new Rect(rect.xMax - 54f, rect.y + 8f, 45f, 18f), "未完成", EditorStyles.miniLabel);
+                    GUI.Label(new Rect(rect.xMax - 54f, rect.y + 34f, 45f, 18f), "已完成", EditorStyles.miniLabel);
+                }
+                else
+                    EditorGUI.DrawRect(outputPort, connectingFromNodeIndex == layout.index ? new Color(0.2f, 1f, 1f) : new Color(0.35f, 0.85f, 1f));
                 if (isRuntime) DrawRectOutline(rect, new Color(0.35f, 1f, 0.38f), 4f);
                 else if (isSelected) DrawRectOutline(rect, new Color(0.25f, 0.85f, 1f), 3f);
             }
@@ -333,11 +404,16 @@ namespace MirrorTrial.Editor
             if (evt.type == EventType.MouseUp && evt.button == 0) draggingNodeIndex = -1;
         }
 
-        void HandleNodeMouse(Event evt, Rect canvas, Rect rect, Rect outputPort, int index, SerializedProperty node)
+        void HandleNodeMouse(Event evt, Rect canvas, Rect rect, Rect outputPort, Rect incompletePort,
+            Rect completePort, bool chargeBranch, int index, SerializedProperty node)
         {
-            if (evt.type == EventType.MouseDown && evt.button == 0 && outputPort.Contains(evt.mousePosition))
+            var clickedBranch = chargeBranch && incompletePort.Contains(evt.mousePosition) ? 0 :
+                chargeBranch && completePort.Contains(evt.mousePosition) ? 1 : -1;
+            var clickedOutput = clickedBranch >= 0 || (!chargeBranch && outputPort.Contains(evt.mousePosition));
+            if (evt.type == EventType.MouseDown && evt.button == 0 && clickedOutput)
             {
                 connectingFromNodeIndex = index;
+                connectingChargeBranch = clickedBranch;
                 connectingFromDecisionIndex = -1;
                 selectedGraphMoveIndex = index;
                 selectedTransitionIndex = -1;
@@ -393,7 +469,9 @@ namespace MirrorTrial.Editor
                 if (inputPort.Contains(evt.mousePosition)) { target = i; break; }
             }
             var source = connectingFromNodeIndex;
+            var chargeBranch = connectingChargeBranch;
             connectingFromNodeIndex = -1;
+            connectingChargeBranch = -1;
             var decisionTarget = -1;
             for (var i = 0; i < decisionLayouts.Count; i++)
             {
@@ -401,7 +479,12 @@ namespace MirrorTrial.Editor
                 var inputPort = new Rect(rect.x - 12f, rect.center.y - 14f, 28f, 28f);
                 if (inputPort.Contains(evt.mousePosition)) { decisionTarget = i; break; }
             }
-            if (decisionTarget >= 0)
+            if (chargeBranch >= 0)
+            {
+                if (target >= 0 && target != source)
+                    ConnectChargeResultBranch(source, target, chargeBranch);
+            }
+            else if (decisionTarget >= 0)
                 ConnectMoveToDecision(source, decisionTarget);
             else if (target >= 0 && target != source)
                 CreateGraphConnection(source, target);
@@ -494,6 +577,14 @@ namespace MirrorTrial.Editor
         {
             var move = node.FindPropertyRelative("move");
             if (move == null) return;
+            var graphs = serializedCombat.FindProperty("comboGraphs");
+            var graph = graphs.GetArrayElementAtIndex(selectedGraphIndex);
+            var weapon = (PlayerWeaponType)graph.FindPropertyRelative("weaponType").enumValueIndex;
+            if (weapon == PlayerWeaponType.Bow)
+            {
+                DrawBowComboMoveEditor(node, move, index);
+                return;
+            }
             EditorGUILayout.Space(8f);
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
@@ -545,6 +636,8 @@ namespace MirrorTrial.Editor
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
                 EditorGUILayout.PropertyField(move.FindPropertyRelative("attackType"), new GUIContent("攻击类型"));
+                EditorGUILayout.PropertyField(move.FindPropertyRelative("hitFlashType"),
+                    new GUIContent("受击闪光", "该招命中敌兵时全身闪白或闪红。"));
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     EditorGUILayout.PropertyField(move.FindPropertyRelative("damageMultiplier"), new GUIContent("伤害倍率"));
@@ -585,6 +678,23 @@ namespace MirrorTrial.Editor
                 }
 
                 EditorGUILayout.Space(3f);
+                EditorGUILayout.LabelField("蓄力结果分歧", EditorStyles.boldLabel);
+                var resultBranch = node.FindPropertyRelative("enableChargeResultBranch");
+                EditorGUILayout.PropertyField(resultBranch, new GUIContent("按是否满蓄力分歧",
+                    "松开时按是否达到最大蓄力时间，进入不同的后续招式节点。"));
+                if (resultBranch.boolValue)
+                {
+                    var graphs = serializedCombat.FindProperty("comboGraphs");
+                    var moves = graphs.GetArrayElementAtIndex(selectedGraphIndex).FindPropertyRelative("instances");
+                    var labels = BuildNameLabels(moves, "招式");
+                    EditorGUI.indentLevel++;
+                    DrawMoveIdPopup(node.FindPropertyRelative("incompleteChargeTargetId"), moves, labels, "未完成 →");
+                    DrawMoveIdPopup(node.FindPropertyRelative("completeChargeTargetId"), moves, labels, "已完成 →");
+                    EditorGUI.indentLevel--;
+                    EditorGUILayout.HelpBox("达到“最大蓄力时间”才算完成。蓄满后会继续保持，直到玩家松开；切换时只播放蓄力定格帧之后的目标动画，目标节点自己的伤害、判定框、击退与后摇完整生效。", MessageType.Info);
+                }
+
+                EditorGUILayout.Space(3f);
                 EditorGUILayout.LabelField("蓄力时间", EditorStyles.boldLabel);
                 using (new EditorGUILayout.HorizontalScope())
                 {
@@ -609,17 +719,20 @@ namespace MirrorTrial.Editor
                 }
 
                 var autoRelease = node.FindPropertyRelative("autoReleaseAtFullCharge");
-                EditorGUILayout.PropertyField(autoRelease, new GUIContent("蓄满后自动出招", "关闭时，蓄满后会保持满蓄力，直到玩家松开按键。"));
-                if (!autoRelease.boolValue)
+                if (!resultBranch.boolValue)
                 {
-                    EditorGUI.indentLevel++;
-                    EditorGUILayout.PropertyField(node.FindPropertyRelative("fullChargeHoldLimit"),
-                        new GUIContent("满蓄力保持上限", "蓄满后还能保持的时间；倒计时结束会自动释放攻击。"));
-                    EditorGUI.indentLevel--;
+                    EditorGUILayout.PropertyField(autoRelease, new GUIContent("蓄满后自动出招", "关闭时，蓄满后会保持满蓄力，直到玩家松开按键。"));
+                    if (!autoRelease.boolValue)
+                    {
+                        EditorGUI.indentLevel++;
+                        EditorGUILayout.PropertyField(node.FindPropertyRelative("fullChargeHoldLimit"),
+                            new GUIContent("满蓄力保持上限", "蓄满后还能保持的时间；倒计时结束会自动释放攻击。"));
+                        EditorGUI.indentLevel--;
+                    }
+                    EditorGUILayout.HelpBox(autoRelease.boolValue
+                        ? "当前释放方式：达到满蓄力后自动出招。"
+                        : "当前释放方式：蓄满后开始倒计时；松开按键或倒计时结束时出招。", MessageType.None);
                 }
-                EditorGUILayout.HelpBox(autoRelease.boolValue
-                    ? "当前释放方式：达到满蓄力后自动出招。"
-                    : "当前释放方式：蓄满后开始倒计时；松开按键或倒计时结束时出招。", MessageType.None);
 
                 EditorGUILayout.Space(3f);
                 EditorGUILayout.LabelField("蓄力表现", EditorStyles.boldLabel);
@@ -634,7 +747,17 @@ EditorGUILayout.PropertyField(
                     EditorGUI.indentLevel++;
                     EditorGUILayout.PropertyField(node.FindPropertyRelative("chargeEffectPrefab"), new GUIContent("蓄力特效 Prefab", "颜色、光点、脉冲和音效统一在 Prefab 的 ChargeTelegraphPresentation 组件中调整。"));
                     EditorGUILayout.PropertyField(node.FindPropertyRelative("chargeEffectOffset"), new GUIContent("特效位置偏移"));
-                    EditorGUILayout.HelpBox("这里只选择 Prefab 和调整挂点位置。特效外观请直接打开 Prefab 调整。", MessageType.Info);
+                    EditorGUILayout.PropertyField(node.FindPropertyRelative("chargeEffectRotationSpeed"),
+                        new GUIContent("特效旋转速度", "每秒旋转角度；正值逆时针，负值顺时针，0 表示不旋转。"));
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        if (GUILayout.Button(chargeEffectPreview ? "刷新蓄力特效预览" : "加载蓄力特效预览"))
+                            RebuildChargeEffectPreview(node);
+                        using (new EditorGUI.DisabledScope(!chargeEffectPreview))
+                            if (GUILayout.Button("移除预览", GUILayout.Width(72f)))
+                                DisposeChargeEffectPreview();
+                    }
+                    EditorGUILayout.HelpBox("可将真实 Prefab 直接加载到场景中的玩家实例上预览；偏移和旋转速度会实时刷新。特效外观仍可打开 Prefab 调整。", MessageType.Info);
                     EditorGUI.indentLevel--;
                 }
 
@@ -782,6 +905,12 @@ EditorGUILayout.PropertyField(
             var id = graph.instances[index].id;
             graph.instances.RemoveAt(index);
             graph.transitions.RemoveAll(x => x.fromInstanceId == id || x.toInstanceId == id);
+            for (var i = 0; i < graph.instances.Count; i++)
+            {
+                if (graph.instances[i].incompleteChargeTargetId == id) graph.instances[i].incompleteChargeTargetId = string.Empty;
+                if (graph.instances[i].completeChargeTargetId == id) graph.instances[i].completeChargeTargetId = string.Empty;
+            }
+            ClearStateDecisionTarget(graph, id);
             for (var i = 0; i < graph.inputDecisions.Count; i++)
             {
                 var decision = graph.inputDecisions[i];
@@ -833,6 +962,13 @@ EditorGUILayout.PropertyField(
                 move = new PlayerComboStep { name = "新招式" },
                 graphPosition = new Vector2(Mathf.Max(12f, position.x), Mathf.Max(12f, position.y))
             };
+            if (graph.weaponType == PlayerWeaponType.Bow)
+            {
+                node.name = "\u84c4\u529b\u5c04\u7bad";
+                node.move.name = node.name;
+                node.move.moveCategory = PlayerMoveCategory.Bow;
+                node.bowShot.enabled = true;
+            }
             graph.instances.Add(node);
             if (string.IsNullOrEmpty(graph.entryInstanceId)) graph.entryInstanceId = node.id;
             selectedGraphMoveIndex = graph.instances.Count - 1;
@@ -863,6 +999,22 @@ EditorGUILayout.PropertyField(
             Undo.RecordObject(combat, "设置连招起手");
             var graph = combat.ComboGraphs[selectedGraphIndex];
             graph.entryInstanceId = graph.instances[Mathf.Clamp(index, 0, graph.instances.Count - 1)].id;
+            RefreshAfterStructureChange();
+        }
+
+        void ConnectChargeResultBranch(int fromIndex, int toIndex, int branch)
+        {
+            CommitAndRefresh();
+            var graph = combat.ComboGraphs[selectedGraphIndex];
+            if (fromIndex < 0 || toIndex < 0 || fromIndex >= graph.instances.Count ||
+                toIndex >= graph.instances.Count || fromIndex == toIndex) return;
+            Undo.RecordObject(combat, "连接蓄力结果分支");
+            var source = graph.instances[fromIndex];
+            if (branch == 0) source.incompleteChargeTargetId = graph.instances[toIndex].id;
+            else source.completeChargeTargetId = graph.instances[toIndex].id;
+            selectedGraphMoveIndex = fromIndex;
+            selectedTransitionIndex = -1;
+            selectedDecisionIndex = -1;
             RefreshAfterStructureChange();
         }
 
@@ -913,6 +1065,18 @@ EditorGUILayout.PropertyField(
                     var next = depth[from] + 1;
                     if (depth[to] < next) { depth[to] = next; changed = true; }
                 }
+                for (var i = 0; i < graph.instances.Count; i++)
+                {
+                    if (depth[i] < 0) continue;
+                    var source = graph.instances[i];
+                    var targets = new[] { source.incompleteChargeTargetId, source.completeChargeTargetId };
+                    for (var branch = 0; branch < targets.Length; branch++)
+                    {
+                        if (!indexById.TryGetValue(targets[branch], out var to)) continue;
+                        var next = depth[i] + 1;
+                        if (depth[to] < next) { depth[to] = next; changed = true; }
+                    }
+                }
                 if (!changed) break;
             }
             var maxDepth = 0;
@@ -943,6 +1107,7 @@ EditorGUILayout.PropertyField(
                         : new Vector2(18f, 28f + i * 100f);
                 }
             }
+            ArrangeStateDecision(graph);
             RefreshAfterStructureChange();
         }
 

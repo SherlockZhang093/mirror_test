@@ -143,6 +143,11 @@ namespace MirrorTrial.Player
 
         public void PlayActionClip(AnimationClip clip, float targetDuration)
         {
+            PlayActionClip(clip, targetDuration, 0f);
+        }
+
+        public void PlayActionClip(AnimationClip clip, float targetDuration, float startTime)
+        {
             if (!animator || !clip)
                 return;
             StopActionClip();
@@ -150,7 +155,10 @@ namespace MirrorTrial.Player
             var output = AnimationPlayableOutput.Create(actionGraph, "Action", animator);
             actionPlayable = AnimationClipPlayable.Create(actionGraph, clip);
             actionPlayable.SetApplyFootIK(false);
-            actionPlayableSpeed = targetDuration > 0f ? clip.length / targetDuration : 1f;
+            var clampedStartTime = Mathf.Clamp(startTime, 0f, clip.length);
+            var remainingDuration = Mathf.Max(0.0001f, clip.length - clampedStartTime);
+            actionPlayableSpeed = targetDuration > 0f ? remainingDuration / targetDuration : 1f;
+            actionPlayable.SetTime(clampedStartTime);
             actionPlayable.SetSpeed(actionPlayableSpeed);
             output.SetSourcePlayable(actionPlayable);
             actionGraph.Play();
@@ -317,6 +325,7 @@ namespace MirrorTrial.Player
                 B(PlayerActionState.PunchA, "PunchA", 0.25f),
                 B(PlayerActionState.PunchB, "PunchB", 0.25f),
                 B(PlayerActionState.PunchC, "PunchC", 0.25f),
+                B(PlayerActionState.PunchD, "PunchD", 0.4375f),
                 B(PlayerActionState.KickA, "KickA", 0.25f),
                 B(PlayerActionState.KickB, "KickB", 0.25f),
                 B(PlayerActionState.KickC, "KickC", 0.25f),

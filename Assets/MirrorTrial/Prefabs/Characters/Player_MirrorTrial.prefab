@@ -970,6 +970,10 @@ MonoBehaviour:
     animatorState: LadderJumpPrepare
     sourceClipDuration: 0.3333333
     timingSource: 0
+  - action: 46
+    animatorState: PunchD
+    sourceClipDuration: 0.4375
+    timingSource: 0
 --- !u!114 &3603827661786735700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1018,6 +1022,7 @@ MonoBehaviour:
         size: {x: 1, y: 0.8}
         interpolation: 0
       attackType: 0
+      hitFlashType: 0
       enableTargetReaction: 1
       targetReaction: 1
       useCustomKnockback: 0
@@ -1077,6 +1082,7 @@ MonoBehaviour:
         size: {x: 1, y: 0.8}
         interpolation: 0
       attackType: 0
+      hitFlashType: 0
       enableTargetReaction: 1
       targetReaction: 1
       useCustomKnockback: 0
@@ -1136,6 +1142,7 @@ MonoBehaviour:
         size: {x: 1, y: 0.8}
         interpolation: 0
       attackType: 0
+      hitFlashType: 0
       enableTargetReaction: 1
       targetReaction: 1
       useCustomKnockback: 0
@@ -1195,6 +1202,7 @@ MonoBehaviour:
         size: {x: 1, y: 0.8}
         interpolation: 0
       attackType: 1
+      hitFlashType: 0
       enableTargetReaction: 1
       targetReaction: 3
       useCustomKnockback: 1
@@ -1262,6 +1270,7 @@ MonoBehaviour:
         size: {x: 1, y: 0.8}
         interpolation: 0
       attackType: 0
+      hitFlashType: 0
       enableTargetReaction: 1
       targetReaction: 1
       useCustomKnockback: 0
@@ -1321,6 +1330,7 @@ MonoBehaviour:
         size: {x: 1, y: 0.8}
         interpolation: 0
       attackType: 0
+      hitFlashType: 0
       enableTargetReaction: 1
       targetReaction: 1
       useCustomKnockback: 0
@@ -1380,6 +1390,7 @@ MonoBehaviour:
         size: {x: 1, y: 0.8}
         interpolation: 0
       attackType: 1
+      hitFlashType: 0
       enableTargetReaction: 1
       targetReaction: 3
       useCustomKnockback: 1
@@ -1420,126 +1431,6 @@ MonoBehaviour:
   swordGuardClip: {fileID: 7400000, guid: 2460091f9596b4241972a347066392b9, type: 2}
   swordGuardImpactClip: {fileID: 7400000, guid: 59ec72e765455be439cfe9a5bcf40d2c,
     type: 2}
-  swordRunAttack:
-    name: "\u5954\u8DD1\u65A9"
-    moveCategory: 1
-    comboCategory: 5
-    input: 0
-    animationClip: {fileID: 7400000, guid: c6a0af29f0f619842809c25774b3b3fc, type: 2}
-    animationState: 26
-    animationFrameRate: 12
-    animationFrameCount: 8
-    mirrorHitboxByFacing: 1
-    hitboxKeys:
-    - frame: 0
-      enabled: 0
-      offset: {x: 0.65, y: 0}
-      size: {x: 1, y: 0.8}
-      interpolation: 0
-    - frame: 2
-      enabled: 1
-      offset: {x: 0.8, y: 0.05}
-      size: {x: 1.25, y: 0.85}
-      interpolation: 1
-    - frame: 5
-      enabled: 0
-      offset: {x: 0.65, y: 0}
-      size: {x: 1, y: 0.8}
-      interpolation: 0
-    attackType: 0
-    enableTargetReaction: 1
-    targetReaction: 1
-    useCustomKnockback: 0
-    customKnockback: {x: 4, y: 1}
-    interruptPower: 1
-    poiseDamage: 1
-    breaksSuperArmor: 0
-    hitFeedback:
-      enableHitEffect: 1
-      hitEffectPrefab: {fileID: 0}
-      hitEffectOffset: {x: 0, y: 0}
-      mirrorHitEffectByDirection: 1
-      hitEffectLifetime: 0.15
-      enableHitStop: 1
-      useAttackTypeDefaultHitStop: 1
-      hitStopDuration: 0.035
-      enableCameraFeedback: 0
-      cameraPower: 0.35
-      enableHitSound: 0
-      hitSound: {fileID: 0}
-      hitSoundVolume: 1
-      notifyPlayerReaction: 1
-    startup: 0.06
-    activeTime: 0.1
-    recovery: 0.19
-    comboWindowStart: 0.1
-    comboWindowEnd: 0.28
-    damageMultiplier: 1.2
-    knockbackMultiplier: 1.15
-    lockMovement: 1
-    bodyState: 0
-    bodyStateStart: 0
-    bodyStateEnd: 0
-  swordCrouchAttack:
-    name: "\u4E0B\u8E72\u65A9"
-    moveCategory: 1
-    comboCategory: 5
-    input: 0
-    animationClip: {fileID: 7400000, guid: 64bd0da4e98c2914d863ac4901c63156, type: 2}
-    animationState: 30
-    animationFrameRate: 12
-    animationFrameCount: 8
-    mirrorHitboxByFacing: 1
-    hitboxKeys:
-    - frame: 0
-      enabled: 0
-      offset: {x: 0.65, y: 0}
-      size: {x: 1, y: 0.8}
-      interpolation: 0
-    - frame: 2
-      enabled: 1
-      offset: {x: 0.72, y: -0.2}
-      size: {x: 1.15, y: 0.62}
-      interpolation: 1
-    - frame: 5
-      enabled: 0
-      offset: {x: 0.65, y: 0}
-      size: {x: 1, y: 0.8}
-      interpolation: 0
-    attackType: 0
-    enableTargetReaction: 1
-    targetReaction: 1
-    useCustomKnockback: 0
-    customKnockback: {x: 4, y: 1}
-    interruptPower: 1
-    poiseDamage: 1
-    breaksSuperArmor: 0
-    hitFeedback:
-      enableHitEffect: 1
-      hitEffectPrefab: {fileID: 0}
-      hitEffectOffset: {x: 0, y: 0}
-      mirrorHitEffectByDirection: 1
-      hitEffectLifetime: 0.15
-      enableHitStop: 1
-      useAttackTypeDefaultHitStop: 1
-      hitStopDuration: 0.035
-      enableCameraFeedback: 0
-      cameraPower: 0.35
-      enableHitSound: 0
-      hitSound: {fileID: 0}
-      hitSoundVolume: 1
-      notifyPlayerReaction: 1
-    startup: 0.07
-    activeTime: 0.1
-    recovery: 0.18
-    comboWindowStart: 0.1
-    comboWindowEnd: 0.28
-    damageMultiplier: 1.1
-    knockbackMultiplier: 1
-    lockMovement: 1
-    bodyState: 0
-    bodyStateStart: 0
-    bodyStateEnd: 0
   attackReaction:
     enabled: 1
     normalRecoilSpeed: 0.35
@@ -1588,6 +1479,7 @@ MonoBehaviour:
           size: {x: 1, y: 0.8}
           interpolation: 0
         attackType: 0
+        hitFlashType: 0
         enableTargetReaction: 1
         targetReaction: 1
         useCustomKnockback: 0
@@ -1621,7 +1513,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 288.3333, y: 66.66669}
+      graphPosition: {x: 448.3333, y: 113.333374}
       moveId: legacy-move-0-0
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -1636,6 +1528,9 @@ MonoBehaviour:
       customKnockback: {x: 4, y: 1}
       enableCharge: 0
       chargeHoldFrame: 1
+      enableChargeResultBranch: 0
+      incompleteChargeTargetId: 
+      completeChargeTargetId: 
       chargeHoldNormalizedTime: 0.35
       chargeAnimation: {fileID: 0}
       showChargeEffect: 1
@@ -1700,6 +1595,23 @@ MonoBehaviour:
       fullChargeHoldLimit: 1.5
       chargeCountdownPrefab: {fileID: 0}
       chargeCountdownOffset: {x: 0, y: 1.15}
+      bowShot:
+        enabled: 0
+        drawClip: {fileID: 0}
+        fullDrawClip: {fileID: 0}
+        fireClip: {fileID: 0}
+        minimumChargeTime: 0.12
+        maximumChargeTime: 0.8
+        recovery: 0.18
+        minimumDamage: 4
+        maximumDamage: 12
+        minimumSpeed: 8
+        maximumSpeed: 16
+        range: 12
+        knockback: {x: 3, y: 0.5}
+        hitStop: 0.025
+        hitFlashType: 0
+        cancelInput: 1
     - id: legacy-instance-0-1
       name: Combo B
       move:
@@ -1734,6 +1646,7 @@ MonoBehaviour:
           size: {x: 1, y: 0.8}
           interpolation: 0
         attackType: 0
+        hitFlashType: 0
         enableTargetReaction: 1
         targetReaction: 1
         useCustomKnockback: 0
@@ -1767,7 +1680,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 612.00006, y: 67.33334}
+      graphPosition: {x: 664.6668, y: 58.00003}
       moveId: legacy-move-0-1
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -1782,6 +1695,9 @@ MonoBehaviour:
       customKnockback: {x: 4, y: 1}
       enableCharge: 0
       chargeHoldFrame: 1
+      enableChargeResultBranch: 0
+      incompleteChargeTargetId: 
+      completeChargeTargetId: 
       chargeHoldNormalizedTime: 0.35
       chargeAnimation: {fileID: 0}
       showChargeEffect: 1
@@ -1846,6 +1762,23 @@ MonoBehaviour:
       fullChargeHoldLimit: 1.5
       chargeCountdownPrefab: {fileID: 0}
       chargeCountdownOffset: {x: 0, y: 1.15}
+      bowShot:
+        enabled: 0
+        drawClip: {fileID: 0}
+        fullDrawClip: {fileID: 0}
+        fireClip: {fileID: 0}
+        minimumChargeTime: 0.12
+        maximumChargeTime: 0.8
+        recovery: 0.18
+        minimumDamage: 4
+        maximumDamage: 12
+        minimumSpeed: 8
+        maximumSpeed: 16
+        range: 12
+        knockback: {x: 3, y: 0.5}
+        hitStop: 0.025
+        hitFlashType: 0
+        cancelInput: 1
     - id: legacy-instance-0-2
       name: Combo C
       move:
@@ -1880,8 +1813,9 @@ MonoBehaviour:
           size: {x: 1, y: 0.8}
           interpolation: 0
         attackType: 0
+        hitFlashType: 1
         enableTargetReaction: 1
-        targetReaction: 1
+        targetReaction: 3
         useCustomKnockback: 0
         customKnockback: {x: 4, y: 1}
         interruptPower: 1
@@ -1907,13 +1841,13 @@ MonoBehaviour:
         recovery: 0.16
         comboWindowStart: 0.1
         comboWindowEnd: 0.28
-        damageMultiplier: 1.2
+        damageMultiplier: 1.5
         knockbackMultiplier: 1
         lockMovement: 1
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 1001.66675, y: 14.666672}
+      graphPosition: {x: 1145.6667, y: 18.000015}
       moveId: legacy-move-0-2
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -1928,6 +1862,9 @@ MonoBehaviour:
       customKnockback: {x: 4, y: 1}
       enableCharge: 0
       chargeHoldFrame: 1
+      enableChargeResultBranch: 0
+      incompleteChargeTargetId: 
+      completeChargeTargetId: 
       chargeHoldNormalizedTime: 0.35
       chargeAnimation: {fileID: 0}
       showChargeEffect: 1
@@ -1992,6 +1929,23 @@ MonoBehaviour:
       fullChargeHoldLimit: 1.5
       chargeCountdownPrefab: {fileID: 0}
       chargeCountdownOffset: {x: 0, y: 1.15}
+      bowShot:
+        enabled: 0
+        drawClip: {fileID: 0}
+        fullDrawClip: {fileID: 0}
+        fireClip: {fileID: 0}
+        minimumChargeTime: 0.12
+        maximumChargeTime: 0.8
+        recovery: 0.18
+        minimumDamage: 4
+        maximumDamage: 12
+        minimumSpeed: 8
+        maximumSpeed: 16
+        range: 12
+        knockback: {x: 3, y: 0.5}
+        hitStop: 0.025
+        hitFlashType: 0
+        cancelInput: 1
     - id: legacy-instance-0-3
       name: Combo D
       move:
@@ -2026,6 +1980,7 @@ MonoBehaviour:
           size: {x: 1, y: 0.8}
           interpolation: 0
         attackType: 1
+        hitFlashType: 1
         enableTargetReaction: 1
         targetReaction: 3
         useCustomKnockback: 1
@@ -2074,6 +2029,9 @@ MonoBehaviour:
       customKnockback: {x: 4, y: 1}
       enableCharge: 1
       chargeHoldFrame: 1
+      enableChargeResultBranch: 0
+      incompleteChargeTargetId: 
+      completeChargeTargetId: 
       chargeHoldNormalizedTime: 0.1582
       chargeAnimation: {fileID: 0}
       showChargeEffect: 1
@@ -2139,6 +2097,185 @@ MonoBehaviour:
       fullChargeHoldLimit: 1.5
       chargeCountdownPrefab: {fileID: 0}
       chargeCountdownOffset: {x: 0, y: 1.15}
+      bowShot:
+        enabled: 0
+        drawClip: {fileID: 0}
+        fullDrawClip: {fileID: 0}
+        fireClip: {fileID: 0}
+        minimumChargeTime: 0.12
+        maximumChargeTime: 0.8
+        recovery: 0.18
+        minimumDamage: 4
+        maximumDamage: 12
+        minimumSpeed: 8
+        maximumSpeed: 16
+        range: 12
+        knockback: {x: 3, y: 0.5}
+        hitStop: 0.025
+        hitFlashType: 0
+        cancelInput: 1
+    - id: sword-run-slash
+      name: "\u5954\u8DD1\u65A9"
+      move:
+        name: "\u5954\u8DD1\u65A9"
+        moveCategory: 1
+        comboCategory: 5
+        input: 0
+        animationClip: {fileID: 7400000, guid: c6a0af29f0f619842809c25774b3b3fc, type: 2}
+        animationState: 26
+        animationFrameRate: 12
+        animationFrameCount: 8
+        mirrorHitboxByFacing: 1
+        hitboxKeys:
+        - frame: 0
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        - frame: 2
+          enabled: 1
+          offset: {x: 0.8, y: 0.05}
+          size: {x: 1.25, y: 0.85}
+          interpolation: 1
+        - frame: 5
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        attackType: 0
+        hitFlashType: 0
+        enableTargetReaction: 1
+        targetReaction: 1
+        useCustomKnockback: 0
+        customKnockback: {x: 4, y: 1}
+        interruptPower: 1
+        poiseDamage: 1
+        breaksSuperArmor: 0
+        hitFeedback:
+          enableHitEffect: 1
+          hitEffectPrefab: {fileID: 0}
+          hitEffectOffset: {x: 0, y: 0}
+          mirrorHitEffectByDirection: 1
+          hitEffectLifetime: 0.15
+          enableHitStop: 1
+          useAttackTypeDefaultHitStop: 1
+          hitStopDuration: 0.035
+          enableCameraFeedback: 0
+          cameraPower: 0.35
+          enableHitSound: 0
+          hitSound: {fileID: 0}
+          hitSoundVolume: 1
+          notifyPlayerReaction: 1
+        startup: 0.06
+        activeTime: 0.1
+        recovery: 0.19
+        comboWindowStart: 0.1
+        comboWindowEnd: 0.28
+        damageMultiplier: 1.2
+        knockbackMultiplier: 1.15
+        lockMovement: 1
+        bodyState: 0
+        bodyStateStart: 0
+        bodyStateEnd: 0
+      graphPosition: {x: 432.33334, y: 12}
+      moveId: 
+      damageMultiplier: 1
+      knockbackMultiplier: 1
+      poiseMultiplier: 1
+      animationSpeed: 1
+      overrideAttackType: 0
+      attackType: 0
+      overrideTargetReaction: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      enableCharge: 0
+      chargeHoldFrame: 1
+      enableChargeResultBranch: 0
+      incompleteChargeTargetId: 
+      completeChargeTargetId: 
+      chargeHoldNormalizedTime: 0.35
+      chargeAnimation: {fileID: 0}
+      showChargeEffect: 1
+      chargeEffectPrefab: {fileID: 0}
+      chargeEffectOffset: {x: 0.65, y: 0.15}
+      chargeEffectScale: 0.75
+      chargeEffectRotationSpeed: 55
+      chargeEffectPulseSpeed: 18
+      chargeEffectPulseAmount: 0.12
+      chargeEffectStartScale: 0.9
+      chargeEffectFullScale: 1.8
+      chargeEffectStartAlpha: 0.55
+      chargeEffectFullAlpha: 1
+      chargeEffectParticleIntensity: 1
+      chargePresentation:
+        style: 0
+        coreStartColor: {r: 0.22, g: 0.58, b: 1, a: 0.55}
+        coreFullColor: {r: 0.82, g: 0.95, b: 1, a: 1}
+        bodyGlowColor: {r: 0.18, g: 0.62, b: 1, a: 0.42}
+        coreStartScale: 0.12
+        coreFullScale: 0.32
+        finalFlashStart: 0.9
+        pulseSpeed: 18
+        pulseAmount: 0.12
+        rotationSpeed: 0
+        particleIntensity: 1
+        particleRadius: 0.9
+        particleSpeed: 2.2
+        bodyGlowMaxAlpha: 0.32
+        bodyGlowScale: 1.035
+        readyChargeThreshold: 0.7
+        readyChargeCue: {fileID: 0}
+        swordOuterColor: {r: 0.2, g: 1, b: 0.45, a: 0.42}
+        swordCoreColor: {r: 0.82, g: 1, b: 0.86, a: 0.9}
+        swordAngle: 0
+        swordLength: 1.35
+        swordWidth: 0.12
+        swordJitterStart: 0.55
+        swordJitterAmount: 0.03125
+        leftFootOffset: {x: -0.3, y: 0.03}
+        rightFootOffset: {x: 0.3, y: 0.03}
+        dustIntensity: 1
+        punchFieldRadius: 1.35
+        punchCoreStartScale: 0.18
+        punchCoreReadyScale: 0.72
+        punchStreamIntensity: 1.25
+        punchAfterimageAlpha: 0.16
+        punchGroundPull: 1
+        chargingLoop: {fileID: 0}
+        fullChargeCue: {fileID: 0}
+        releaseCue: {fileID: 0}
+        feintCue: {fileID: 0}
+        interruptedCue: {fileID: 0}
+        audioVolume: 0.8
+      minimumChargeTime: 0.18
+      maximumChargeTime: 0.7
+      launchChargeThreshold: 0.65
+      insufficientLaunchReaction: 2
+      fullChargeDamageMultiplier: 1.5
+      fullChargeKnockbackMultiplier: 1.35
+      autoReleaseAtFullCharge: 1
+      fullChargeHoldLimit: 1.5
+      chargeCountdownPrefab: {fileID: 0}
+      chargeCountdownOffset: {x: 0, y: 1.15}
+      bowShot:
+        enabled: 0
+        drawClip: {fileID: 0}
+        fullDrawClip: {fileID: 0}
+        fireClip: {fileID: 0}
+        minimumChargeTime: 0.12
+        maximumChargeTime: 0.8
+        recovery: 0.18
+        minimumDamage: 6
+        maximumDamage: 18
+        minimumSpeed: 10
+        maximumSpeed: 20
+        range: 12
+        knockback: {x: 2.5, y: 0.5}
+        hitStop: 0.04
+        hitFlashType: 0
+        cancelInput: 1
     transitions:
     - id: legacy-link-0-0
       fromInstanceId: legacy-instance-0-0
@@ -2149,17 +2286,26 @@ MonoBehaviour:
       windowEnd: 1
       holdThreshold: 0.15
       requiresHit: 0
+    - id: 2af4e4ca7c0b413db3f10539c3e87540
+      fromInstanceId: sword-run-slash
+      toInstanceId: legacy-instance-0-1
+      input: 0
+      condition: 1
+      windowStart: 0.1
+      windowEnd: 1
+      holdThreshold: 0.15
+      requiresHit: 0
     inputDecisions:
     - id: decision-entry-0
       name: "\u8D77\u624B\u70B9\u6309 / \u957F\u6309"
-      graphPosition: {x: 23.666664, y: 146}
+      graphPosition: {x: 30.333328, y: 192}
       enabled: 1
       sourceInstanceId: 
       input: 0
       listenStartFrame: 0
-      decisionFrame: 6
+      decisionFrame: 12
       entryFrameRate: 60
-      tapTargetInstanceId: legacy-instance-0-0
+      tapTargetInstanceId: e143742905154c10ad93328b36e6510a
       holdTargetInstanceId: legacy-instance-0-3
       noInputTargetInstanceId: 
       tapRequiresHit: 0
@@ -2167,7 +2313,7 @@ MonoBehaviour:
       noInputRequiresHit: 0
     - id: decision-branch-0-0
       name: "\u8FDE\u62DB\u70B9\u6309 / \u957F\u6309"
-      graphPosition: {x: 787.3334, y: 69.33334}
+      graphPosition: {x: 845.3334, y: 72.00003}
       enabled: 1
       sourceInstanceId: legacy-instance-0-1
       input: 0
@@ -2180,6 +2326,15 @@ MonoBehaviour:
       tapRequiresHit: 0
       holdRequiresHit: 1
       noInputRequiresHit: 0
+    stateDecision:
+      id: e143742905154c10ad93328b36e6510a
+      name: "\u5F53\u524D\u72B6\u6001\u5224\u5B9A"
+      graphPosition: {x: 202.33331, y: 51.666687}
+      enabled: 1
+      branches:
+      - state: 31
+        targetId: sword-run-slash
+      defaultTargetId: legacy-instance-0-0
   - name: "\u62F3\u51FB\u4E09\u8FDE"
     weaponType: 0
     entryInput: 0
@@ -2211,8 +2366,8 @@ MonoBehaviour:
           interpolation: 1
         - frame: 2
           enabled: 1
-          offset: {x: 0.8449293, y: 0.6865814}
-          size: {x: 0.5092002, y: 0.4414394}
+          offset: {x: 0.43077278, y: 0.8022002}
+          size: {x: 1.6826496, y: 0.90736604}
           interpolation: 0
         - frame: 3
           enabled: 0
@@ -2220,6 +2375,7 @@ MonoBehaviour:
           size: {x: 1, y: 0.8}
           interpolation: 0
         attackType: 0
+        hitFlashType: 0
         enableTargetReaction: 1
         targetReaction: 1
         useCustomKnockback: 0
@@ -2253,7 +2409,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 275, y: 137.16666}
+      graphPosition: {x: 282.33334, y: 20.5}
       moveId: legacy-move-1-0
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -2268,6 +2424,9 @@ MonoBehaviour:
       customKnockback: {x: 4, y: 1}
       enableCharge: 0
       chargeHoldFrame: 1
+      enableChargeResultBranch: 0
+      incompleteChargeTargetId: 
+      completeChargeTargetId: 
       chargeHoldNormalizedTime: 0.35
       chargeAnimation: {fileID: 0}
       showChargeEffect: 1
@@ -2332,6 +2491,23 @@ MonoBehaviour:
       fullChargeHoldLimit: 1.5
       chargeCountdownPrefab: {fileID: 0}
       chargeCountdownOffset: {x: 0, y: 1.15}
+      bowShot:
+        enabled: 0
+        drawClip: {fileID: 0}
+        fullDrawClip: {fileID: 0}
+        fireClip: {fileID: 0}
+        minimumChargeTime: 0.12
+        maximumChargeTime: 0.8
+        recovery: 0.18
+        minimumDamage: 4
+        maximumDamage: 12
+        minimumSpeed: 8
+        maximumSpeed: 16
+        range: 12
+        knockback: {x: 3, y: 0.5}
+        hitStop: 0.025
+        hitFlashType: 0
+        cancelInput: 1
     - id: legacy-instance-1-1
       name: "\u6446\u62F3\u8854\u63A5"
       move:
@@ -2351,14 +2527,14 @@ MonoBehaviour:
           size: {x: 1, y: 0.8}
           interpolation: 0
         - frame: 1
-          enabled: 1
-          offset: {x: 0.5343965, y: 0.8505335}
-          size: {x: 0.5517099, y: 0.5723345}
+          enabled: 0
+          offset: {x: 0.20997429, y: 0.7918613}
+          size: {x: 1.2005539, y: 0.6896788}
           interpolation: 1
         - frame: 2
           enabled: 1
-          offset: {x: 0.5254365, y: 0.9217676}
-          size: {x: 0.7048805, y: 0.47421932}
+          offset: {x: 0.18720818, y: 0.8630954}
+          size: {x: 1.3813381, y: 0.59156346}
           interpolation: 0
         - frame: 3
           enabled: 0
@@ -2366,6 +2542,7 @@ MonoBehaviour:
           size: {x: 1, y: 0.8}
           interpolation: 0
         attackType: 0
+        hitFlashType: 0
         enableTargetReaction: 1
         targetReaction: 1
         useCustomKnockback: 0
@@ -2399,7 +2576,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 506, y: 127.16666}
+      graphPosition: {x: 533.3333, y: 20.49997}
       moveId: legacy-move-1-1
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -2414,6 +2591,9 @@ MonoBehaviour:
       customKnockback: {x: 4, y: 1}
       enableCharge: 0
       chargeHoldFrame: 1
+      enableChargeResultBranch: 0
+      incompleteChargeTargetId: 
+      completeChargeTargetId: 
       chargeHoldNormalizedTime: 0.35
       chargeAnimation: {fileID: 0}
       showChargeEffect: 1
@@ -2478,14 +2658,31 @@ MonoBehaviour:
       fullChargeHoldLimit: 1.5
       chargeCountdownPrefab: {fileID: 0}
       chargeCountdownOffset: {x: 0, y: 1.15}
-    - id: legacy-instance-1-2
-      name: "\u84C4\u529B\u91CD\u51FB\u7EC8\u7ED3"
+      bowShot:
+        enabled: 0
+        drawClip: {fileID: 0}
+        fullDrawClip: {fileID: 0}
+        fireClip: {fileID: 0}
+        minimumChargeTime: 0.12
+        maximumChargeTime: 0.8
+        recovery: 0.18
+        minimumDamage: 4
+        maximumDamage: 12
+        minimumSpeed: 8
+        maximumSpeed: 16
+        range: 12
+        knockback: {x: 3, y: 0.5}
+        hitStop: 0.025
+        hitFlashType: 0
+        cancelInput: 1
+    - id: punch-charge-result
+      name: "\u516C\u5171\u84C4\u529B"
       move:
-        name: "\u84C4\u529B\u91CD\u51FB\u7EC8\u7ED3"
+        name: "\u516C\u5171\u84C4\u529B"
         moveCategory: 2
         comboCategory: 2
         input: 0
-        animationClip: {fileID: 7400000, guid: c597c06a9e9196347857e43072f14058, type: 2}
+        animationClip: {fileID: 7400000, guid: f012d4a7c6e84b25a9037d19b6e2540f, type: 2}
         animationState: 21
         animationFrameRate: 16
         animationFrameCount: 8
@@ -2503,8 +2700,8 @@ MonoBehaviour:
           interpolation: 1
         - frame: 3
           enabled: 1
-          offset: {x: 0.5849383, y: 1.0212606}
-          size: {x: 0.86348677, y: 0.8778934}
+          offset: {x: 1.4891796, y: 0.99019897}
+          size: {x: 2.3958683, y: 1.0573614}
           interpolation: 0
         - frame: 4
           enabled: 0
@@ -2512,6 +2709,7 @@ MonoBehaviour:
           size: {x: 1, y: 0.8}
           interpolation: 0
         attackType: 1
+        hitFlashType: 0
         enableTargetReaction: 1
         targetReaction: 3
         useCustomKnockback: 1
@@ -2545,8 +2743,8 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 929.6666, y: 31.666656}
-      moveId: legacy-move-1-2
+      graphPosition: {x: 939.6666, y: 156}
+      moveId: 
       damageMultiplier: 1
       knockbackMultiplier: 1
       poiseMultiplier: 1
@@ -2560,6 +2758,9 @@ MonoBehaviour:
       customKnockback: {x: 4, y: 1}
       enableCharge: 1
       chargeHoldFrame: 1
+      enableChargeResultBranch: 1
+      incompleteChargeTargetId: legacy-quick-finisher-Unarmed
+      completeChargeTargetId: legacy-instance-1-2
       chargeHoldNormalizedTime: 0.2178
       chargeAnimation: {fileID: 0}
       showChargeEffect: 1
@@ -2625,6 +2826,191 @@ MonoBehaviour:
       fullChargeHoldLimit: 1.5
       chargeCountdownPrefab: {fileID: 0}
       chargeCountdownOffset: {x: 0, y: 1.15}
+      bowShot:
+        enabled: 0
+        drawClip: {fileID: 0}
+        fullDrawClip: {fileID: 0}
+        fireClip: {fileID: 0}
+        minimumChargeTime: 0.12
+        maximumChargeTime: 0.8
+        recovery: 0.18
+        minimumDamage: 4
+        maximumDamage: 12
+        minimumSpeed: 8
+        maximumSpeed: 16
+        range: 12
+        knockback: {x: 3, y: 0.5}
+        hitStop: 0.025
+        hitFlashType: 0
+        cancelInput: 1
+    - id: legacy-instance-1-2
+      name: "\u84C4\u529B\u91CD\u51FB\u7EC8\u7ED3"
+      move:
+        name: "\u84C4\u529B\u91CD\u51FB\u7EC8\u7ED3"
+        moveCategory: 2
+        comboCategory: 2
+        input: 0
+        animationClip: {fileID: 7400000, guid: f012d4a7c6e84b25a9037d19b6e2540f, type: 2}
+        animationState: 21
+        animationFrameRate: 16
+        animationFrameCount: 8
+        mirrorHitboxByFacing: 1
+        hitboxKeys:
+        - frame: 0
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        - frame: 2
+          enabled: 0
+          offset: {x: 0.8436464, y: 0.8775339}
+          size: {x: 1.380903, y: 1.1653467}
+          interpolation: 1
+        - frame: 3
+          enabled: 1
+          offset: {x: 1.4891796, y: 0.99019897}
+          size: {x: 2.3958683, y: 1.0573614}
+          interpolation: 0
+        - frame: 4
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        attackType: 1
+        hitFlashType: 1
+        enableTargetReaction: 1
+        targetReaction: 3
+        useCustomKnockback: 1
+        customKnockback: {x: 5.5, y: 7}
+        interruptPower: 1
+        poiseDamage: 1
+        breaksSuperArmor: 0
+        hitFeedback:
+          enableHitEffect: 1
+          hitEffectPrefab: {fileID: 0}
+          hitEffectOffset: {x: 0, y: 0}
+          mirrorHitEffectByDirection: 0
+          hitEffectLifetime: 0.15
+          enableHitStop: 1
+          useAttackTypeDefaultHitStop: 0
+          hitStopDuration: 0.2
+          enableCameraFeedback: 1
+          cameraPower: 1
+          enableHitSound: 0
+          hitSound: {fileID: 0}
+          hitSoundVolume: 1
+          notifyPlayerReaction: 1
+        startup: 0.08
+        activeTime: 0.1
+        recovery: 0.18
+        comboWindowStart: 0.1
+        comboWindowEnd: 0.28
+        damageMultiplier: 1.3
+        knockbackMultiplier: 1.35
+        lockMovement: 1
+        bodyState: 0
+        bodyStateStart: 0
+        bodyStateEnd: 0
+      graphPosition: {x: 1201.0001, y: 139.00003}
+      moveId: legacy-move-1-2
+      damageMultiplier: 1
+      knockbackMultiplier: 1
+      poiseMultiplier: 1
+      animationSpeed: 1
+      overrideAttackType: 0
+      attackType: 1
+      overrideTargetReaction: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      enableCharge: 0
+      chargeHoldFrame: 1
+      enableChargeResultBranch: 0
+      incompleteChargeTargetId: 
+      completeChargeTargetId: 
+      chargeHoldNormalizedTime: 0.2178
+      chargeAnimation: {fileID: 0}
+      showChargeEffect: 1
+      chargeEffectPrefab: {fileID: 430001, guid: 59fe6a79392443e2b02567532bbf660f,
+        type: 3}
+      chargeEffectOffset: {x: -0.5, y: 1}
+      chargeEffectScale: 0.15
+      chargeEffectRotationSpeed: 54.29
+      chargeEffectPulseSpeed: 18
+      chargeEffectPulseAmount: 0.12
+      chargeEffectStartScale: 0.9
+      chargeEffectFullScale: 1.8
+      chargeEffectStartAlpha: 0.55
+      chargeEffectFullAlpha: 1
+      chargeEffectParticleIntensity: 1
+      chargePresentation:
+        style: 0
+        coreStartColor: {r: 0.22, g: 0.58, b: 1, a: 0.55}
+        coreFullColor: {r: 0.82, g: 0.95, b: 1, a: 1}
+        bodyGlowColor: {r: 0.18, g: 0.62, b: 1, a: 0.42}
+        coreStartScale: 0.12
+        coreFullScale: 0.32
+        finalFlashStart: 0.9
+        pulseSpeed: 18
+        pulseAmount: 0.12
+        rotationSpeed: 0
+        particleIntensity: 1
+        particleRadius: 0.9
+        particleSpeed: 2.2
+        bodyGlowMaxAlpha: 0.32
+        bodyGlowScale: 1.035
+        readyChargeThreshold: 0.7
+        readyChargeCue: {fileID: 0}
+        swordOuterColor: {r: 0.2, g: 1, b: 0.45, a: 0.42}
+        swordCoreColor: {r: 0.82, g: 1, b: 0.86, a: 0.9}
+        swordAngle: 0
+        swordLength: 1.35
+        swordWidth: 0.12
+        swordJitterStart: 0.55
+        swordJitterAmount: 0.03125
+        leftFootOffset: {x: -0.3, y: 0.03}
+        rightFootOffset: {x: 0.3, y: 0.03}
+        dustIntensity: 1
+        punchFieldRadius: 1.35
+        punchCoreStartScale: 0.18
+        punchCoreReadyScale: 0.72
+        punchStreamIntensity: 1.25
+        punchAfterimageAlpha: 0.16
+        punchGroundPull: 1
+        chargingLoop: {fileID: 0}
+        fullChargeCue: {fileID: 0}
+        releaseCue: {fileID: 0}
+        feintCue: {fileID: 0}
+        interruptedCue: {fileID: 0}
+        audioVolume: 0.8
+      minimumChargeTime: 0.28
+      maximumChargeTime: 1
+      launchChargeThreshold: 0.65
+      insufficientLaunchReaction: 2
+      fullChargeDamageMultiplier: 2
+      fullChargeKnockbackMultiplier: 1.6
+      autoReleaseAtFullCharge: 0
+      fullChargeHoldLimit: 1.5
+      chargeCountdownPrefab: {fileID: 0}
+      chargeCountdownOffset: {x: 0, y: 1.15}
+      bowShot:
+        enabled: 0
+        drawClip: {fileID: 0}
+        fullDrawClip: {fileID: 0}
+        fireClip: {fileID: 0}
+        minimumChargeTime: 0.12
+        maximumChargeTime: 0.8
+        recovery: 0.18
+        minimumDamage: 4
+        maximumDamage: 12
+        minimumSpeed: 8
+        maximumSpeed: 16
+        range: 12
+        knockback: {x: 3, y: 0.5}
+        hitStop: 0.025
+        hitFlashType: 0
+        cancelInput: 1
     - id: legacy-quick-finisher-Unarmed
       name: "\u5FEB\u901F\u7EC8\u7ED3"
       move:
@@ -2650,8 +3036,8 @@ MonoBehaviour:
           interpolation: 1
         - frame: 3
           enabled: 1
-          offset: {x: 0.53885174, y: 1.1153195}
-          size: {x: 1, y: 0.8}
+          offset: {x: 0.31106377, y: 1.1532841}
+          size: {x: 1.455574, y: 1.4143323}
           interpolation: 0
         - frame: 4
           enabled: 0
@@ -2659,6 +3045,7 @@ MonoBehaviour:
           size: {x: 1, y: 0.8}
           interpolation: 0
         attackType: 0
+        hitFlashType: 0
         enableTargetReaction: 1
         targetReaction: 1
         useCustomKnockback: 0
@@ -2692,7 +3079,7 @@ MonoBehaviour:
         bodyState: 0
         bodyStateStart: 0
         bodyStateEnd: 0
-      graphPosition: {x: 948.3334, y: 149.66666}
+      graphPosition: {x: 1174.6666, y: 40}
       moveId: legacy-move-1-2
       damageMultiplier: 1
       knockbackMultiplier: 1
@@ -2707,6 +3094,9 @@ MonoBehaviour:
       customKnockback: {x: 4, y: 1}
       enableCharge: 0
       chargeHoldFrame: 1
+      enableChargeResultBranch: 0
+      incompleteChargeTargetId: 
+      completeChargeTargetId: 
       chargeHoldNormalizedTime: 0.35
       chargeAnimation: {fileID: 0}
       showChargeEffect: 1
@@ -2771,6 +3161,23 @@ MonoBehaviour:
       fullChargeHoldLimit: 1.5
       chargeCountdownPrefab: {fileID: 0}
       chargeCountdownOffset: {x: 0, y: 1.15}
+      bowShot:
+        enabled: 0
+        drawClip: {fileID: 0}
+        fullDrawClip: {fileID: 0}
+        fireClip: {fileID: 0}
+        minimumChargeTime: 0.12
+        maximumChargeTime: 0.8
+        recovery: 0.18
+        minimumDamage: 4
+        maximumDamage: 12
+        minimumSpeed: 8
+        maximumSpeed: 16
+        range: 12
+        knockback: {x: 3, y: 0.5}
+        hitStop: 0.025
+        hitFlashType: 0
+        cancelInput: 1
     transitions:
     - id: legacy-link-1-0
       fromInstanceId: legacy-instance-1-0
@@ -2792,7 +3199,7 @@ MonoBehaviour:
       decisionFrame: 6
       entryFrameRate: 60
       tapTargetInstanceId: legacy-instance-1-0
-      holdTargetInstanceId: legacy-instance-1-2
+      holdTargetInstanceId: punch-charge-result
       noInputTargetInstanceId: 
       tapRequiresHit: 0
       holdRequiresHit: 0
@@ -2803,16 +3210,200 @@ MonoBehaviour:
       enabled: 1
       sourceInstanceId: legacy-instance-1-1
       input: 0
-      listenStartFrame: 0
+      listenStartFrame: 3
       decisionFrame: 7
       entryFrameRate: 60
       tapTargetInstanceId: legacy-quick-finisher-Unarmed
-      holdTargetInstanceId: legacy-instance-1-2
+      holdTargetInstanceId: punch-charge-result
       noInputTargetInstanceId: 
       tapRequiresHit: 0
       holdRequiresHit: 1
       noInputRequiresHit: 0
-  moveComboSchemaVersion: 7
+    stateDecision:
+      id: 4fa35d286dff48aeb7c81b1d0e94cd19
+      name: "\u8D77\u624B\u72B6\u6001\u5224\u5B9A"
+      graphPosition: {x: 20, y: 30}
+      enabled: 0
+      branches: []
+      defaultTargetId: 
+  - name: "\u84C4\u529B\u5C04\u7BAD"
+    weaponType: 2
+    entryInput: 0
+    entryInstanceId: bow-charge-shot
+    entryDecisionId: 
+    instances:
+    - id: bow-charge-shot
+      name: "\u84C4\u529B\u5C04\u7BAD"
+      move:
+        name: "\u84C4\u529B\u5C04\u7BAD"
+        moveCategory: 4
+        comboCategory: 5
+        input: 0
+        animationClip: {fileID: 7400000, guid: 2e20e1f593d7d064c9b7172d2fd116b1, type: 2}
+        animationState: 11
+        animationFrameRate: 12
+        animationFrameCount: 8
+        mirrorHitboxByFacing: 1
+        hitboxKeys:
+        - frame: 0
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        - frame: 1
+          enabled: 1
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        - frame: 2
+          enabled: 0
+          offset: {x: 0.65, y: 0}
+          size: {x: 1, y: 0.8}
+          interpolation: 0
+        attackType: 0
+        hitFlashType: 0
+        enableTargetReaction: 1
+        targetReaction: 1
+        useCustomKnockback: 0
+        customKnockback: {x: 4, y: 1}
+        interruptPower: 1
+        poiseDamage: 1
+        breaksSuperArmor: 0
+        hitFeedback:
+          enableHitEffect: 1
+          hitEffectPrefab: {fileID: 0}
+          hitEffectOffset: {x: 0, y: 0}
+          mirrorHitEffectByDirection: 1
+          hitEffectLifetime: 0.15
+          enableHitStop: 1
+          useAttackTypeDefaultHitStop: 1
+          hitStopDuration: 0.035
+          enableCameraFeedback: 0
+          cameraPower: 0.35
+          enableHitSound: 0
+          hitSound: {fileID: 0}
+          hitSoundVolume: 1
+          notifyPlayerReaction: 1
+        startup: 0.08
+        activeTime: 0.08
+        recovery: 0.16
+        comboWindowStart: 0.1
+        comboWindowEnd: 0.28
+        damageMultiplier: 1
+        knockbackMultiplier: 1
+        lockMovement: 1
+        bodyState: 0
+        bodyStateStart: 0
+        bodyStateEnd: 0
+      graphPosition: {x: 220, y: 55}
+      moveId: 
+      damageMultiplier: 1
+      knockbackMultiplier: 1
+      poiseMultiplier: 1
+      animationSpeed: 1
+      overrideAttackType: 0
+      attackType: 0
+      overrideTargetReaction: 0
+      enableTargetReaction: 1
+      targetReaction: 1
+      useCustomKnockback: 0
+      customKnockback: {x: 4, y: 1}
+      enableCharge: 0
+      chargeHoldFrame: 1
+      enableChargeResultBranch: 0
+      incompleteChargeTargetId: 
+      completeChargeTargetId: 
+      chargeHoldNormalizedTime: 0.35
+      chargeAnimation: {fileID: 0}
+      showChargeEffect: 1
+      chargeEffectPrefab: {fileID: 0}
+      chargeEffectOffset: {x: 0.65, y: 0.15}
+      chargeEffectScale: 0.75
+      chargeEffectRotationSpeed: 55
+      chargeEffectPulseSpeed: 18
+      chargeEffectPulseAmount: 0.12
+      chargeEffectStartScale: 0.9
+      chargeEffectFullScale: 1.8
+      chargeEffectStartAlpha: 0.55
+      chargeEffectFullAlpha: 1
+      chargeEffectParticleIntensity: 1
+      chargePresentation:
+        style: 0
+        coreStartColor: {r: 0.22, g: 0.58, b: 1, a: 0.55}
+        coreFullColor: {r: 0.82, g: 0.95, b: 1, a: 1}
+        bodyGlowColor: {r: 0.18, g: 0.62, b: 1, a: 0.42}
+        coreStartScale: 0.12
+        coreFullScale: 0.32
+        finalFlashStart: 0.9
+        pulseSpeed: 18
+        pulseAmount: 0.12
+        rotationSpeed: 0
+        particleIntensity: 1
+        particleRadius: 0.9
+        particleSpeed: 2.2
+        bodyGlowMaxAlpha: 0.32
+        bodyGlowScale: 1.035
+        readyChargeThreshold: 0.7
+        readyChargeCue: {fileID: 0}
+        swordOuterColor: {r: 0.2, g: 1, b: 0.45, a: 0.42}
+        swordCoreColor: {r: 0.82, g: 1, b: 0.86, a: 0.9}
+        swordAngle: 0
+        swordLength: 1.35
+        swordWidth: 0.12
+        swordJitterStart: 0.55
+        swordJitterAmount: 0.03125
+        leftFootOffset: {x: -0.3, y: 0.03}
+        rightFootOffset: {x: 0.3, y: 0.03}
+        dustIntensity: 1
+        punchFieldRadius: 1.35
+        punchCoreStartScale: 0.18
+        punchCoreReadyScale: 0.72
+        punchStreamIntensity: 1.25
+        punchAfterimageAlpha: 0.16
+        punchGroundPull: 1
+        chargingLoop: {fileID: 0}
+        fullChargeCue: {fileID: 0}
+        releaseCue: {fileID: 0}
+        feintCue: {fileID: 0}
+        interruptedCue: {fileID: 0}
+        audioVolume: 0.8
+      minimumChargeTime: 0.18
+      maximumChargeTime: 0.7
+      launchChargeThreshold: 0.65
+      insufficientLaunchReaction: 2
+      fullChargeDamageMultiplier: 1.5
+      fullChargeKnockbackMultiplier: 1.35
+      autoReleaseAtFullCharge: 1
+      fullChargeHoldLimit: 1.5
+      chargeCountdownPrefab: {fileID: 0}
+      chargeCountdownOffset: {x: 0, y: 1.15}
+      bowShot:
+        enabled: 1
+        drawClip: {fileID: 7400000, guid: 2e20e1f593d7d064c9b7172d2fd116b1, type: 2}
+        fullDrawClip: {fileID: 7400000, guid: 5b6240e8c875df34cb058909e1cdbe06, type: 2}
+        fireClip: {fileID: 7400000, guid: 1ef75b23fa20025478aa122e114ee448, type: 2}
+        minimumChargeTime: 0.12
+        maximumChargeTime: 0.8
+        recovery: 0.18
+        minimumDamage: 6
+        maximumDamage: 18
+        minimumSpeed: 10
+        maximumSpeed: 20
+        range: 12
+        knockback: {x: 2.5, y: 0.5}
+        hitStop: 0.04
+        hitFlashType: 0
+        cancelInput: 0
+    transitions: []
+    inputDecisions: []
+    stateDecision:
+      id: 59f8e4fee2e540fb9cb55980ba827c66
+      name: "\u8D77\u624B\u72B6\u6001\u5224\u5B9A"
+      graphPosition: {x: 20, y: 30}
+      enabled: 0
+      branches: []
+      defaultTargetId: 
+  moveComboSchemaVersion: 11
 --- !u!114 &5090720824673183153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3000,7 +3591,8 @@ MonoBehaviour:
   wallJumpVelocity: {x: 5.5, y: 8}
   ladderSpeed: 2.4
   ladderGrabTime: 0.15
-  ladderFinishTime: 0.55
+  ladderFinishTime: 0.12
+  ladderTopHopVelocity: 3.5
   ladderJumpVelocity: {x: 2.5, y: 6.5}
 --- !u!114 &89275410039288737
 MonoBehaviour:
@@ -3015,6 +3607,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   current: 0
+  fractionalProgress: 0
   baseCapacity: 5
   sessionCapacityBonus: 0
   temporaryCapacityBonus: 0

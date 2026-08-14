@@ -88,6 +88,7 @@ namespace MirrorTrial.Editor
             PlayerActionState.PunchA,
             PlayerActionState.PunchB,
             PlayerActionState.PunchC,
+            PlayerActionState.PunchD,
             PlayerActionState.KickA,
             PlayerActionState.KickB,
             PlayerActionState.KickC,
@@ -95,8 +96,7 @@ namespace MirrorTrial.Editor
             PlayerActionState.SwordRunSlash,
             PlayerActionState.SwordGuard,
             PlayerActionState.SwordGuardImpact,
-            PlayerActionState.SwordSprintSlash,
-            PlayerActionState.CrouchSlash
+            PlayerActionState.SwordSprintSlash
         };
 
         static readonly string[] ActionLabels =
@@ -115,6 +115,7 @@ namespace MirrorTrial.Editor
             "\u51fa\u62f3 A",
             "\u51fa\u62f3 B",
             "\u51fa\u62f3 C",
+            "\u51fa\u62f3 D",
             "\u8e22\u51fb A",
             "\u8e22\u51fb B",
             "\u8e22\u51fb C",
@@ -122,8 +123,7 @@ namespace MirrorTrial.Editor
             "\u5954\u8dd1\u65a9",
             "\u5251\u9632\u5fa1",
             "\u9632\u5fa1\u53cd\u51fb",
-            "\u75be\u8dd1\u65a9",
-            "\u4e0b\u8e72\u65a9"
+            "\u75be\u8dd1\u65a9"
         };
 
         PlayerInputReader input;
@@ -143,7 +143,11 @@ namespace MirrorTrial.Editor
         int currentFrame;
         bool scenePreviewEnabled = true;
         bool animationPlaying;
+        AnimationClip animationPreviewOverride;
         double lastAnimationUpdate;
+        GameObject chargeEffectPreview;
+        MirrorTrial.Combat.ChargeTelegraphPresentation chargeEffectPreviewPresentation;
+        string chargeEffectPreviewMoveId;
         enum EditorTargetMode { Player, FirstMirrorBoss, MirrorBoss }
         EditorTargetMode targetMode;
 
@@ -183,13 +187,17 @@ namespace MirrorTrial.Editor
             EditorApplication.quitting -= StopAnimationPreview;
             DisableRuntimePreviewBridge();
             StopAnimationPreview();
+            DisposeChargeEffectPreview();
             DisposeBossPreview();
         }
 
         void OnPlayModeStateChanged(PlayModeStateChange state)
         {
             if (state == PlayModeStateChange.ExitingEditMode || state == PlayModeStateChange.EnteredPlayMode)
+            {
                 StopAnimationPreview();
+                DisposeChargeEffectPreview();
+            }
             HandleRuntimePreviewPlayModeChange(state);
         }
 
@@ -209,6 +217,7 @@ namespace MirrorTrial.Editor
                     target = sourceComponent.gameObject;
             }
             StopAnimationPreview();
+            DisposeChargeEffectPreview();
             input = target ? target.GetComponent<PlayerInputReader>() : null;
             combat = target ? target.GetComponent<PlayerCombat>() : null;
             weapons = target ? target.GetComponent<PlayerWeaponController>() : null;
@@ -389,28 +398,7 @@ namespace MirrorTrial.Editor
         void DrawBowSettings()
         {
             EditorGUILayout.LabelField("\u5f13\u7bad\u7cfb\u7edf", EditorStyles.boldLabel);
-            var abilities = serializedTuning.FindProperty("abilities");
-            if (serializedBow != null)
-            {
-                EditorGUILayout.PropertyField(serializedBow.FindProperty("drawClip"), new GUIContent("\u62c9\u5f13\u52a8\u753b"));
-                EditorGUILayout.PropertyField(serializedBow.FindProperty("fullDrawClip"), new GUIContent("\u84c4\u6ee1\u52a8\u753b"));
-                EditorGUILayout.PropertyField(serializedBow.FindProperty("fireClip"), new GUIContent("\u5c04\u51fb\u52a8\u753b"));
-            }
-            EditorGUILayout.PropertyField(abilities.FindPropertyRelative("bowMinChargeTime"), new GUIContent("\u6700\u77ed\u84c4\u529b\u65f6\u95f4"));
-            EditorGUILayout.PropertyField(abilities.FindPropertyRelative("bowMaxChargeTime"), new GUIContent("\u84c4\u6ee1\u65f6\u95f4"));
-            EditorGUILayout.PropertyField(abilities.FindPropertyRelative("bowRecovery"), new GUIContent("\u5c04\u51fb\u540e\u6447"));
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                EditorGUILayout.PropertyField(abilities.FindPropertyRelative("bowMinDamage"), new GUIContent("\u6700\u4f4e\u4f24\u5bb3"));
-                EditorGUILayout.PropertyField(abilities.FindPropertyRelative("bowMaxDamage"), new GUIContent("\u6ee1\u84c4\u529b\u4f24\u5bb3"));
-            }
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                EditorGUILayout.PropertyField(abilities.FindPropertyRelative("bowMinSpeed"), new GUIContent("\u6700\u4f4e\u7bad\u901f"));
-                EditorGUILayout.PropertyField(abilities.FindPropertyRelative("bowMaxSpeed"), new GUIContent("\u6ee1\u84c4\u529b\u7bad\u901f"));
-            }
-            EditorGUILayout.PropertyField(abilities.FindPropertyRelative("bowRange"), new GUIContent("\u5c04\u7a0b"));
-            EditorGUILayout.HelpBox("J \u6309\u4f4f\u84c4\u529b / \u677e\u5f00\u5c04\u51fb\uff0cK \u53d6\u6d88\u62c9\u5f13\u3002\u5f13\u7bad\u59cb\u7ec8\u6c34\u5e73\u671d\u89d2\u8272\u9762\u5411\u53d1\u5c04\u3002", MessageType.None);
+            EditorGUILayout.HelpBox("\u5f13\u7bad\u5df2\u7eb3\u5165\u8fde\u62db\u7f16\u8f91\u3002\u8bf7\u5728\u2018\u8fde\u62db\u7f16\u8f91\u2019\u9875\u9009\u62e9\u5f13\u7bad\u8fde\u62db\uff0c\u7f16\u8f91\u2018\u84c4\u529b\u5c04\u7bad\u2019\u590d\u5408\u62db\u5f0f\u3002", MessageType.Info);
         }
 
         void DrawSwordSettings()
@@ -425,9 +413,7 @@ namespace MirrorTrial.Editor
             EditorGUILayout.PropertyField(abilities.FindPropertyRelative("mirrorBladeCooldown"), new GUIContent("\u955c\u5203\u51b7\u5374"));
             EditorGUILayout.PropertyField(abilities.FindPropertyRelative("mirrorBladeSpeed"), new GUIContent("\u955c\u5203\u901f\u5ea6"));
             EditorGUILayout.PropertyField(abilities.FindPropertyRelative("mirrorBladeRange"), new GUIContent("\u955c\u5203\u5c04\u7a0b"));
-            EditorGUILayout.PropertyField(serializedCombat.FindProperty("swordRunAttack"), new GUIContent("\u5954\u8dd1\u65a9\u914d\u7f6e"), true);
-            EditorGUILayout.PropertyField(serializedCombat.FindProperty("swordCrouchAttack"), new GUIContent("\u4e0b\u8e72\u65a9\u914d\u7f6e"), true);
-            EditorGUILayout.HelpBox("J \u5251\u672f\u56db\u8fde\uff1b\u79fb\u52a8+J \u5954\u8dd1\u65a9\uff1b\u4e0b+J \u4e0b\u8e72\u65a9\uff1bK \u6309\u4f4f\u9632\u5fa1\uff1bL \u955c\u5203\u3002", MessageType.None);
+            EditorGUILayout.HelpBox("\u5e73 A \u7684\u5251\u672f\u5206\u6b67\u5df2\u7eb3\u5165\u8fde\u62db\u56fe\uff1aRun \u72b6\u6001\u8fdb\u5165\u5954\u8dd1\u65a9\uff0c\u5176\u4ed6\u72b6\u6001\u8d70\u9ed8\u8ba4\u8d77\u624b\u3002K \u6309\u4f4f\u9632\u5fa1\uff1bL \u955c\u5203\u3002", MessageType.None);
         }
 
         void SelectComboSetForWeapon(PlayerWeaponType weaponType)
@@ -702,6 +688,8 @@ namespace MirrorTrial.Editor
                 EditorGUILayout.HelpBox("\u8fd9\u4e9b\u9009\u9879\u5c5e\u4e8e\u4e0a\u65b9\u9010\u5e27\u653b\u51fb\u6846\uff1a\u8be5\u653b\u51fb\u6846\u547d\u4e2d\u65f6\u6267\u884c\u3002\u591a\u76ee\u6807\u65f6\u6bcf\u4e2a\u76ee\u6807\u90fd\u53d7\u4f24\u5e76\u64ad\u653e\u547d\u4e2d\u7279\u6548\uff0c\u987f\u5e27/\u955c\u5934/\u97f3\u6548/\u73a9\u5bb6\u53cd\u4f5c\u7528\u53ea\u89e6\u53d1\u4e00\u6b21\u3002", MessageType.Info);
 
                 EditorGUILayout.PropertyField(step.FindPropertyRelative("attackType"), new GUIContent("\u6280\u80fd\u653b\u51fb\u7c7b\u578b"));
+                EditorGUILayout.PropertyField(step.FindPropertyRelative("hitFlashType"),
+                    new GUIContent("\u53d7\u51fb\u95ea\u5149", "\u8be5\u62db\u547d\u4e2d\u654c\u5175\u65f6\u5168\u8eab\u95ea\u767d\u6216\u95ea\u7ea2\u3002"));
 
                 var targetReaction = step.FindPropertyRelative("enableTargetReaction");
                 EditorGUILayout.PropertyField(targetReaction, new GUIContent("\u542f\u7528\u76ee\u6807\u53cd\u5e94"));
@@ -775,13 +763,18 @@ namespace MirrorTrial.Editor
         }
         void DrawHitboxKeyEditor(SerializedProperty step, int stepIndex)
         {
+            animationPreviewOverride = null;
             var frameCountProperty = step.FindPropertyRelative("animationFrameCount");
             var frameRateProperty = step.FindPropertyRelative("animationFrameRate");
             var keys = step.FindPropertyRelative("hitboxKeys");
             var action = (PlayerActionState)step.FindPropertyRelative("animationState").enumValueIndex;
-            var clipProperty = step.FindPropertyRelative("animationClip");
-            var clip = clipProperty != null ? clipProperty.objectReferenceValue as AnimationClip : null;
-            if (!clip) clip = GetAnimationClip(action);
+            var clip = animationPreviewOverride;
+            if (!clip)
+            {
+                var clipProperty = step.FindPropertyRelative("animationClip");
+                clip = clipProperty != null ? clipProperty.objectReferenceValue as AnimationClip : null;
+                if (!clip) clip = GetAnimationClip(action);
+            }
             var frameRate = clip ? Mathf.Max(1, Mathf.RoundToInt(clip.frameRate)) : Mathf.Max(1, frameRateProperty.intValue);
             if (clip)
             {
@@ -918,6 +911,7 @@ namespace MirrorTrial.Editor
 
         void TickAnimationPreview()
         {
+            TickChargeEffectPreview();
             if (targetMode == EditorTargetMode.FirstMirrorBoss) return;
             if (targetMode == EditorTargetMode.MirrorBoss)
             {
@@ -934,9 +928,13 @@ namespace MirrorTrial.Editor
             if (step == null)
                 return;
             var action = (PlayerActionState)step.FindPropertyRelative("animationState").enumValueIndex;
-            var clipProperty = step.FindPropertyRelative("animationClip");
-            var clip = clipProperty != null ? clipProperty.objectReferenceValue as AnimationClip : null;
-            if (!clip) clip = GetAnimationClip(action);
+            var clip = animationPreviewOverride;
+            if (!clip)
+            {
+                var clipProperty = step.FindPropertyRelative("animationClip");
+                clip = clipProperty != null ? clipProperty.objectReferenceValue as AnimationClip : null;
+                if (!clip) clip = GetAnimationClip(action);
+            }
             var frameRate = clip ? Mathf.Max(1, Mathf.RoundToInt(clip.frameRate)) : 1;
             if (!clip)
             {
@@ -1012,9 +1010,101 @@ namespace MirrorTrial.Editor
         void StopAnimationPreview()
         {
             animationPlaying = false;
+            animationPreviewOverride = null;
             if (AnimationMode.InAnimationMode())
                 AnimationMode.StopAnimationMode();
             SceneView.RepaintAll();
+        }
+
+        void RebuildChargeEffectPreview(SerializedProperty node)
+        {
+            DisposeChargeEffectPreview();
+            if (Application.isPlaying || node == null)
+                return;
+
+            serializedCombat.ApplyModifiedProperties();
+            var prefab = node.FindPropertyRelative("chargeEffectPrefab").objectReferenceValue as GameObject;
+            if (!prefab)
+            {
+                ShowNotification(new GUIContent("请先指定蓄力特效 Prefab"));
+                return;
+            }
+
+            var sceneCombat = combat;
+            if (EditorUtility.IsPersistent(sceneCombat.gameObject))
+                sceneCombat = FindScenePreviewCombat(sceneCombat);
+            if (!sceneCombat)
+            {
+                ShowNotification(new GUIContent("场景中没有当前 Player Prefab 的实例，无法加载特效预览"));
+                return;
+            }
+
+            chargeEffectPreview = PrefabUtility.InstantiatePrefab(prefab, sceneCombat.transform) as GameObject;
+            if (!chargeEffectPreview)
+                return;
+            chargeEffectPreview.name = prefab.name + "_ComboEditorPreview";
+            chargeEffectPreview.hideFlags = HideFlags.HideAndDontSave;
+            chargeEffectPreview.transform.localPosition = Vector3.zero;
+            chargeEffectPreview.transform.localRotation = Quaternion.identity;
+            chargeEffectPreviewPresentation = chargeEffectPreview.GetComponent<MirrorTrial.Combat.ChargeTelegraphPresentation>();
+            chargeEffectPreviewMoveId = node.FindPropertyRelative("id").stringValue;
+            RefreshChargeEffectPreview(node);
+            Selection.activeGameObject = chargeEffectPreview;
+            SceneView.lastActiveSceneView?.FrameSelected(false);
+        }
+
+        void RefreshChargeEffectPreview(SerializedProperty node)
+        {
+            if (!chargeEffectPreview || node == null)
+                return;
+            var offset = node.FindPropertyRelative("chargeEffectOffset").vector2Value;
+            var rotationSpeed = node.FindPropertyRelative("chargeEffectRotationSpeed").floatValue;
+            if (chargeEffectPreviewPresentation)
+                chargeEffectPreviewPresentation.EditorSetPreview(true, 0.9f, true, offset, 0f, rotationSpeed);
+            else
+                chargeEffectPreview.transform.localPosition = offset;
+            SceneView.RepaintAll();
+        }
+
+        void TickChargeEffectPreview()
+        {
+            if (!chargeEffectPreview || Application.isPlaying || serializedCombat == null)
+                return;
+            serializedCombat.UpdateIfRequiredOrScript();
+            var graphs = serializedCombat.FindProperty("comboGraphs");
+            if (selectedGraphIndex < 0 || selectedGraphIndex >= graphs.arraySize)
+            {
+                DisposeChargeEffectPreview();
+                return;
+            }
+            var moves = graphs.GetArrayElementAtIndex(selectedGraphIndex).FindPropertyRelative("instances");
+            SerializedProperty previewNode = null;
+            for (var i = 0; i < moves.arraySize; i++)
+            {
+                var candidate = moves.GetArrayElementAtIndex(i);
+                if (candidate.FindPropertyRelative("id").stringValue == chargeEffectPreviewMoveId)
+                {
+                    previewNode = candidate;
+                    break;
+                }
+            }
+            if (previewNode == null || !previewNode.FindPropertyRelative("showChargeEffect").boolValue)
+            {
+                DisposeChargeEffectPreview();
+                return;
+            }
+            RefreshChargeEffectPreview(previewNode);
+        }
+
+        void DisposeChargeEffectPreview()
+        {
+            if (chargeEffectPreviewPresentation)
+                chargeEffectPreviewPresentation.EditorSetPreview(false, 0f, true);
+            if (chargeEffectPreview)
+                DestroyImmediate(chargeEffectPreview);
+            chargeEffectPreview = null;
+            chargeEffectPreviewPresentation = null;
+            chargeEffectPreviewMoveId = null;
         }
 
         Animator GetEditorAnimator()

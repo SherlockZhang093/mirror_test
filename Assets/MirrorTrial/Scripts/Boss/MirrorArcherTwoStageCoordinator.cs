@@ -67,7 +67,10 @@ namespace MirrorTrial.Boss
             playerTarget = player.transform;
             var point = airSpawnPoint ? airSpawnPoint.transform : transform;
             activeMountedBoss = Instantiate(ResolveMountedPrefab(), point.position, point.rotation, transform);
-            activeMountedBoss.Configure(profile, area.bounds);
+            var minimumVisibleFlightY = rockfallArea
+                ? rockfallArea.WorldBounds.min.y
+                : area.bounds.min.y;
+            activeMountedBoss.Configure(profile, area.bounds, minimumVisibleFlightY);
             activeMountedBoss.MountDefeated += OnMountDefeated;
             activeMountedBoss.HealthChanged += OnMountedHealthChanged;
             PresentMountedHealth(activeMountedBoss);

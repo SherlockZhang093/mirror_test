@@ -16,7 +16,8 @@ namespace MirrorTrial.Editor.Level
         const string RopeTexturePath = ArtRoot + "/PulleyBraidedRopeLine.png";
         const string RopeMaterialPath = ArtRoot + "/PulleyBraidedRopeLine.mat";
         const string FiberMaterialPath = ArtRoot + "/PulleyRopeFiber.mat";
-        const int CurrentSetupVersion = 4;
+        const int CurrentSetupVersion = 5;
+        const float DefaultPromptWorldSize = 5.6f;
 
         // RopeHitTarget is centered on the hit box, while the slanted LineRenderer
         // crosses the cut height about 0.10 units to its left.
@@ -83,6 +84,21 @@ namespace MirrorTrial.Editor.Level
 
                 ApplyRopeMaterial(root, ropeMaterial);
 
+                var existingHint = root.GetComponent<PulleyRopeHintVisual>();
+                if (existingHint && existingHint.SetupVersion == 4)
+                {
+                    var migratedProximityArea = GetOrCreatePromptArea(hitTarget);
+                    var migration = new SerializedObject(existingHint);
+                    migration.FindProperty("setupVersion").intValue = CurrentSetupVersion;
+                    migration.FindProperty("promptProximityArea").objectReferenceValue = migratedProximityArea;
+                    migration.ApplyModifiedPropertiesWithoutUndo();
+                    PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
+                    AssetDatabase.SaveAssets();
+                    if (logResult)
+                        Debug.Log("[PulleyLiftHintSetup] 已添加可编辑的靠近提示区域。");
+                    return;
+                }
+
                 var oldHint = FindDirectChild(hitTarget, "CutHintRoot");
                 if (oldHint)
                     Object.DestroyImmediate(oldHint.gameObject);
@@ -116,6 +132,7 @@ namespace MirrorTrial.Editor.Level
                     Vector3.one * 0.52f);
                 var dust = CreateRopeDust(hintRoot, particleMaterial);
                 var breakParticles = CreateBreakParticles(hitTarget, particleMaterial);
+                var proximityArea = GetOrCreatePromptArea(hitTarget);
 
                 var hint = root.GetComponent<PulleyRopeHintVisual>();
                 if (!hint)
@@ -131,6 +148,7 @@ namespace MirrorTrial.Editor.Level
                 promptRenderers.arraySize = 1;
                 promptRenderers.GetArrayElementAtIndex(0).objectReferenceValue = icon;
                 hintSerialized.FindProperty("ropeDust").objectReferenceValue = dust;
+                hintSerialized.FindProperty("promptProximityArea").objectReferenceValue = proximityArea;
                 hintSerialized.ApplyModifiedPropertiesWithoutUndo();
 
                 var controllerSerialized = new SerializedObject(controller);
@@ -339,6 +357,26 @@ namespace MirrorTrial.Editor.Level
             go.transform.SetParent(parent, false);
             go.transform.localPosition = localPosition;
             return go.transform;
+        }
+
+        static BoxCollider2D GetOrCreatePromptArea(Transform hitTarget)
+        {
+            var areaTransform = FindDirectChild(hitTarget, "PromptProximityArea");
+            if (!areaTransform)
+                areaTransform = CreateChild(hitTarget, "PromptProximityArea", CutVisualLocalPosition);
+
+            var area = areaTransform.GetComponent<BoxCollider2D>();
+            if (!area)
+                area = areaTransform.gameObject.AddComponent<BoxCollider2D>();
+            area.isTrigger = true;
+            if (area.size == Vector2.one)
+            {
+                var scale = areaTransform.lossyScale;
+                area.size = new Vector2(
+                    DefaultPromptWorldSize / Mathf.Max(Mathf.Abs(scale.x), 0.0001f),
+                    DefaultPromptWorldSize / Mathf.Max(Mathf.Abs(scale.y), 0.0001f));
+            }
+            return area;
         }
 
         static Transform FindChild(Transform root, string name)

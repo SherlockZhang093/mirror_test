@@ -7,6 +7,8 @@ namespace MirrorTrial.Player
     [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
     public class PlayerMotor : MonoBehaviour
     {
+        const string DoubleJumpVfxResourcePath = "Effects/PlayerDoubleJumpFootVfx";
+
         [Header("Grounding")]
         [SerializeField] LayerMask groundMask = ~0;
         [SerializeField, Min(0.001f)] float groundCheckDistance = 0.04f;
@@ -33,6 +35,7 @@ namespace MirrorTrial.Player
         bool groundingInitialized;
         int remainingAirJumps;
         float doubleJumpAnimationTimer;
+        GameObject doubleJumpVfxPrefab;
 
         public bool MovementLocked { get; set; }
         public bool TraversalLocked { get; set; }
@@ -74,6 +77,7 @@ namespace MirrorTrial.Player
                 useTriggers = false
             };
             groundFilter.SetLayerMask(groundMask);
+            doubleJumpVfxPrefab = Resources.Load<GameObject>(DoubleJumpVfxResourcePath);
         }
 
         void Update()
@@ -158,6 +162,7 @@ namespace MirrorTrial.Player
                 remainingAirJumps--;
                 doubleJumpAnimationTimer = tuning.abilities.doubleJumpAnimationTime;
                 DoubleJumped?.Invoke();
+                PlayDoubleJumpVfx();
             }
             else if (jumpCutRequested && velocity.y > 0f)
             {
@@ -221,6 +226,32 @@ namespace MirrorTrial.Player
                 coyoteCounter = tuning.movement.coyoteTime;
             else
                 coyoteCounter = Mathf.Max(0f, coyoteCounter - deltaTime);
+        }
+
+        void PlayDoubleJumpVfx()
+        {
+            if (!doubleJumpVfxPrefab)
+                doubleJumpVfxPrefab = Resources.Load<GameObject>(DoubleJumpVfxResourcePath);
+            if (!doubleJumpVfxPrefab || !bodyCollider)
+                return;
+
+            var bounds = bodyCollider.bounds;
+            var position = new Vector3(bounds.center.x, bounds.min.y + 0.02f, transform.position.z);
+            var effect = Instantiate(doubleJumpVfxPrefab, position, Quaternion.identity);
+            var effectVfx = effect.GetComponent<PlayerDoubleJumpFootVfx>();
+            if (effectVfx && spriteRenderer)
+            {
+                effectVfx.ConfigureSorting(spriteRenderer.sortingLayerID, spriteRenderer.sortingOrder + 1);
+            }
+            else
+            {
+                var effectRenderer = effect.GetComponentInChildren<SpriteRenderer>(true);
+                if (effectRenderer && spriteRenderer)
+                {
+                    effectRenderer.sortingLayerID = spriteRenderer.sortingLayerID;
+                    effectRenderer.sortingOrder = spriteRenderer.sortingOrder + 1;
+                }
+            }
         }
 
         void UpdateFacing(float moveX)

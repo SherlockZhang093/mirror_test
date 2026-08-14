@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using MirrorTrial.Combat;
 using MirrorTrial.Feedback;
@@ -37,6 +37,24 @@ namespace MirrorTrial.Player
         public event Action Damaged;
         public event Action Died;
         public static event Action PlayerRespawned;
+
+        public void CancelHurtInvincibilityForAttack()
+        {
+            if (!hurtInvincible)
+                return;
+
+            if (hurtRoutine != null)
+            {
+                StopCoroutine(hurtRoutine);
+                hurtRoutine = null;
+            }
+
+            hurtInvincible = false;
+            if (bodyState)
+                bodyState.ClearBodyState(this);
+            if (damageVisual)
+                damageVisual.ResetVisual();
+        }
 
         public void KillAndRespawn()
         {

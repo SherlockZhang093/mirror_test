@@ -1,0 +1,1 @@
+No visual deviations. Slide 6 reuses the inherited title and body text boxes without changing their geometry.

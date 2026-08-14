@@ -64,5 +64,40 @@ namespace MirrorTrial.Growth
                     return "未知提升";
             }
         }
+
+        public static string FormatCardTitle(GrowthEffectType effectType)
+        {
+            switch (effectType)
+            {
+                case GrowthEffectType.MaxHealth:
+                    return "生命增幅";
+                case GrowthEffectType.AttackDamage:
+                    return "攻击增幅";
+                case GrowthEffectType.MoveSpeed:
+                    return "速度增幅";
+                default:
+                    return "属性增幅";
+            }
+        }
+
+        public static string FormatCardValue(float amount)
+        {
+            return "+" + amount.ToString("0.#");
+        }
+
+        public static string FormatCardAttribute(GrowthEffectType effectType)
+        {
+            switch (effectType)
+            {
+                case GrowthEffectType.MaxHealth:
+                    return "最大生命";
+                case GrowthEffectType.AttackDamage:
+                    return "攻击伤害";
+                case GrowthEffectType.MoveSpeed:
+                    return "移动速度";
+                default:
+                    return "未知属性";
+            }
+        }
     }
 }

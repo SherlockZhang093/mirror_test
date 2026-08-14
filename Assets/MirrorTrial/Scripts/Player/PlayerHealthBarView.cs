@@ -6,7 +6,7 @@ namespace MirrorTrial.Player
 {
     public sealed class PlayerHealthBarView : MonoBehaviour
     {
-        [Header("5 Life Blocks, left to right")]
+        [Header("Life Blocks, left to right")]
         [SerializeField] Image[] fills = new Image[5];
         [SerializeField] Image[] hitFlashes = new Image[5];
 
@@ -125,7 +125,7 @@ namespace MirrorTrial.Player
                 StopDeathFeedback();
         }
 
-        public void SetReserve(int current, int capacity, bool isCasting)
+        public void SetReserve(float current, int capacity, bool isCasting)
         {
             var normalized = capacity > 0
                 ? Mathf.Clamp01((float)current / capacity)
@@ -136,17 +136,17 @@ namespace MirrorTrial.Player
                 reserveFill.fillAmount = normalized;
                 reserveFill.color = isCasting
                     ? reserveCastingColor
-                    : current > 0 ? reserveReadyColor : reserveEmptyColor;
+                    : current > 0.0001f ? reserveReadyColor : reserveEmptyColor;
             }
 
             if (reserveGroup)
-                reserveGroup.alpha = current > 0 || isCasting ? 1f : 0.62f;
+                reserveGroup.alpha = current > 0.0001f || isCasting ? 1f : 0.62f;
 
             if (recoverKeyText)
             {
                 recoverKeyText.color = isCasting
                     ? reserveCastingColor
-                    : current > 0 ? reserveReadyColor : reserveEmptyColor;
+                    : current >= 0.9999f ? reserveReadyColor : reserveEmptyColor;
             }
         }
 

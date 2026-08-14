@@ -457,6 +457,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: MirrorArcherBossBattleArea
       objectReference: {fileID: 0}
+    - target: {fileID: 6345590882841721677, guid: 6ea770a67e146ee489c3ba53c9aa44e5,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 8.3767605
+      objectReference: {fileID: 0}
+    - target: {fileID: 6345590882841721677, guid: 6ea770a67e146ee489c3ba53c9aa44e5,
+        type: 3}
+      propertyPath: m_Offset.y
+      value: 1.5322115
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -805,6 +815,8 @@ MonoBehaviour:
   previousSequence: {fileID: 0}
   nextSequence: {fileID: 0}
   nextSequenceDelay: 0
+  healthThreshold: 2
+  requireLifeEnergy: 1
 --- !u!114 &1067146618
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1341,7 +1353,7 @@ Transform:
   m_GameObject: {fileID: 2101000001}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.65, z: 0}
+  m_LocalPosition: {x: 0, y: 0.59, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1379,7 +1391,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 1.5927957}
+  m_Offset: {x: 0, y: 0.22482955}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -1390,7 +1402,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 18, y: 11.18559}
+  m_Size: {x: 18, y: 8.321016}
   m_EdgeRadius: 0
 --- !u!114 &2101000004
 MonoBehaviour:
@@ -1407,22 +1419,32 @@ MonoBehaviour:
   firstDelay: 3
   cooldown: 7
   waveCount: 3
-  impactsPerWave: 5
+  impactsPerWave: 3
   waveInterval: 0.45
   perImpactStagger: 0.18
   impactRadius: 0.8
   impactSpacingMultiplier: 2.25
   minimumImpactSpacing: 1.2
+  startHorizontalRandomness: 1.5
   damage: 1
   knockback: {x: 1.5, y: 0.3}
-  lockMoment: 0.25
-  releaseMoment: 0.8
-  minimumFallDuration: 0.15
+  fallDuration: 1.25
+  preFallWarningDuration: 0.6
   recovery: 1.15
+  fallingRumbleVolume: 0.72
+  fallingRumblePitch: 0.65
+  fallingRumbleLowPass: 900
+  impactVolume: 1
+  impactPitch: 0.9
   platformLiftHeight: 2.2
   platformFramesPerSecond: 12
   platformPixelsPerUnit: 100
-  platformSurfaceOffset: 0.2
+  platformSurfaceAnchor: -0.3
+  platformAlignmentOffset: 0
+  descentWarningDuration: 0.58
+  playerPushSpeed: 7.5
+  playerPushDuration: 0.16
+  playerExitPadding: 0.15
   safeRadius: 2.4
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

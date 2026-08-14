@@ -22,18 +22,18 @@ namespace MirrorTrial.UI
             recovery = GetComponent<PlayerRecoveryAbility>();
             health = GetComponent<Health>();
             BuildView();
-            Refresh(reserve.Current, reserve.Capacity);
+            Refresh(reserve.DisplayedCurrent, reserve.Capacity);
         }
 
         void OnEnable()
         {
-            if (reserve != null) reserve.Changed += Refresh;
+            if (reserve != null) reserve.ProgressChanged += Refresh;
             if (recovery != null) recovery.CastStateChanged += OnCastStateChanged;
         }
 
         void OnDisable()
         {
-            if (reserve != null) reserve.Changed -= Refresh;
+            if (reserve != null) reserve.ProgressChanged -= Refresh;
             if (recovery != null) recovery.CastStateChanged -= OnCastStateChanged;
         }
 
@@ -95,10 +95,10 @@ namespace MirrorTrial.UI
             return text;
         }
 
-        void Refresh(int current, int capacity)
+        void Refresh(float current, int capacity)
         {
             if (!valueText) BuildView();
-            if (valueText) valueText.text = "HEALTH RESERVE   " + current + " / " + capacity;
+            if (valueText) valueText.text = "HEALTH RESERVE   " + current.ToString("0.0") + " / " + capacity;
             RefreshHint();
         }
 

@@ -97,13 +97,139 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
+      name: attack_windup_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 480
+        width: 464
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 36cb42f1974c394faa2020998022de3e
+      internalID: 1030100101
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: attack_windup_1
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 480
+        width: 464
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 22aedd3086773ba3d14617c7ca7b8b54
+      internalID: 1030100102
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: attack_windup_2
+      rect:
+        serializedVersion: 2
+        x: 928
+        y: 480
+        width: 464
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7dd89121f1bebdf16838a23dde8ecff0
+      internalID: 1030100103
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: attack_windup_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 320
+        width: 464
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 492253dd090a45259a71194e92e30e8c
+      internalID: 1030100104
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: attack_windup_4
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 320
+        width: 464
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f4202fca84b84345633f84708418fbce
+      internalID: 1030100105
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: attack_windup_5
+      rect:
+        serializedVersion: 2
+        x: 928
+        y: 320
+        width: 464
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a5e2e399da51a21d613bd9e9d3d8cef
+      internalID: 1030100106
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
       name: attack_0
       rect:
         serializedVersion: 2
-        x: 49
-        y: 44
-        width: 257
-        height: 117
+        x: 0
+        y: 160
+        width: 464
+        height: 160
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -114,17 +240,17 @@ TextureImporter:
       spriteID: 708c74516009528f2fff3f3dc9b8f236
       internalID: 1030100001
       vertices: []
-      indices: 
+      indices:
       edges: []
       weights: []
     - serializedVersion: 2
       name: attack_1
       rect:
         serializedVersion: 2
-        x: 394
-        y: 41
-        width: 244
-        height: 123
+        x: 464
+        y: 160
+        width: 464
+        height: 160
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -135,17 +261,17 @@ TextureImporter:
       spriteID: 52a7818fa4c255f4c7176a2a11acf970
       internalID: 1030100002
       vertices: []
-      indices: 
+      indices:
       edges: []
       weights: []
     - serializedVersion: 2
       name: attack_2
       rect:
         serializedVersion: 2
-        x: 733
-        y: 41
-        width: 247
-        height: 116
+        x: 928
+        y: 160
+        width: 464
+        height: 160
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -156,17 +282,17 @@ TextureImporter:
       spriteID: d52abb938333a2bf8855356b57fc7a1c
       internalID: 1030100003
       vertices: []
-      indices: 
+      indices:
       edges: []
       weights: []
     - serializedVersion: 2
       name: attack_3
       rect:
         serializedVersion: 2
-        x: 1097
-        y: 34
-        width: 335
-        height: 133
+        x: 0
+        y: 0
+        width: 464
+        height: 160
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -177,17 +303,17 @@ TextureImporter:
       spriteID: ca98f1afd1a2d5c6e63bdc325f0cd577
       internalID: 1030100004
       vertices: []
-      indices: 
+      indices:
       edges: []
       weights: []
     - serializedVersion: 2
       name: attack_4
       rect:
         serializedVersion: 2
-        x: 1436
-        y: 43
-        width: 244
-        height: 117
+        x: 464
+        y: 0
+        width: 464
+        height: 160
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -198,17 +324,17 @@ TextureImporter:
       spriteID: ac510c2958b42052ed718ac948afa665
       internalID: 1030100005
       vertices: []
-      indices: 
+      indices:
       edges: []
       weights: []
     - serializedVersion: 2
       name: attack_5
       rect:
         serializedVersion: 2
-        x: 1795
-        y: 43
-        width: 250
-        height: 122
+        x: 928
+        y: 0
+        width: 464
+        height: 160
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -219,7 +345,7 @@ TextureImporter:
       spriteID: 0693fa76a57121d1b2eae5df4a4afee0
       internalID: 1030100006
       vertices: []
-      indices: 
+      indices:
       edges: []
       weights: []
     outline: []
@@ -233,6 +359,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      attack_windup_0: 1030100101
+      attack_windup_1: 1030100102
+      attack_windup_2: 1030100103
+      attack_windup_3: 1030100104
+      attack_windup_4: 1030100105
+      attack_windup_5: 1030100106
       attack_0: 1030100001
       attack_1: 1030100002
       attack_2: 1030100003

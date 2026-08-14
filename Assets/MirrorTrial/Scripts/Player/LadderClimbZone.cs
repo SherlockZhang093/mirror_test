@@ -14,33 +14,58 @@ namespace MirrorTrial.Player
         [Header("Bounds")]
         [SerializeField] float topInset = 0.15f;
         [SerializeField] float bottomInset = 0.1f;
+        [SerializeField, Min(0f)] float topClimbOffset = 0.55f;
+        [SerializeField, Min(0f)] float entryTolerance = 0.25f;
 
         [Header("Top Support")]
-        [SerializeField] bool createTopSupport = true;
+        [SerializeField] bool createTopSupport;
+        [SerializeField] string topSupportLayerName = "Ground";
         [SerializeField, Min(0.1f)] float topSupportWidth = 1.2f;
         [SerializeField, Min(0.02f)] float topSupportThickness = 0.2f;
 
         BoxCollider2D trigger;
         BoxCollider2D topSupport;
+        bool topEntryArmed;
 
         public float CenterX => trigger ? trigger.bounds.center.x : transform.position.x;
         public float BottomY => trigger ? trigger.bounds.min.y + bottomInset : transform.position.y;
-        public float TopY => trigger ? trigger.bounds.max.y - topInset : transform.position.y;
+        public float TopY => topExit
+            ? topExit.position.y - topClimbOffset
+            : (trigger ? trigger.bounds.max.y - topInset : transform.position.y);
         public Vector2 TopExitPosition => topExit ? (Vector2)topExit.position : new Vector2(CenterX, TopY + 0.85f);
         public Collider2D TopSupportCollider => topSupport;
 
+        public bool CanEnterFromBottom(float playerRootY) =>
+            playerRootY <= BottomY + entryTolerance;
+
+        public bool CanEnterFromTop(float playerRootY) =>
+            playerRootY >= TopY - entryTolerance;
+
         void Awake()
         {
-            trigger = GetComponent<BoxCollider2D>();
-            trigger.isTrigger = true;
+            ConfigureTrigger();
             EnsureTopSupport();
+        }
+
+        void OnValidate()
+        {
+            ConfigureTrigger();
         }
 
         void Reset()
         {
-            trigger = GetComponent<BoxCollider2D>();
-            trigger.isTrigger = true;
+            ConfigureTrigger();
             trigger.size = new Vector2(0.9f, 5f);
+        }
+
+        void ConfigureTrigger()
+        {
+            trigger = GetComponent<BoxCollider2D>();
+            if (!trigger)
+                return;
+
+            trigger.isTrigger = true;
+            trigger.offset = Vector2.zero;
         }
 
         public Vector2 GetTopExitPosition(float direction)
@@ -65,10 +90,14 @@ namespace MirrorTrial.Player
             if (!supportTransform)
             {
                 var supportObject = new GameObject("LadderTopSupport");
-                supportObject.layer = gameObject.layer;
                 supportTransform = supportObject.transform;
                 supportTransform.SetParent(transform, false);
             }
+
+            var supportLayer = LayerMask.NameToLayer(topSupportLayerName);
+            supportTransform.gameObject.layer = supportLayer >= 0
+                ? supportLayer
+                : gameObject.layer;
 
             topSupport = supportTransform.GetComponent<BoxCollider2D>();
             if (!topSupport)
@@ -76,7 +105,7 @@ namespace MirrorTrial.Player
 
             supportTransform.position = new Vector2(
                 CenterX,
-                trigger.bounds.max.y + topSupportThickness * 0.5f);
+                TopExitPosition.y - topSupportThickness * 0.5f);
             topSupport.isTrigger = false;
             topSupport.size = new Vector2(
                 Mathf.Max(topSupportWidth, trigger.size.x),
@@ -87,8 +116,28 @@ namespace MirrorTrial.Player
         {
             var traversal = other.GetComponentInParent<PlayerTraversalController>();
             var input = other.GetComponentInParent<PlayerInputReader>();
-            if (traversal && input && (Mathf.Abs(input.MoveY) > 0.25f || input.InteractPressed))
-                traversal.TryEnterLadder(this);
+            if (!traversal || !input || !input.InputEnabled)
+                return;
+
+            var playerRootY = traversal.transform.position.y;
+            if (CanEnterFromTop(playerRootY))
+            {
+                if (input.MoveY >= -0.25f)
+                    topEntryArmed = true;
+                else if (topEntryArmed)
+                {
+                    topEntryArmed = false;
+                    traversal.TryEnterLadder(this, -1f);
+                }
+            }
+            else if (input.MoveY > 0.25f && CanEnterFromBottom(playerRootY))
+                traversal.TryEnterLadder(this, 1f);
+        }
+
+        void OnTriggerExit2D(Collider2D other)
+        {
+            if (other.GetComponentInParent<PlayerTraversalController>())
+                topEntryArmed = false;
         }
     }
 }

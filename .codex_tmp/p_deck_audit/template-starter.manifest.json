@@ -1,0 +1,89 @@
+{
+  "sourcePptx": "C:\\Users\\zharkzhang\\Documents\\WXWork\\1688857072832480\\Cache\\File\\2026-07\\2026超新星P族答辩参考模板.pptx",
+  "mapPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-frame-map.json",
+  "output": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter.pptx",
+  "outputBytes": 5101939,
+  "sourceSlideCount": 7,
+  "slideCount": 7,
+  "previewDir": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-preview",
+  "layoutDir": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-layout",
+  "slides": [
+    {
+      "outputSlide": 1,
+      "sourceSlide": 1,
+      "narrativeRole": "opening identity",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-preview\\starter-slide-01.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-01.png",
+      "layoutPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-layout\\starter-slide-01.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-01.layout.json"
+    },
+    {
+      "outputSlide": 2,
+      "sourceSlide": 2,
+      "narrativeRole": "preserve template directory",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 0,
+      "previewPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-preview\\starter-slide-02.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-02.png",
+      "layoutPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-layout\\starter-slide-02.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-02.layout.json"
+    },
+    {
+      "outputSlide": 3,
+      "sourceSlide": 3,
+      "narrativeRole": "personal introduction",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-preview\\starter-slide-03.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-03.png",
+      "layoutPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-layout\\starter-slide-03.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-03.layout.json"
+    },
+    {
+      "outputSlide": 4,
+      "sourceSlide": 4,
+      "narrativeRole": "preserve research instruction",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 0,
+      "previewPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-preview\\starter-slide-04.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-04.png",
+      "layoutPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-layout\\starter-slide-04.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-04.layout.json"
+    },
+    {
+      "outputSlide": 5,
+      "sourceSlide": 5,
+      "narrativeRole": "preserve internship instruction",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 0,
+      "previewPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-preview\\starter-slide-05.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-05.png",
+      "layoutPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-layout\\starter-slide-05.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-05.layout.json"
+    },
+    {
+      "outputSlide": 6,
+      "sourceSlide": 6,
+      "narrativeRole": "closing bumper",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 0,
+      "previewPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-preview\\starter-slide-06.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-06.png",
+      "layoutPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-layout\\starter-slide-06.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-06.layout.json"
+    },
+    {
+      "outputSlide": 7,
+      "sourceSlide": 7,
+      "narrativeRole": "appendix blank",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-preview\\starter-slide-07.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-07.png",
+      "layoutPath": "G:\\mirror_test\\.codex_tmp\\p_deck_audit\\template-starter-layout\\starter-slide-07.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-07.layout.json"
+    }
+  ]
+}

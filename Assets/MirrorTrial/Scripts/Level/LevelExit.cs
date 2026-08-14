@@ -1,6 +1,5 @@
 using MirrorTrial.Player;
 using MirrorTrial.Audio;
-using MirrorTrial.Growth;
 using UnityEngine;
 
 namespace MirrorTrial.Level
@@ -33,8 +32,7 @@ namespace MirrorTrial.Level
             else
                 PlayerAudioFeedback.PlayComplete();
 
-            if (!LevelEndGrowthController.TryShow(playerInput.gameObject, LoadNextScene))
-                loading = false;
+            LoadNextScene();
         }
 
         void LoadNextScene()

@@ -1,0 +1,13 @@
+{
+  "status": "pass",
+  "checkedAt": "2026-08-13T06:51:03.961Z",
+  "workspace": "G:\\mirror_test\\.codex_tmp\\p_deck_resume",
+  "finalPptx": "G:\\mirror_test\\2026超新星P族答辩_张聪_简历版.pptx",
+  "starterPptx": "G:\\mirror_test\\.codex_tmp\\p_deck_resume\\template-starter.pptx",
+  "mapPath": "G:\\mirror_test\\.codex_tmp\\p_deck_resume\\template-frame-map.json",
+  "starterLayoutDir": "G:\\mirror_test\\.codex_tmp\\p_deck_resume\\template-starter-layout",
+  "finalLayoutDir": "G:\\mirror_test\\.codex_tmp\\p_deck_resume\\final-layout\\final",
+  "editDir": "G:\\mirror_test\\.codex_tmp\\p_deck_resume",
+  "issueCount": 0,
+  "issues": []
+}

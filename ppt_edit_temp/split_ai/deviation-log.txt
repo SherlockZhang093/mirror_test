@@ -1,0 +1,8 @@
+Slides 6-8:
+- Split source slide 6 into three consecutive pages.
+- Rewrote title and body content for one AI theme per page.
+- Repositioned the inherited body textbox to a 500 px left column.
+- Deleted the inherited small image so the right side remains open for user-provided screenshots.
+- Restored the AI section's original dark background image.
+
+Slides 1-5 and 9: no intentional deviations.

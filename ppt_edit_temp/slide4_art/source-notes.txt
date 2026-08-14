@@ -1,0 +1,4 @@
+Generated asset: assets/mirror-loop-concept.png
+Generator: built-in image generation tool.
+Prompt summary: original 16:9 pixel-art scene showing a ruined real world, fractured mirror realm, protagonist confronting a mirrored self, ability motes, and a distant boss silhouette; left 40% kept dark for slide copy.
+No external web source was used.

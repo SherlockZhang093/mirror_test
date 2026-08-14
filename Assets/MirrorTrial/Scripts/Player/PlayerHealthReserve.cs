@@ -12,6 +12,7 @@ namespace MirrorTrial.Player
     {
         [Header("Current Life Energy")]
         [SerializeField, Min(0)] int current;
+        [SerializeField, Range(0f, 0.9999f)] float fractionalProgress;
         [SerializeField, Min(0)] int baseCapacity = 5;
         [SerializeField, Min(0)] int sessionCapacityBonus;
         [SerializeField, Min(0)] int temporaryCapacityBonus;
@@ -19,11 +20,14 @@ namespace MirrorTrial.Player
         Health health;
 
         public int Current => current;
+        public float FractionalProgress => fractionalProgress;
+        public float DisplayedCurrent => Mathf.Min(Capacity, current + fractionalProgress);
         public int BaseCapacity => baseCapacity;
         public int SessionCapacityBonus => sessionCapacityBonus;
         public int TemporaryCapacityBonus => temporaryCapacityBonus;
         public int Capacity => Mathf.Max(0, baseCapacity + sessionCapacityBonus + temporaryCapacityBonus);
         public event Action<int, int> Changed;
+        public event Action<float, int> ProgressChanged;
 
         public void ConfigureBase(int capacity)
         {
@@ -34,7 +38,9 @@ namespace MirrorTrial.Player
         public void SetCurrent(int amount)
         {
             current = Mathf.Clamp(amount, 0, Capacity);
+            fractionalProgress = 0f;
             Changed?.Invoke(current, Capacity);
+            ProgressChanged?.Invoke(DisplayedCurrent, Capacity);
         }
 
         void Awake()
@@ -68,13 +74,40 @@ namespace MirrorTrial.Player
             }
 
             var before = current;
-            current = Mathf.Clamp(current + amount, 0, Capacity);
-            if (current != before)
-                Changed?.Invoke(current, Capacity);
+            AddProgress(amount);
             Trace($"[生命能量][Add] 请求={amount}, 写入={current - before}, {before}->{current}/{Capacity}");
             return current - before;
         }
 
+        public float AddProgress(float amount)
+        {
+            if (amount <= 0f || Capacity <= 0)
+                return 0f;
+
+            var beforeProgress = DisplayedCurrent;
+            if (beforeProgress >= Capacity)
+            {
+                fractionalProgress = 0f;
+                return 0f;
+            }
+
+            var accepted = Mathf.Min(amount, Capacity - beforeProgress);
+            var accumulated = fractionalProgress + accepted;
+            var wholeGain = Mathf.FloorToInt(accumulated + 0.0001f);
+            fractionalProgress = Mathf.Clamp(accumulated - wholeGain, 0f, 0.9999f);
+
+            var beforeWhole = current;
+            current = Mathf.Clamp(current + wholeGain, 0, Capacity);
+            if (current >= Capacity)
+                fractionalProgress = 0f;
+
+            if (current != beforeWhole)
+                Changed?.Invoke(current, Capacity);
+            ProgressChanged?.Invoke(DisplayedCurrent, Capacity);
+            Trace($"[LifeEnergy][Progress] request={amount:0.###}, applied={DisplayedCurrent - beforeProgress:0.###}, " +
+                  $"{beforeProgress:0.###}->{DisplayedCurrent:0.###}/{Capacity}");
+            return DisplayedCurrent - beforeProgress;
+        }
         public bool TryReserveForFullHeal(out int reservedAmount)
         {
             reservedAmount = 0;
@@ -96,6 +129,7 @@ namespace MirrorTrial.Player
 
             current -= reservedAmount;
             Changed?.Invoke(current, Capacity);
+            ProgressChanged?.Invoke(DisplayedCurrent, Capacity);
             Trace($"[生命能量][G预扣] 数量={reservedAmount}, 剩余={current}/{Capacity}");
             return true;
         }
@@ -114,14 +148,17 @@ namespace MirrorTrial.Player
 
         public void Clear()
         {
-            if (current == 0)
+            if (current == 0 && fractionalProgress <= 0f)
             {
                 Changed?.Invoke(0, Capacity);
+                ProgressChanged?.Invoke(0f, Capacity);
                 return;
             }
 
             current = 0;
+            fractionalProgress = 0f;
             Changed?.Invoke(current, Capacity);
+            ProgressChanged?.Invoke(DisplayedCurrent, Capacity);
         }
 
         void ResetForReality()
@@ -151,12 +188,15 @@ namespace MirrorTrial.Player
             sessionCapacityBonus = Mathf.Max(0, sessionCapacityBonus);
             temporaryCapacityBonus = Mathf.Max(0, temporaryCapacityBonus);
             current = Mathf.Clamp(current, 0, Capacity);
+            fractionalProgress = Mathf.Clamp(fractionalProgress, 0f, current < Capacity ? 0.9999f : 0f);
         }
 
         void ClampAndNotify()
         {
             current = Mathf.Clamp(current, 0, Capacity);
+            fractionalProgress = Mathf.Clamp(fractionalProgress, 0f, current < Capacity ? 0.9999f : 0f);
             Changed?.Invoke(current, Capacity);
+            ProgressChanged?.Invoke(DisplayedCurrent, Capacity);
         }
 
         [System.Diagnostics.Conditional("UNITY_EDITOR")]

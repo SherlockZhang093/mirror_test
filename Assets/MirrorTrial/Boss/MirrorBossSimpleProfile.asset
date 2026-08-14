@@ -90,6 +90,10 @@ MonoBehaviour:
     landingSlideDuration: 0.12
     knockdownDuration: 0.28
     presentation: {fileID: 11400000, guid: 6533e9468fb67114cb5905876c630119, type: 2}
+  getUpProtection:
+    invincibleDuringGetUp: 1
+    postGetUpInvincibleDuration: 1
+    blinkInterval: 0.08
   enableRangedTeleportKit: 0
   bowDrawDuration: 0.8
   bowShotInterval: 0.35

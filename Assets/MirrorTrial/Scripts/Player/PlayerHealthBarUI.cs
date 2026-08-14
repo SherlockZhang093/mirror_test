@@ -1,4 +1,5 @@
 using Platformer.Mechanics;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MirrorTrial.Player
@@ -7,8 +8,10 @@ namespace MirrorTrial.Player
     public sealed class PlayerHealthBarUI : MonoBehaviour
     {
         const string DefaultResourcePath = "UI/PlayerHealthBarUI";
+        const int DefaultSlotCount = 5;
 
         static PlayerHealthBarView levelViewPrefab;
+        static readonly HashSet<string> MissingVariantWarnings = new HashSet<string>();
 
         [SerializeField] PlayerHealthBarView viewPrefab;
         [SerializeField] string resourcePath = DefaultResourcePath;
@@ -23,6 +26,7 @@ namespace MirrorTrial.Player
         static void ResetLevelViewPrefab()
         {
             levelViewPrefab = null;
+            MissingVariantWarnings.Clear();
         }
 
         public static void SetLevelViewPrefab(PlayerHealthBarView prefab)
@@ -60,7 +64,7 @@ namespace MirrorTrial.Player
 
             if (reserve != null)
             {
-                reserve.Changed += OnReserveChanged;
+                reserve.ProgressChanged += OnReserveProgressChanged;
                 RefreshReserve();
             }
 
@@ -76,7 +80,7 @@ namespace MirrorTrial.Player
             if (health != null)
                 health.Changed -= Refresh;
             if (reserve != null)
-                reserve.Changed -= OnReserveChanged;
+                reserve.ProgressChanged -= OnReserveProgressChanged;
             if (recovery != null)
                 recovery.CastStateChanged -= OnCastStateChanged;
         }
@@ -92,13 +96,7 @@ namespace MirrorTrial.Player
             if (view != null)
                 return;
 
-            var prefab = levelViewPrefab ? levelViewPrefab : viewPrefab;
-            if (prefab == null)
-            {
-                var prefabObject = Resources.Load<GameObject>(string.IsNullOrEmpty(resourcePath) ? DefaultResourcePath : resourcePath);
-                if (prefabObject != null)
-                    prefab = prefabObject.GetComponent<PlayerHealthBarView>();
-            }
+            var prefab = ResolveViewPrefab(health ? health.maxHP : DefaultSlotCount);
 
             if (prefab == null)
             {
@@ -113,7 +111,8 @@ namespace MirrorTrial.Player
 
         void ApplyLevelViewPrefab()
         {
-            if (!levelViewPrefab || instantiatedPrefab == levelViewPrefab)
+            var targetPrefab = ResolveViewPrefab(health ? health.maxHP : DefaultSlotCount);
+            if (!targetPrefab || instantiatedPrefab == targetPrefab)
                 return;
 
             if (view != null)
@@ -136,14 +135,43 @@ namespace MirrorTrial.Player
 
         void Refresh(int currentHP, int maxHP)
         {
-            if (view == null)
-                CreateView();
+            ApplyLevelViewPrefab();
 
             if (view != null)
                 view.SetHealth(currentHP, maxHP);
         }
 
-        void OnReserveChanged(int current, int capacity)
+        PlayerHealthBarView ResolveViewPrefab(int maxHealth)
+        {
+            var standardPrefab = levelViewPrefab ? levelViewPrefab : viewPrefab;
+            if (!standardPrefab)
+            {
+                var path = string.IsNullOrEmpty(resourcePath) ? DefaultResourcePath : resourcePath;
+                var prefabObject = Resources.Load<GameObject>(path);
+                if (prefabObject)
+                    standardPrefab = prefabObject.GetComponent<PlayerHealthBarView>();
+            }
+
+            if (!standardPrefab || maxHealth <= DefaultSlotCount)
+                return standardPrefab;
+
+            var variantPath = $"UI/{standardPrefab.gameObject.name}_{maxHealth}Slot";
+            var variantObject = Resources.Load<GameObject>(variantPath);
+            var variant = variantObject ? variantObject.GetComponent<PlayerHealthBarView>() : null;
+            if (variant)
+                return variant;
+
+            if (MissingVariantWarnings.Add(variantPath))
+            {
+                Debug.LogWarning(
+                    $"[PlayerHealthBarUI] 玩家最大生命值为 {maxHealth}，但找不到 Resources/{variantPath}，继续使用标准生命 UI。",
+                    this);
+            }
+
+            return standardPrefab;
+        }
+
+        void OnReserveProgressChanged(float current, int capacity)
         {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             Debug.Log(
@@ -165,7 +193,7 @@ namespace MirrorTrial.Player
         {
             if (view == null) CreateView();
             if (view != null)
-                view.SetReserve(reserve != null ? reserve.Current : 0,
+                view.SetReserve(reserve != null ? reserve.DisplayedCurrent : 0f,
                     reserve != null ? reserve.Capacity : 0,
                     recovery != null && recovery.IsCasting);
         }

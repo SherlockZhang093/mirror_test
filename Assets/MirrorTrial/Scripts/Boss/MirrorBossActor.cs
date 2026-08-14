@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using MirrorTrial.Combat;
+using MirrorTrial.Enemies;
 using MirrorTrial.Player;
 using UnityEngine;
 
@@ -20,6 +21,7 @@ namespace MirrorTrial.Boss
 
         Rigidbody2D body;
         Animator animator;
+        EnemyDamageVisual damageVisual;
         Coroutine action;
         int hp;
         int phase = 1;
@@ -45,6 +47,9 @@ namespace MirrorTrial.Boss
             body = GetComponent<Rigidbody2D>();
             animator = GetComponentInChildren<Animator>(true);
             if (!sprite) sprite = GetComponentInChildren<SpriteRenderer>(true);
+            damageVisual = GetComponent<EnemyDamageVisual>();
+            if (!damageVisual) damageVisual = gameObject.AddComponent<EnemyDamageVisual>();
+            damageVisual.Bind(sprite);
             if (!swordHitbox) swordHitbox = GetComponentInChildren<Hitbox>(true);
             if (!swordCollider && swordHitbox) swordCollider = swordHitbox.GetComponent<BoxCollider2D>();
             body.freezeRotation = true;
@@ -199,7 +204,10 @@ namespace MirrorTrial.Boss
             hp = Mathf.Max(0, hp - requestedDamage);
             var actualDamage = beforeDamage - hp;
             if (actualDamage > 0)
+            {
                 DamageDealtEvents.RaisePlayerDamageDealt(new DamageDealtResult(payload.source, gameObject, requestedDamage, actualDamage));
+                if (damageVisual) damageVisual.PlayDamage(payload.hitFlashType, actualDamage);
+            }
             HealthChanged?.Invoke(this, hp, MaxHitPoints);
             if (hp <= 0) { Die(); return; }
             body.velocity = payload.knockback;

@@ -49,7 +49,8 @@ namespace MirrorTrial.Player
         [Header("Ladder")]
         [SerializeField, Min(0.1f)] float ladderSpeed = 2.4f;
         [SerializeField, Min(0.05f)] float ladderGrabTime = 0.15f;
-        [SerializeField, Min(0.05f)] float ladderFinishTime = 0.55f;
+        [SerializeField, Min(0.05f)] float ladderFinishTime = 0.12f;
+        [SerializeField, Min(0.1f)] float ladderTopHopVelocity = 3.5f;
         [SerializeField] Vector2 ladderJumpVelocity = new Vector2(2.5f, 6.5f);
 
         PlayerInputReader input;
@@ -73,7 +74,6 @@ namespace MirrorTrial.Player
         LadderClimbZone ladder;
         PlayerActionState ladderAnimationState = PlayerActionState.None;
         float ladderGrabTimer;
-        bool ladderAtTop;
 
         public bool IsLedgeHanging => mode == TraversalMode.LedgeHang;
         public bool IsLedgeClimbing => mode == TraversalMode.LedgeClimb;
@@ -160,21 +160,28 @@ namespace MirrorTrial.Player
                 KeepRootLocked();
         }
 
-        public bool TryEnterLadder(LadderClimbZone zone)
+        public bool TryEnterLadder(LadderClimbZone zone, float entryDirection)
         {
             if (!zone || (IsTraversing && mode != TraversalMode.Ladder) || stateMachine.IsInActionState)
                 return false;
             if (mode == TraversalMode.Ladder)
                 return ladder == zone;
 
+            var enteringFromBottom = entryDirection > 0f;
+            if (enteringFromBottom && !zone.CanEnterFromBottom(body.position.y))
+                return false;
+            if (!enteringFromBottom && !zone.CanEnterFromTop(body.position.y))
+                return false;
+
             ladder = zone;
             mode = TraversalMode.Ladder;
             ladderGrabTimer = ladderGrabTime;
-            ladderAtTop = body.position.y >= ladder.TopY - 0.01f;
             motor.CancelForcedVelocity();
             motor.TraversalLocked = true;
             SetTopSupportIgnored(true);
-            body.position = new Vector2(ladder.CenterX, Mathf.Clamp(body.position.y, ladder.BottomY, ladder.TopY));
+            body.position = new Vector2(
+                ladder.CenterX,
+                enteringFromBottom ? ladder.BottomY : ladder.TopY);
             SetLadderAnimation(PlayerActionState.LadderGrab);
             return true;
         }
@@ -187,14 +194,15 @@ namespace MirrorTrial.Player
                 return;
             }
 
+            if (climbRoutine != null)
+                return;
+
             var jumpPressed = input.InputEnabled &&
                 (input.JumpPressed || Input.GetKeyDown(KeyCode.Space));
-            var moveX = GetLadderHorizontalInput();
 
             if (jumpPressed)
             {
-                if (climbRoutine == null)
-                    climbRoutine = StartCoroutine(JumpOffLadder());
+                climbRoutine = StartCoroutine(JumpOffLadder());
                 return;
             }
 
@@ -202,17 +210,10 @@ namespace MirrorTrial.Player
             if (ladderGrabTimer > 0f)
                 return;
 
-            ladderAtTop |= body.position.y >= ladder.TopY - 0.01f;
-            if (ladderAtTop && Mathf.Abs(moveX) > 0.15f)
-            {
-                if (climbRoutine == null)
-                    climbRoutine = StartCoroutine(FinishLadder(Mathf.Sign(moveX)));
-                return;
-            }
-
-            if (!ladderAtTop && input.MoveY > 0.15f)
+            var ladderMoveY = input.MoveY;
+            if (ladderMoveY > 0.15f)
                 SetLadderAnimation(motor.FacingRight ? PlayerActionState.LadderClimbUpRight : PlayerActionState.LadderClimbUpLeft);
-            else if (input.MoveY < -0.15f)
+            else if (ladderMoveY < -0.15f)
                 SetLadderAnimation(motor.FacingRight ? PlayerActionState.LadderClimbDownRight : PlayerActionState.LadderClimbDownLeft);
             else
                 SetLadderAnimation(PlayerActionState.LadderIdle);
@@ -220,18 +221,19 @@ namespace MirrorTrial.Player
 
         void MoveOnLadder()
         {
-            if (!ladder || ladderGrabTimer > 0f)
+            if (!ladder || ladderGrabTimer > 0f || climbRoutine != null)
                 return;
 
-            var nextY = body.position.y + input.MoveY * ladderSpeed * Time.fixedDeltaTime;
-            if (nextY >= ladder.TopY && input.MoveY > 0.15f)
+            var ladderMoveY = input.MoveY;
+            var nextY = body.position.y + ladderMoveY * ladderSpeed * Time.fixedDeltaTime;
+            if (nextY >= ladder.TopY && ladderMoveY > 0.15f)
             {
-                ladderAtTop = true;
                 body.position = new Vector2(ladder.CenterX, ladder.TopY);
                 body.velocity = Vector2.zero;
+                climbRoutine = StartCoroutine(FinishLadder());
                 return;
             }
-            if (nextY < ladder.BottomY && input.MoveY < -0.15f)
+            if (nextY < ladder.BottomY && ladderMoveY < -0.15f)
             {
                 ExitTraversal(Vector2.down * 0.2f);
                 return;
@@ -241,25 +243,14 @@ namespace MirrorTrial.Player
             body.velocity = Vector2.zero;
         }
 
-        float GetLadderHorizontalInput()
-        {
-            if (!input.InputEnabled)
-                return 0f;
-            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-                return -1f;
-            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-                return 1f;
-            return input.MoveX;
-        }
-
-        IEnumerator FinishLadder(float direction)
+        IEnumerator FinishLadder()
         {
             SetLadderAnimation(PlayerActionState.LadderClimbFinish);
             yield return new WaitForSeconds(ladderFinishTime);
             if (ladder)
-                body.position = ladder.GetTopExitPosition(direction);
+                body.position = ladder.TopExitPosition;
             climbRoutine = null;
-            ExitTraversal(Vector2.zero);
+            ExitTraversal(Vector2.up * ladderTopHopVelocity);
         }
 
         IEnumerator JumpOffLadder()
@@ -394,6 +385,9 @@ namespace MirrorTrial.Player
             if (!IsUsableHit(wallHit) || Mathf.Abs(wallHit.normal.x) < 0.8f)
                 return;
 
+            if (wallHit.collider.GetComponentInParent<NonClimbableLedge>() != null)
+                return;
+
             var upperOrigin = new Vector2(bounds.center.x, bounds.max.y + standSkin);
             var upperHit = Physics2D.Raycast(
                 upperOrigin,
@@ -413,6 +407,9 @@ namespace MirrorTrial.Player
                 ledgeMask);
             if (!IsUsableHit(topHit) || topHit.normal.y < minTopNormalY ||
                 topHit.point.y <= wallOrigin.y + standSkin)
+                return;
+
+            if (topHit.collider.GetComponentInParent<NonClimbableLedge>() != null)
                 return;
 
             var rootToBottom = body.position.y - bounds.min.y;
@@ -526,7 +523,6 @@ namespace MirrorTrial.Player
                 animationDriver.ClearForcedState(ladderAnimationState);
             ladderAnimationState = PlayerActionState.None;
             SetTopSupportIgnored(false);
-            ladderAtTop = false;
             mode = TraversalMode.None;
             monkeyBarAnchor = null;
             ladder = null;

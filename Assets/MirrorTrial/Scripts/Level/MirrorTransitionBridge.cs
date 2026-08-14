@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using MirrorTrial.Player;
 using MirrorTrial.Growth;
+using MirrorTrial.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -84,7 +84,7 @@ namespace MirrorTrial.Level
             pendingMirrorGateId = null;
             pendingRealityScene = null;
 
-            LevelEndGrowthController.TryShow(persistentPlayer, () => CompleteMirrorBossClear(realityScene));
+            CompleteMirrorBossClear(realityScene);
         }
 
         void CompleteMirrorBossClear(string realityScene)

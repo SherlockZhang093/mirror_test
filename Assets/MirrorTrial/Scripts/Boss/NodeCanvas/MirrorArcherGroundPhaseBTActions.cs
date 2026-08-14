@@ -83,10 +83,10 @@ namespace MirrorTrial.Boss.NodeCanvasIntegration
             platform = agent.GetComponent<MirrorArcherRockfallPlatformPresentation>();
             if (!platform) platform = agent.gameObject.AddComponent<MirrorArcherRockfallPlatformPresentation>();
             duration = Mathf.Max(0.1f, Context.PlatformAnimationDuration);
-            var raiseStartPoint = Context.RockfallArea.GetLandingPoint(agent.transform.position.x);
+            var raiseStartPoint = Context.RockfallArea.GetBottomPoint(agent.transform.position.x);
             if (!platform.BeginRaise(Context.PlatformAnimationSheet, Context.PlatformPixelsPerUnit,
-                    Context.PlatformLiftHeight, Context.PlatformSurfaceOffset, Context.BlockedHitSound,
-                    raiseStartPoint))
+                    Context.PlatformLiftHeight, Context.BlockedHitSound, raiseStartPoint,
+                    Context.RockfallArea, Context.Target))
                 EndAction(false);
         }
 
@@ -203,7 +203,9 @@ namespace MirrorTrial.Boss.NodeCanvasIntegration
             Vector2? startPoint = area.GetStartPoint(x);
             MirrorBossRockProjectile.Spawn(skill.projectilePrefab, point, agent.gameObject,
                 Context.Target.gameObject, area.Damage, area.ImpactRadius, area.Knockback,
-                null, area.FallDuration, startPoint);
+                null, area.FallDuration, startPoint, area.PreFallWarningDuration,
+                area.FallingRumbleVolume, area.FallingRumblePitch, area.FallingRumbleLowPass,
+                area.ImpactVolume, area.ImpactPitch);
         }
 
         void GetArenaSpan(out float left, out float right)
@@ -222,6 +224,7 @@ namespace MirrorTrial.Boss.NodeCanvasIntegration
         MirrorArcherRockfallPlatformPresentation platform;
         float lowerStartedAt = -1f;
         float lowerDuration;
+        bool lowerPrepared;
 
         protected override void OnExecute()
         {
@@ -231,6 +234,7 @@ namespace MirrorTrial.Boss.NodeCanvasIntegration
             platform = agent.GetComponent<MirrorArcherRockfallPlatformPresentation>();
             lowerStartedAt = -1f;
             lowerDuration = Context ? Mathf.Max(0.1f, Context.PlatformAnimationDuration) : 1f;
+            lowerPrepared = false;
         }
 
         protected override void OnUpdate()
@@ -243,7 +247,12 @@ namespace MirrorTrial.Boss.NodeCanvasIntegration
                 return;
             }
             if (elapsedTime < Context.RockfallArea.Recovery) return;
-            if (lowerStartedAt < 0f) lowerStartedAt = elapsedTime;
+            if (!lowerPrepared)
+            {
+                if (platform && !platform.PrepareForLowering()) return;
+                lowerPrepared = true;
+                lowerStartedAt = elapsedTime;
+            }
             var lowerProgress = (elapsedTime - lowerStartedAt) / lowerDuration;
             if (platform) platform.TickLower(lowerProgress);
             if (lowerProgress < 1f) return;

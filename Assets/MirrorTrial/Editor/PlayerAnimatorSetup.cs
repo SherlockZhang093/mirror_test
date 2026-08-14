@@ -69,6 +69,7 @@ namespace MirrorTrial.Editor
                 { "PunchA", "PunchA.anim" },
                 { "PunchB", "PunchB.anim" },
                 { "PunchC", "PunchC.anim" },
+                { "PunchD", "PunchD.anim" },
                 // 拳 - 踢击
                 { "KickA", "KickA.anim" },
                 { "KickB", "KickB.anim" },
@@ -165,17 +166,19 @@ namespace MirrorTrial.Editor
         {
             var sourcePath = SourceAnimationFolder + sourceFileName;
             var targetPath = ClipFolder + "/" + sourceFileName;
+            var clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(targetPath);
 
-            if (!AssetDatabase.LoadAssetAtPath<AnimationClip>(sourcePath))
+            if (!clip && !AssetDatabase.LoadAssetAtPath<AnimationClip>(sourcePath))
             {
                 Debug.LogError("缺少玩家动画片段：" + sourceFileName);
                 return null;
             }
 
-            if (!AssetDatabase.LoadAssetAtPath<AnimationClip>(targetPath))
+            if (!clip)
+            {
                 AssetDatabase.CopyAsset(sourcePath, targetPath);
-
-            var clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(targetPath);
+                clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(targetPath);
+            }
             if (!clip)
                 return null;
 

@@ -92,10 +92,13 @@ namespace MirrorTrial.Abilities
                 return;
             var hurtbox = other.GetComponent<Hurtbox>();
             if (!hurtbox) return;
-            hurtbox.ReceiveHit(payload);
-            MirrorTrial.Player.PlayerAudioFeedback.PlaySharedArrowHit();
-            HitStopService.Request(payload.hitStop);
-            CameraFeedbackService.RequestHit(payload);
+            var allowsHitFeedback = hurtbox.ReceiveHit(payload);
+            if (allowsHitFeedback)
+            {
+                MirrorTrial.Player.PlayerAudioFeedback.PlaySharedArrowHit();
+                HitStopService.Request(payload.hitStop);
+                CameraFeedbackService.RequestHit(payload);
+            }
             Destroy(gameObject);
         }
     }

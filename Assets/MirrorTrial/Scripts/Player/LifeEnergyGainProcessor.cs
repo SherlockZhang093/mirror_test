@@ -1,4 +1,5 @@
 using MirrorTrial.Combat;
+using MirrorTrial.HealthResources;
 using UnityEngine;
 
 namespace MirrorTrial.Player
@@ -13,11 +14,10 @@ namespace MirrorTrial.Player
 
         PlayerInputReader input;
         PlayerHealthReserve reserve;
-        float fractionalCarry;
 
         public float BaseDamageConversionRate => baseDamageConversionRate;
         public float PlayerConversionMultiplier => playerConversionMultiplier;
-        public float FractionalCarry => fractionalCarry;
+        public float FractionalCarry => reserve ? reserve.FractionalProgress : 0f;
 
         public void Configure(float rate, float multiplier)
         {
@@ -46,14 +46,12 @@ namespace MirrorTrial.Player
             if (!reserve || !input || !IsOwnedByThisPlayer(result.source))
                 return;
 
-            var raw = result.actualDamage * baseDamageConversionRate * playerConversionMultiplier + fractionalCarry;
-            var gain = Mathf.FloorToInt(raw);
-            fractionalCarry = raw - gain;
-
-            if (gain <= 0)
+            var gain = result.actualDamage * baseDamageConversionRate * playerConversionMultiplier;
+            if (gain <= 0f)
                 return;
 
-            reserve.Add(gain);
+            reserve.AddProgress(gain);
+            DamageLifeEnergyBurstEffect.TrySpawn(result.target, transform, gain);
         }
 
         bool IsOwnedByThisPlayer(GameObject source)

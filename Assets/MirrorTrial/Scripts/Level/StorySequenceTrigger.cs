@@ -30,6 +30,7 @@ namespace MirrorTrial.Level
         [SerializeField] CombatEncounter encounter;
         [SerializeField] MirrorGate mirrorGate;
         [SerializeField] StoryTutorialSequence previousSequence;
+        [SerializeField] StoryTutorialSequence prerequisiteSequence;
         [SerializeField] StoryTutorialSequence nextSequence;
         [SerializeField, Min(0f)] float nextSequenceDelay;
         [SerializeField, Min(1)] int healthThreshold = 2;
@@ -37,11 +38,14 @@ namespace MirrorTrial.Level
 
         bool fired;
         bool subscribed;
+        bool prerequisiteCompleted;
+        bool pendingPrerequisite;
         Health playerHealth;
         PlayerHealthReserve playerHealthReserve;
 
         public StoryTutorialSequence Sequence => sequence;
         public StorySequenceTriggerMode TriggerMode => triggerMode;
+        public StoryTutorialSequence PrerequisiteSequence => prerequisiteSequence;
         public StoryTutorialSequence NextSequence => nextSequence;
         public int HealthThreshold => healthThreshold;
 
@@ -56,6 +60,7 @@ namespace MirrorTrial.Level
 
         void OnEnable()
         {
+            prerequisiteCompleted = !prerequisiteSequence || prerequisiteSequence.IsCompleted;
             Subscribe();
         }
 
@@ -70,6 +75,7 @@ namespace MirrorTrial.Level
 
         void OnDisable()
         {
+            pendingPrerequisite = false;
             Unsubscribe();
             UnsubscribePlayerHealth();
         }
@@ -84,6 +90,13 @@ namespace MirrorTrial.Level
         public void Fire()
         {
             if (!enabledAtStart || (oneShot && fired) || !sequence) return;
+            if (!IsPrerequisiteSatisfied())
+            {
+                pendingPrerequisite = true;
+                return;
+            }
+
+            pendingPrerequisite = false;
             fired = true;
             if (delay > 0f) StartCoroutine(PlayAfter(delay));
             else sequence.Play();
@@ -92,6 +105,12 @@ namespace MirrorTrial.Level
         public void ResetTrigger()
         {
             fired = false;
+            pendingPrerequisite = false;
+        }
+
+        bool IsPrerequisiteSatisfied()
+        {
+            return !prerequisiteSequence || prerequisiteCompleted || prerequisiteSequence.IsCompleted;
         }
 
         IEnumerator PlayAfter(float seconds)
@@ -118,6 +137,7 @@ namespace MirrorTrial.Level
                 mirrorGate.OnCompleted += OnMirrorCompleted;
             }
             if (previousSequence) previousSequence.SequenceCompleted += OnPreviousSequenceCompleted;
+            if (prerequisiteSequence) prerequisiteSequence.SequenceCompleted += OnPrerequisiteSequenceCompleted;
             if (sequence) sequence.SequenceCompleted += OnSequenceCompleted;
         }
 
@@ -133,6 +153,7 @@ namespace MirrorTrial.Level
                 mirrorGate.OnCompleted -= OnMirrorCompleted;
             }
             if (previousSequence) previousSequence.SequenceCompleted -= OnPreviousSequenceCompleted;
+            if (prerequisiteSequence) prerequisiteSequence.SequenceCompleted -= OnPrerequisiteSequenceCompleted;
             if (sequence) sequence.SequenceCompleted -= OnSequenceCompleted;
         }
 
@@ -154,6 +175,12 @@ namespace MirrorTrial.Level
         void OnPreviousSequenceCompleted()
         {
             if (triggerMode == StorySequenceTriggerMode.PreviousSequenceCompleted) Fire();
+        }
+
+        void OnPrerequisiteSequenceCompleted()
+        {
+            prerequisiteCompleted = true;
+            if (pendingPrerequisite) Fire();
         }
 
         void OnSequenceCompleted()

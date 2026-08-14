@@ -62,11 +62,14 @@ namespace MirrorTrial.Abilities
             if (!hurtbox)
                 return;
 
-            hurtbox.ReceiveHit(payload);
-            if (payload.source)
-                payload.source.SendMessage("OnMirrorBladeConnected", SendMessageOptions.DontRequireReceiver);
-            HitStopService.Request(payload.hitStop);
-            CameraFeedbackService.RequestHit(payload);
+            var allowsHitFeedback = hurtbox.ReceiveHit(payload);
+            if (allowsHitFeedback)
+            {
+                if (payload.source)
+                    payload.source.SendMessage("OnMirrorBladeConnected", SendMessageOptions.DontRequireReceiver);
+                HitStopService.Request(payload.hitStop);
+                CameraFeedbackService.RequestHit(payload);
+            }
             Destroy(gameObject);
         }
     }

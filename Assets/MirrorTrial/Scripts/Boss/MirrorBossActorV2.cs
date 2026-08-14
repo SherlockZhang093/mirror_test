@@ -9,7 +9,7 @@ using UnityEngine;
 namespace MirrorTrial.Boss
 {
     [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D), typeof(Hurtbox))]
-    public sealed class MirrorBossActorV2 : MonoBehaviour
+    public sealed class MirrorBossActorV2 : MonoBehaviour, IHitFeedbackGate
     {
         public enum State
         {
@@ -30,6 +30,8 @@ namespace MirrorTrial.Boss
         Collider2D bodyCollider;
         Hurtbox hurtbox;
         EnemyLaunchController2D launchController;
+        EnemyDamageVisual damageVisual;
+        BossInvincibilityBlinkVisual invincibilityBlinkVisual;
         MirrorBossMinionController minionController;
         Animator animator;
         ChargeTelegraphPresentation windupPresentation;
@@ -58,6 +60,8 @@ namespace MirrorTrial.Boss
         bool meleeHeavySlashSelected;
         bool externalCombatDriver;
         bool rockfallInvulnerable;
+        bool invincibleDuringGetUp;
+        float postGetUpInvincibleUntil;
 
         public State CurrentState { get; private set; } = State.Dormant;
         public int CurrentHitPoints => hitPoints;
@@ -78,6 +82,7 @@ namespace MirrorTrial.Boss
         public float HeavySlashRecovery => profile ? profile.heavySlashRecovery : 1.1f;
         public bool IsActionRunning => action != null;
         public bool RockfallInvulnerable => rockfallInvulnerable;
+        public bool GetUpInvulnerable => invincibleDuringGetUp || Time.time < postGetUpInvincibleUntil;
         public MirrorBossTacticalAction TacticalDecision => tacticalDecision;
         public int AliveMinionCount => minionController ? minionController.AliveCount : 0;
         public string DisplayName => profile ? profile.displayName : "镜中行刑者";
@@ -85,6 +90,17 @@ namespace MirrorTrial.Boss
         public event Action<MirrorBossActorV2, int, int> HealthChanged;
         public event Action<MirrorBossActorV2, int> PhaseChanged;
         public event Action<MirrorBossActorV2> Defeated;
+
+        public bool AllowsHitFeedback(DamagePayload payload)
+        {
+            if (CurrentState == State.Dead || GetUpInvulnerable)
+                return false;
+            if (!rockfallInvulnerable)
+                return true;
+
+            var platformWard = GetComponent<MirrorArcherRockfallPlatformPresentation>();
+            return !platformWard || !platformWard.PositionLocked;
+        }
 
         void Awake()
         {
@@ -112,8 +128,14 @@ namespace MirrorTrial.Boss
             launchController.Configure(profile ? profile.launchSettings : null);
             if (!GetComponent<EnemyLaunchAnimationPresenter>()) gameObject.AddComponent<EnemyLaunchAnimationPresenter>();
             if (!GetComponent<EnemyLaunchVfxPresenter>()) gameObject.AddComponent<EnemyLaunchVfxPresenter>();
+            invincibilityBlinkVisual = GetComponent<BossInvincibilityBlinkVisual>();
+            if (!invincibilityBlinkVisual) invincibilityBlinkVisual = gameObject.AddComponent<BossInvincibilityBlinkVisual>();
+            launchController.PhaseChanged += OnLaunchPhaseChanged;
             launchController.LaunchCompleted += OnLaunchCompleted;
             if (!sprite) sprite = GetComponentInChildren<SpriteRenderer>(true);
+            damageVisual = GetComponent<EnemyDamageVisual>();
+            if (!damageVisual) damageVisual = gameObject.AddComponent<EnemyDamageVisual>();
+            damageVisual.Bind(sprite);
             if (!swordHitbox) swordHitbox = GetComponentInChildren<Hitbox>(true);
             if (!swordCollider && swordHitbox) swordCollider = swordHitbox.GetComponent<BoxCollider2D>();
             if (profile && profile.enableRangedTeleportKit)
@@ -129,6 +151,7 @@ namespace MirrorTrial.Boss
 
         void Update()
         {
+            UpdateGetUpInvincibility();
             if (launchController && launchController.IsLaunching) return;
             if (behaviourTreeControlled) return;
             if (!profile || CurrentState != State.Approach || !target) return;
@@ -845,24 +868,47 @@ namespace MirrorTrial.Boss
         void OnDamagePayloadReceived(DamagePayload payload)
         {
             if (CurrentState == State.Dead) return;
+            var platformWard = GetComponent<MirrorArcherRockfallPlatformPresentation>();
             if (rockfallInvulnerable)
             {
-                var ward = GetComponent<MirrorArcherRockfallPlatformPresentation>();
-                if (ward) ward.PlayBlockedHit();
-                return;
+                if (platformWard && platformWard.PositionLocked)
+                {
+                    platformWard.PlayBlockedHit();
+                    platformWard.KeepBossLocked();
+                    return;
+                }
+
+                // Fail open if the presentation disappeared unexpectedly so the boss cannot
+                // become permanently invulnerable for the rest of the encounter.
+                SetRockfallInvulnerable(false);
             }
+
+            if (GetUpInvulnerable)
+                return;
+
             var beforeDamage = hitPoints;
             var requestedDamage = Mathf.Max(0, payload.damage);
             hitPoints = Mathf.Max(0, hitPoints - requestedDamage);
             var actualDamage = beforeDamage - hitPoints;
             if (actualDamage > 0)
+            {
                 DamageDealtEvents.RaisePlayerDamageDealt(new DamageDealtResult(payload.source, gameObject, requestedDamage, actualDamage));
+                if (damageVisual) damageVisual.PlayDamage(payload.hitFlashType, actualDamage);
+            }
             HealthChanged?.Invoke(this, hitPoints, MaxHitPoints);
             if (hitPoints <= 0) { Die(); return; }
             PlayerAudioFeedback.PlayEnemyHurt();
 
-            // Launch, landing and get-up own their complete reaction window. Further hits
-            // still deal damage, but cannot restart launch, alter velocity or interrupt recovery.
+            // Damage is allowed after the guardrails retract, but no hit reaction, launch or
+            // knockback may move the boss while it is standing on the rockfall platform.
+            if (platformWard && platformWard.PositionLocked)
+            {
+                platformWard.KeepBossLocked();
+                return;
+            }
+
+            // Outside the configured get-up invincibility window, the launch sequence still
+            // takes damage, but further hits cannot restart launch, redirect it or interrupt it.
             if (launchController && launchController.IsLaunching)
                 return;
 
@@ -899,15 +945,36 @@ namespace MirrorTrial.Boss
 
         void BeginLaunch(Vector2 velocity)
         {
+            ClearGetUpInvincibility();
             CancelAction();
             CurrentState = State.Launch;
             launchController.Configure(profile ? profile.launchSettings : null);
             launchController.BeginLaunch(velocity);
         }
 
+        void OnLaunchPhaseChanged(EnemyLaunchController2D.LaunchPhase launchPhase, Vector2 velocity)
+        {
+            if (launchPhase != EnemyLaunchController2D.LaunchPhase.Recovering)
+                return;
+
+            var protection = profile ? profile.getUpProtection : null;
+            invincibleDuringGetUp = protection != null && protection.invincibleDuringGetUp;
+            if (invincibleDuringGetUp && invincibilityBlinkVisual)
+                invincibilityBlinkVisual.BeginBlink(protection.blinkInterval);
+        }
+
         void OnLaunchCompleted()
         {
             if (CurrentState != State.Launch) return;
+            invincibleDuringGetUp = false;
+            var protection = profile ? profile.getUpProtection : null;
+            var postDuration = protection != null ? Mathf.Max(0f, protection.postGetUpInvincibleDuration) : 0f;
+            postGetUpInvincibleUntil = postDuration > 0f ? Time.time + postDuration : 0f;
+            if (postDuration > 0f && invincibilityBlinkVisual)
+                invincibilityBlinkVisual.BeginBlink(protection.blinkInterval);
+            else if (invincibilityBlinkVisual)
+                invincibilityBlinkVisual.EndBlink();
+
             var ratio = hitPoints / (float)MaxHitPoints;
             if (!externalCombatDriver && phase == 1 && ratio <= profile.phaseTwoAt) { BeginPhase(2); return; }
             if (!externalCombatDriver && phase == 2 && ratio <= profile.phaseThreeAt) { BeginPhase(3); return; }
@@ -920,7 +987,30 @@ namespace MirrorTrial.Boss
         {
             if (windupPresentation)
                 windupPresentation.End(ChargeTelegraphEndReason.Cancelled, facingRight);
-            if (launchController) launchController.LaunchCompleted -= OnLaunchCompleted;
+            if (launchController)
+            {
+                launchController.PhaseChanged -= OnLaunchPhaseChanged;
+                launchController.LaunchCompleted -= OnLaunchCompleted;
+            }
+            ClearGetUpInvincibility();
+        }
+
+        void UpdateGetUpInvincibility()
+        {
+            if (postGetUpInvincibleUntil <= 0f || Time.time < postGetUpInvincibleUntil)
+                return;
+
+            postGetUpInvincibleUntil = 0f;
+            if (!invincibleDuringGetUp && invincibilityBlinkVisual)
+                invincibilityBlinkVisual.EndBlink();
+        }
+
+        void ClearGetUpInvincibility()
+        {
+            invincibleDuringGetUp = false;
+            postGetUpInvincibleUntil = 0f;
+            if (invincibilityBlinkVisual)
+                invincibilityBlinkVisual.EndBlink();
         }
         void BeginPhase(int nextPhase)
         {
@@ -944,6 +1034,7 @@ namespace MirrorTrial.Boss
 
         void Die()
         {
+            ClearGetUpInvincibility();
             CancelAction();
             CurrentState = State.Dead;
             PlayerAudioFeedback.PlayEnemyDeath();

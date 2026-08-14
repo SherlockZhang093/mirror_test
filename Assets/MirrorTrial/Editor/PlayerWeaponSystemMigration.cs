@@ -75,8 +75,6 @@ namespace MirrorTrial.Editor
             if (sets != null)
                 for (var i = 0; i < sets.arraySize; i++)
                     AssignStepListClips(sets.GetArrayElementAtIndex(i).FindPropertyRelative("steps"));
-            AssignStepClip(serialized.FindProperty("swordRunAttack"));
-            AssignStepClip(serialized.FindProperty("swordCrouchAttack"));
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 

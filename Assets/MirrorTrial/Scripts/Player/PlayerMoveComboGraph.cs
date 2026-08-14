@@ -53,6 +53,9 @@ namespace MirrorTrial.Player
 
         public bool enableCharge;
         [Min(0)] public int chargeHoldFrame = 1;
+        public bool enableChargeResultBranch;
+        [HideInInspector] public string incompleteChargeTargetId;
+        [HideInInspector] public string completeChargeTargetId;
         [HideInInspector, Range(0f, 0.95f)] public float chargeHoldNormalizedTime = 0.35f;
         [HideInInspector] public AnimationClip chargeAnimation;
         public bool showChargeEffect = true;
@@ -78,6 +81,7 @@ namespace MirrorTrial.Player
         [Min(0.05f)] public float fullChargeHoldLimit = 1.5f;
         public GameObject chargeCountdownPrefab;
         public Vector2 chargeCountdownOffset = new Vector2(0f, 1.15f);
+        public PlayerBowComboSettings bowShot = new PlayerBowComboSettings();
     }
 
     [Serializable]
@@ -116,6 +120,45 @@ namespace MirrorTrial.Player
     }
 
     [Serializable]
+    public sealed class PlayerComboStateBranch
+    {
+        public PlayerActionState state = PlayerActionState.Idle;
+        [HideInInspector] public string targetId;
+    }
+
+    [Serializable]
+    public sealed class PlayerComboStateDecision
+    {
+        [HideInInspector] public string id;
+        public string name = "\u5f53\u524d\u72b6\u6001\u5224\u5b9a";
+        public Vector2 graphPosition = new Vector2(20f, 30f);
+        public bool enabled;
+        public List<PlayerComboStateBranch> branches = new List<PlayerComboStateBranch>();
+        [HideInInspector] public string defaultTargetId;
+    }
+
+    [Serializable]
+    public sealed class PlayerBowComboSettings
+    {
+        public bool enabled;
+        public AnimationClip drawClip;
+        public AnimationClip fullDrawClip;
+        public AnimationClip fireClip;
+        [Min(0f)] public float minimumChargeTime = 0.12f;
+        [Min(0.01f)] public float maximumChargeTime = 0.8f;
+        [Min(0f)] public float recovery = 0.18f;
+        [Min(0)] public int minimumDamage = 6;
+        [Min(0)] public int maximumDamage = 18;
+        [Min(0.01f)] public float minimumSpeed = 10f;
+        [Min(0.01f)] public float maximumSpeed = 20f;
+        [Min(0.01f)] public float range = 12f;
+        public Vector2 knockback = new Vector2(2.5f, 0.5f);
+        [Min(0f)] public float hitStop = 0.04f;
+        public HitFlashType hitFlashType = HitFlashType.White;
+        public PlayerInputCommand cancelInput = PlayerInputCommand.SecondaryAttack;
+    }
+
+    [Serializable]
     public sealed class PlayerComboGraph
     {
         public string name = "新连招";
@@ -126,6 +169,7 @@ namespace MirrorTrial.Player
         public List<PlayerComboMove> instances = new List<PlayerComboMove>();
         public List<PlayerComboTransition> transitions = new List<PlayerComboTransition>();
         public List<PlayerComboInputDecision> inputDecisions = new List<PlayerComboInputDecision>();
+        public PlayerComboStateDecision stateDecision = new PlayerComboStateDecision();
     }
 
     public partial class PlayerCombat
@@ -189,6 +233,7 @@ namespace MirrorTrial.Player
             public string targetInstanceId;
             public string runtimeId;
             public float heldDuration;
+            public int animationStartFrame;
         }
 
         bool HasGraphForWeapon(PlayerWeaponType weapon)
@@ -209,12 +254,86 @@ namespace MirrorTrial.Player
             if (entryDecision != null && entryDecision.enabled)
             {
                 if (input.WasPressed(entryDecision.input))
+                {
+                    CancelHurtInvincibilityForPrimaryAttack(entryDecision.input);
                     attackRoutine = StartCoroutine(GraphEntryDecisionRoutine(graph, entryDecision));
+                }
+                return;
+            }
+
+            var stateDecision = graph.stateDecision;
+            if (stateDecision != null && stateDecision.enabled)
+            {
+                if (input.WasPressed(graph.entryInput))
+                {
+                    CancelHurtInvincibilityForPrimaryAttack(graph.entryInput);
+                    attackRoutine = StartGraphTarget(graph, stateDecision.id, graph.entryInput);
+                }
                 return;
             }
 
             if (input.WasPressed(graph.entryInput))
+            {
+                CancelHurtInvincibilityForPrimaryAttack(graph.entryInput);
                 attackRoutine = StartCoroutine(GraphComboRoutine(graph));
+            }
+        }
+
+        Coroutine StartGraphTarget(PlayerComboGraph graph, string targetId, PlayerInputCommand incomingInput)
+        {
+            if (string.IsNullOrEmpty(targetId))
+                return null;
+            return StartCoroutine(GraphTargetRoutine(graph, targetId, incomingInput, 0f, ++actionVersion));
+        }
+
+        IEnumerator GraphTargetRoutine(PlayerComboGraph graph, string targetId,
+            PlayerInputCommand incomingInput, float incomingHeldTime, int version)
+        {
+            var stateDecision = graph.stateDecision;
+            if (stateDecision != null && stateDecision.enabled && targetId == stateDecision.id)
+            {
+                var currentState = stateMachine ? stateMachine.CurrentState : PlayerActionState.None;
+                runtimeCurrentDecisionId = stateDecision.id;
+                runtimeLastTransitionId = stateDecision.id + ":" + currentState;
+                targetId = ResolveStateDecisionTarget(stateDecision, currentState);
+                runtimeCurrentDecisionId = string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(targetId))
+            {
+                FinishGraphAction();
+                yield break;
+            }
+
+            var decision = FindDecision(graph, targetId);
+            if (decision != null && decision.enabled)
+            {
+                yield return GraphEntryDecisionRoutine(graph, decision, version);
+                yield break;
+            }
+
+            if (FindInstance(graph, targetId) != null)
+            {
+                yield return GraphComboRoutine(
+                    graph, targetId, incomingInput, incomingHeldTime, version);
+                yield break;
+            }
+
+            FinishGraphAction();
+        }
+
+        static string ResolveStateDecisionTarget(PlayerComboStateDecision decision, PlayerActionState state)
+        {
+            if (decision.branches != null)
+            {
+                for (var i = 0; i < decision.branches.Count; i++)
+                {
+                    var branch = decision.branches[i];
+                    if (branch != null && branch.state == state)
+                        return branch.targetId;
+                }
+            }
+            return decision.defaultTargetId;
         }
 
         PlayerComboGraph FindGraphForWeapon(PlayerWeaponType weapon)
@@ -226,14 +345,23 @@ namespace MirrorTrial.Player
             return null;
         }
 
+        public bool TryGetBowCombo(out PlayerComboGraph graph, out PlayerComboMove move)
+        {
+            EnsureMoveComboData();
+            graph = FindGraphForWeapon(PlayerWeaponType.Bow);
+            move = graph != null ? FindInstance(graph, graph.entryInstanceId) : null;
+            return move != null && move.bowShot != null && move.bowShot.enabled;
+        }
+
         IEnumerator GraphComboRoutine(PlayerComboGraph graph)
         {
             var version = ++actionVersion;
-            yield return StartCoroutine(GraphComboRoutine(graph, graph.entryInstanceId, graph.entryInput, 0f, version));
+            yield return GraphComboRoutine(graph, graph.entryInstanceId, graph.entryInput, 0f, version);
         }
 
         IEnumerator GraphComboRoutine(PlayerComboGraph graph, string startInstanceId,
-            PlayerInputCommand incomingChargeInput, float incomingChargeTime, int version)
+            PlayerInputCommand incomingChargeInput, float incomingChargeTime, int version,
+            int incomingAnimationStartFrame = 0)
         {
             var current = FindInstance(graph, startInstanceId);
             while (current != null)
@@ -245,14 +373,15 @@ namespace MirrorTrial.Player
                     break;
 
                 var selection = new SelectedTransition();
-                yield return StartCoroutine(GraphMoveRoutine(
+                yield return GraphMoveRoutine(
                     graph,
                     current,
                     current.move,
                     selection,
                     incomingChargeInput,
                     incomingChargeTime,
-                    version));
+                    incomingAnimationStartFrame,
+                    version);
                 if (version != actionVersion)
                     yield break;
                 var targetInstanceId = !string.IsNullOrEmpty(selection.targetInstanceId)
@@ -266,6 +395,7 @@ namespace MirrorTrial.Player
                     : selection.transition.id;
                 current = FindInstance(graph, targetInstanceId);
                 incomingChargeTime = selection.heldDuration;
+                incomingAnimationStartFrame = selection.animationStartFrame;
                 if (selection.transition != null)
                     incomingChargeInput = selection.transition.input;
             }
@@ -276,6 +406,11 @@ namespace MirrorTrial.Player
         IEnumerator GraphEntryDecisionRoutine(PlayerComboGraph graph, PlayerComboInputDecision decision)
         {
             var version = ++actionVersion;
+            yield return GraphEntryDecisionRoutine(graph, decision, version);
+        }
+
+        IEnumerator GraphEntryDecisionRoutine(PlayerComboGraph graph, PlayerComboInputDecision decision, int version)
+        {
             var elapsed = 0f;
             var duration = Mathf.Max(1, decision.decisionFrame) / (float)Mathf.Max(1, decision.entryFrameRate);
             runtimeCurrentDecisionId = decision.id;
@@ -290,8 +425,8 @@ namespace MirrorTrial.Player
                     runtimeCurrentDecisionId = string.Empty;
                     runtimeDecisionProgress = 1f;
                     if (!string.IsNullOrEmpty(decision.tapTargetInstanceId))
-                        yield return StartCoroutine(GraphComboRoutine(graph, decision.tapTargetInstanceId,
-                            decision.input, elapsed, version));
+                        yield return GraphTargetRoutine(graph, decision.tapTargetInstanceId,
+                            decision.input, elapsed, version);
                     else
                         FinishGraphAction();
                     yield break;
@@ -311,7 +446,7 @@ namespace MirrorTrial.Player
             runtimeCurrentDecisionId = string.Empty;
             runtimeDecisionProgress = 1f;
             if (!string.IsNullOrEmpty(target))
-                yield return StartCoroutine(GraphComboRoutine(graph, target, decision.input, elapsed, version));
+                yield return GraphTargetRoutine(graph, target, decision.input, elapsed, version);
             else
                 FinishGraphAction();
         }
@@ -321,6 +456,7 @@ namespace MirrorTrial.Player
             DeactivateActiveHitbox();
             motor.MovementLocked = false;
             attackRoutine = null;
+            dodgeCancelAvailable = false;
             runtimeChargeStage = PlayerChargeStage.None;
             runtimeCurrentDecisionId = string.Empty;
             runtimeDecisionProgress = 0f;
@@ -331,6 +467,7 @@ namespace MirrorTrial.Player
         {
             public bool completed;
             public float normalized;
+            public bool reachedMaximum;
         }
 
         IEnumerator ChargeRoutine(PlayerComboMove instance, PlayerInputCommand command, float initialTime,
@@ -360,7 +497,7 @@ namespace MirrorTrial.Player
                     activeChargePresentation.Bind(visual);
                     ownsActiveChargePresentation = true;
                     activeChargePresentation.Begin(null, offset, motor.FacingRight, null, 0f, visualReadyThreshold,
-                        playerChargeStart, playerChargeFull, false);
+                        playerChargeStart, playerChargeFull, false, instance.chargeEffectRotationSpeed);
                 }
                 else
                 {
@@ -378,7 +515,7 @@ namespace MirrorTrial.Player
                         : null;
                     activeChargePresentation.Begin(presentationSettings, offset, motor.FacingRight,
                         customRenderer ? customRenderer.sprite : null, 0f, visualReadyThreshold,
-                        playerChargeStart, playerChargeFull, false);
+                        playerChargeStart, playerChargeFull, false, instance.chargeEffectRotationSpeed);
                 }
             }
 
@@ -403,6 +540,7 @@ namespace MirrorTrial.Player
             runtimeChargeStage = PlayerChargeStage.Charging;
             while (version == actionVersion && input.IsHeld(command) &&
                    (elapsed < maximum ||
+                    instance.enableChargeResultBranch ||
                     (!instance.autoReleaseAtFullCharge &&
                      fullChargeElapsed < Mathf.Max(0.05f, instance.fullChargeHoldLimit))))
             {
@@ -446,6 +584,7 @@ namespace MirrorTrial.Player
             EndChargeCountdown();
 
             result.completed = true;
+            result.reachedMaximum = elapsed >= maximum - 0.0001f;
             result.normalized = maximum <= minimum
                 ? 1f
                 : Mathf.Clamp01((elapsed - minimum) / (maximum - minimum));
@@ -492,6 +631,7 @@ namespace MirrorTrial.Player
             SelectedTransition selection,
             PlayerInputCommand chargeCommand,
             float initialChargeTime,
+            int animationStartFrame,
             int version)
         {
             var combatTuning = tuning.combat;
@@ -527,16 +667,20 @@ namespace MirrorTrial.Player
                 : 0;
             currentComboMoveHitConfirmed = false;
             acceptingComboHitConfirm = true;
+            dodgeCancelAvailable = false;
 
             if (move.lockMovement)
                 motor.MovementLocked = true;
             animationDriver.ForceState(PlayerActionState.Attack);
             if (move.animationClip)
-                animationDriver.PlayActionClip(move.animationClip, totalDuration);
+            {
+                var animationStartTime = Mathf.Max(0, animationStartFrame) / Mathf.Max(1f, move.animationClip.frameRate);
+                animationDriver.PlayActionClip(move.animationClip, totalDuration, animationStartTime);
+            }
             else
                 animationDriver.ForceState(move.animationState);
 
-            while (elapsed < totalDuration)
+            while (version == actionVersion && elapsed < totalDuration)
             {
                 if (!chargeHandled && elapsed >= chargeHoldTime)
                 {
@@ -544,15 +688,27 @@ namespace MirrorTrial.Player
                     animationDriver.SetActionClipPaused(true);
                     runtimePreviewStatus = "蓄力定格";
                     var chargeResult = new ChargeResult();
-                    yield return StartCoroutine(ChargeRoutine(instance, chargeCommand, initialChargeTime, chargeResult, version));
+                    yield return ChargeRoutine(instance, chargeCommand, initialChargeTime, chargeResult, version);
                     if (!chargeResult.completed || version != actionVersion)
                         yield break;
                     animationDriver.SetActionClipPaused(false);
+                    if (instance.enableChargeResultBranch)
+                    {
+                        var full = chargeResult.reachedMaximum;
+                        selection.targetInstanceId = full
+                            ? instance.completeChargeTargetId
+                            : instance.incompleteChargeTargetId;
+                        selection.runtimeId = instance.id + (full ? ":charge-complete" : ":charge-incomplete");
+                        selection.animationStartFrame = chargeFrame + 1;
+                        runtimePreviewStatus = full ? "满蓄力分支" : "未满蓄力分支";
+                        break;
+                    }
                     move = ResolveMove(sourceMove, instance, chargeResult.normalized);
                     runtimePreviewStatus = "释放重击";
                 }
 
                 var moveElapsed = elapsed * speed;
+                dodgeCancelAvailable = moveElapsed >= Mathf.Max(0f, move.startup) + Mathf.Max(0f, move.activeTime);
                 if (!attackCuePlayed && moveElapsed >= Mathf.Max(0f, move.startup))
                 {
                     attackCuePlayed = true;
@@ -630,9 +786,13 @@ namespace MirrorTrial.Player
             }
 
             var decisionElapsed = totalDuration * speed;
-            if (inputDecision == null && selection.transition == null)
+            if (version != actionVersion)
+                yield break;
+
+            if (inputDecision == null && selection.transition == null && string.IsNullOrEmpty(selection.targetInstanceId))
                 ResolveBufferedTransition(outgoing, decisionElapsed, selection);
             acceptingComboHitConfirm = false;
+            dodgeCancelAvailable = false;
 
             DeactivateActiveHitbox();
             if (bodyStateController)
@@ -776,6 +936,7 @@ namespace MirrorTrial.Player
                 mirrorHitboxByFacing = source.mirrorHitboxByFacing,
                 hitboxKeys = source.hitboxKeys,
                 attackType = source.attackType,
+                hitFlashType = source.hitFlashType,
                 enableTargetReaction = source.enableTargetReaction,
                 targetReaction = source.targetReaction,
                 useCustomKnockback = source.useCustomKnockback,
@@ -904,7 +1065,268 @@ namespace MirrorTrial.Player
                 MigrateInputDecisionNodes();
                 moveComboSchemaVersion = 7;
             }
+            if (moveComboSchemaVersion < 8)
+            {
+                MigrateStateAndBowGraphs();
+                moveComboSchemaVersion = 8;
+            }
+            if (moveComboSchemaVersion < 9)
+            {
+                MigrateStateDecisionAfterEntryTap();
+                moveComboSchemaVersion = 9;
+            }
+            if (moveComboSchemaVersion < 10)
+            {
+                MigratePunchChargeResultBranch();
+                moveComboSchemaVersion = 10;
+            }
+            if (moveComboSchemaVersion < 11)
+            {
+                MigratePunchChargeResultBranch();
+                moveComboSchemaVersion = 11;
+            }
             EnsureMoveComboIds();
+        }
+
+        void MigratePunchChargeResultBranch()
+        {
+            // Schema v10 briefly placed this branch in the sword graph. Restore that graph first.
+            var swordGraph = comboGraphs.Find(candidate => candidate != null &&
+                candidate.weaponType == PlayerWeaponType.Sword);
+            if (swordGraph != null && swordGraph.instances != null)
+            {
+                const string wrongChargeId = "sword-charge-result";
+                var comboC = swordGraph.instances.Find(instance => instance != null &&
+                    instance.id == "legacy-instance-0-2");
+                var comboD = swordGraph.instances.Find(instance => instance != null &&
+                    instance.id == "legacy-instance-0-3");
+                var wrongCharge = swordGraph.instances.Find(instance => instance != null &&
+                    instance.id == wrongChargeId);
+                if (wrongCharge != null)
+                {
+                    swordGraph.instances.Remove(wrongCharge);
+                    if (comboC != null) comboC.graphPosition = new Vector2(1145.6667f, 17.333359f);
+                    if (comboD != null) comboD.graphPosition = new Vector2(1184.6669f, 208.66666f);
+                }
+                if (comboD != null)
+                {
+                    comboD.enableCharge = true;
+                    comboD.enableChargeResultBranch = false;
+                    comboD.incompleteChargeTargetId = string.Empty;
+                    comboD.completeChargeTargetId = string.Empty;
+                    comboD.autoReleaseAtFullCharge = false;
+                }
+                if (swordGraph.inputDecisions != null)
+                {
+                    for (var i = 0; i < swordGraph.inputDecisions.Count; i++)
+                    {
+                        var decision = swordGraph.inputDecisions[i];
+                        if (decision != null && decision.holdTargetInstanceId == wrongChargeId)
+                            decision.holdTargetInstanceId = comboD != null ? comboD.id : string.Empty;
+                    }
+                }
+            }
+
+            var graph = comboGraphs.Find(candidate => candidate != null &&
+                candidate.weaponType == PlayerWeaponType.Unarmed);
+            if (graph == null || graph.instances == null) return;
+
+            var incomplete = graph.instances.Find(instance => instance != null &&
+                instance.id == "legacy-quick-finisher-Unarmed");
+            var complete = graph.instances.Find(instance => instance != null &&
+                instance.id == "legacy-instance-1-2");
+            if (incomplete == null || complete == null || complete.move == null) return;
+
+            const string chargeId = "punch-charge-result";
+            var charge = graph.instances.Find(instance => instance != null && instance.id == chargeId);
+            if (charge == null)
+            {
+                charge = JsonUtility.FromJson<PlayerComboMove>(JsonUtility.ToJson(complete));
+                charge.id = chargeId;
+                charge.name = "公共蓄力";
+                charge.move.name = "公共蓄力";
+                charge.moveId = string.Empty;
+                graph.instances.Add(charge);
+            }
+
+            charge.graphPosition = new Vector2(929.6666f, 95f);
+            charge.enableCharge = true;
+            charge.enableChargeResultBranch = true;
+            charge.incompleteChargeTargetId = incomplete.id;
+            charge.completeChargeTargetId = complete.id;
+            charge.autoReleaseAtFullCharge = false;
+
+            incomplete.graphPosition = new Vector2(1173.3334f, 40f);
+            complete.graphPosition = new Vector2(1173.3334f, 150f);
+            complete.enableCharge = false;
+            complete.enableChargeResultBranch = false;
+            complete.incompleteChargeTargetId = string.Empty;
+            complete.completeChargeTargetId = string.Empty;
+
+            if (graph.inputDecisions != null)
+            {
+                for (var i = 0; i < graph.inputDecisions.Count; i++)
+                {
+                    var decision = graph.inputDecisions[i];
+                    if (decision != null && decision.holdTargetInstanceId == complete.id)
+                        decision.holdTargetInstanceId = charge.id;
+                }
+            }
+            if (graph.transitions != null)
+            {
+                for (var i = 0; i < graph.transitions.Count; i++)
+                {
+                    var transition = graph.transitions[i];
+                    if (transition != null && transition.condition == ComboInputCondition.Hold &&
+                        transition.toInstanceId == complete.id)
+                        transition.toInstanceId = charge.id;
+                }
+            }
+        }
+        void MigrateStateDecisionAfterEntryTap()
+        {
+            var swordGraph = comboGraphs.Find(graph => graph != null && graph.weaponType == PlayerWeaponType.Sword);
+            if (swordGraph == null || swordGraph.stateDecision == null || !swordGraph.stateDecision.enabled)
+                return;
+
+            swordGraph.stateDecision.name = "\u5f53\u524d\u72b6\u6001\u5224\u5b9a";
+            swordGraph.stateDecision.defaultTargetId = swordGraph.entryInstanceId;
+            var entryDecision = FindDecision(swordGraph, swordGraph.entryDecisionId);
+            if (entryDecision != null)
+            {
+                entryDecision.tapTargetInstanceId = swordGraph.stateDecision.id;
+                swordGraph.stateDecision.graphPosition = entryDecision.graphPosition + new Vector2(190f, -5f);
+            }
+        }
+        void MigrateStateAndBowGraphs()
+        {
+            var swordGraph = comboGraphs.Find(graph => graph != null && graph.weaponType == PlayerWeaponType.Sword);
+            if (swordGraph != null)
+            {
+                var runSlash = swordGraph.instances.Find(instance => instance != null && instance.move != null &&
+                    instance.move.animationState == PlayerActionState.SwordRunSlash);
+                if (runSlash == null)
+                {
+                    runSlash = CreateSwordRunSlashGraphMove();
+                    var entry = FindInstance(swordGraph, swordGraph.entryInstanceId);
+                    runSlash.graphPosition = entry != null
+                        ? entry.graphPosition + new Vector2(0f, 135f)
+                        : new Vector2(280f, 180f);
+                    swordGraph.instances.Add(runSlash);
+                }
+
+                if (swordGraph.stateDecision == null) swordGraph.stateDecision = new PlayerComboStateDecision();
+                swordGraph.stateDecision.id = string.IsNullOrEmpty(swordGraph.stateDecision.id)
+                    ? "state-entry-sword"
+                    : swordGraph.stateDecision.id;
+                swordGraph.stateDecision.name = "\u5f53\u524d\u72b6\u6001\u5224\u5b9a";
+                swordGraph.stateDecision.enabled = true;
+                if (swordGraph.stateDecision.branches == null)
+                    swordGraph.stateDecision.branches = new List<PlayerComboStateBranch>();
+                var runBranch = swordGraph.stateDecision.branches.Find(branch => branch != null &&
+                    branch.state == PlayerActionState.Run);
+                if (runBranch == null)
+                {
+                    runBranch = new PlayerComboStateBranch { state = PlayerActionState.Run };
+                    swordGraph.stateDecision.branches.Add(runBranch);
+                }
+                runBranch.targetId = runSlash.id;
+                swordGraph.stateDecision.defaultTargetId = !string.IsNullOrEmpty(swordGraph.entryDecisionId)
+                    ? swordGraph.entryDecisionId
+                    : swordGraph.entryInstanceId;
+            }
+
+            var bowGraph = comboGraphs.Find(graph => graph != null && graph.weaponType == PlayerWeaponType.Bow);
+            if (bowGraph == null)
+            {
+                var legacyBow = GetComponent<PlayerBowCombat>();
+                var bowSettings = legacyBow
+                    ? legacyBow.BuildComboSettingsFromLegacy()
+                    : new PlayerBowComboSettings { enabled = true };
+                var bowMove = new PlayerComboMove
+                {
+                    id = "bow-charge-shot",
+                    name = "\u84c4\u529b\u5c04\u7bad",
+                    graphPosition = new Vector2(220f, 55f),
+                    move = new PlayerComboStep
+                    {
+                        name = "\u84c4\u529b\u5c04\u7bad",
+                        moveCategory = PlayerMoveCategory.Bow,
+                        comboCategory = PlayerComboCategory.Special,
+                        input = PlayerInputCommand.PrimaryAttack,
+                        animationClip = bowSettings.drawClip,
+                        animationState = PlayerActionState.BowDraw,
+                        animationFrameRate = 12,
+                        animationFrameCount = 8,
+                        lockMovement = true
+                    },
+                    bowShot = bowSettings
+                };
+                bowGraph = new PlayerComboGraph
+                {
+                    name = "\u84c4\u529b\u5c04\u7bad",
+                    weaponType = PlayerWeaponType.Bow,
+                    entryInput = PlayerInputCommand.PrimaryAttack,
+                    entryInstanceId = bowMove.id,
+                    instances = new List<PlayerComboMove> { bowMove }
+                };
+                comboGraphs.Add(bowGraph);
+            }
+        }
+
+        PlayerComboMove CreateSwordRunSlashGraphMove()
+        {
+            return new PlayerComboMove
+            {
+                id = "sword-run-slash",
+                name = "\u5954\u8dd1\u65a9",
+                move = new PlayerComboStep
+                {
+                    name = "\u5954\u8dd1\u65a9",
+                    moveCategory = PlayerMoveCategory.Sword,
+                    comboCategory = PlayerComboCategory.Special,
+                    input = PlayerInputCommand.PrimaryAttack,
+                    animationClip = FindAnimatorClip("SwordRunSlash"),
+                    animationState = PlayerActionState.SwordRunSlash,
+                    animationFrameRate = 12,
+                    animationFrameCount = 8,
+                    startup = 0.06f,
+                    activeTime = 0.1f,
+                    recovery = 0.19f,
+                    damageMultiplier = 1.2f,
+                    knockbackMultiplier = 1.15f,
+                    lockMovement = true,
+                    hitboxKeys = new List<PlayerAttackHitboxKey>
+                    {
+                        new PlayerAttackHitboxKey { frame = 0, enabled = false },
+                        new PlayerAttackHitboxKey
+                        {
+                            frame = 2,
+                            enabled = true,
+                            offset = new Vector2(0.8f, 0.05f),
+                            size = new Vector2(1.25f, 0.85f),
+                            interpolation = AttackHitboxInterpolation.Linear
+                        },
+                        new PlayerAttackHitboxKey { frame = 5, enabled = false }
+                    }
+                }
+            };
+        }
+
+        AnimationClip FindAnimatorClip(string clipName)
+        {
+            var driver = GetComponent<PlayerAnimationDriver>();
+            var animator = driver ? driver.Animator : null;
+            if (!animator) animator = GetComponentInChildren<Animator>(true);
+            var controller = animator ? animator.runtimeAnimatorController : null;
+            if (!controller || controller.animationClips == null) return null;
+            for (var i = 0; i < controller.animationClips.Length; i++)
+            {
+                var clip = controller.animationClips[i];
+                if (clip && string.Equals(clip.name, clipName, StringComparison.Ordinal))
+                    return clip;
+            }
+            return null;
         }
 
         void MigrateInputDecisionNodes()
@@ -1174,11 +1596,15 @@ namespace MirrorTrial.Player
                 if (graph.instances == null) graph.instances = new List<PlayerComboMove>();
                 if (graph.transitions == null) graph.transitions = new List<PlayerComboTransition>();
                 if (graph.inputDecisions == null) graph.inputDecisions = new List<PlayerComboInputDecision>();
+                if (graph.stateDecision == null) graph.stateDecision = new PlayerComboStateDecision();
+                if (string.IsNullOrEmpty(graph.stateDecision.id)) graph.stateDecision.id = Guid.NewGuid().ToString("N");
+                if (graph.stateDecision.branches == null) graph.stateDecision.branches = new List<PlayerComboStateBranch>();
                 for (var j = 0; j < graph.instances.Count; j++)
                 {
                     if (graph.instances[j] == null) graph.instances[j] = new PlayerComboMove();
                     if (string.IsNullOrEmpty(graph.instances[j].id)) graph.instances[j].id = Guid.NewGuid().ToString("N");
                     if (graph.instances[j].move == null) graph.instances[j].move = new PlayerComboStep();
+                    if (graph.instances[j].bowShot == null) graph.instances[j].bowShot = new PlayerBowComboSettings();
                     EnsureHitboxKeys(graph.instances[j].move);
                     if (graph.instances[j].move.hitFeedback == null) graph.instances[j].move.hitFeedback = new SkillHitFeedbackSettings();
                 }

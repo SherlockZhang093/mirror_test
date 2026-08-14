@@ -56,6 +56,7 @@ namespace MirrorTrial.Player
         public bool mirrorHitboxByFacing = true;
         public List<PlayerAttackHitboxKey> hitboxKeys = new List<PlayerAttackHitboxKey>();
         public SkillAttackType attackType = SkillAttackType.Normal;
+        public HitFlashType hitFlashType = HitFlashType.White;
         public bool enableTargetReaction = true;
         public HitReactionType targetReaction = HitReactionType.LightHurt;
         public bool useCustomKnockback;
@@ -114,8 +115,6 @@ namespace MirrorTrial.Player
         [SerializeField, HideInInspector] int hitFeedbackSchemaVersion;
         [SerializeField] AnimationClip swordGuardClip;
         [SerializeField] AnimationClip swordGuardImpactClip;
-        [SerializeField] PlayerComboStep swordRunAttack = CreateSwordRunAttack();
-        [SerializeField] PlayerComboStep swordCrouchAttack = CreateSwordCrouchAttack();
         [SerializeField] PlayerAttackReactionSettings attackReaction = new PlayerAttackReactionSettings();
 
         PlayerInputReader input;
@@ -124,16 +123,20 @@ namespace MirrorTrial.Player
         PlayerAnimationDriver animationDriver;
         PlayerWeaponController weapons;
         PlayerBodyStateController bodyStateController;
+        PlayerStateMachine stateMachine;
+        PlayerDamageReceiver damageReceiver;
 
         Coroutine attackRoutine;
         Hitbox activeHitbox;
         bool queuedNextComboStep;
         bool acceptingComboHitConfirm;
         bool currentComboMoveHitConfirmed;
+        bool dodgeCancelAvailable;
         bool guarding;
         Coroutine guardImpactRoutine;
 
         public bool IsAttacking { get { return attackRoutine != null || guarding; } }
+        public bool CanDodgeCancel => attackRoutine != null && dodgeCancelAvailable;
         public bool IsGuarding { get { return guarding; } }
         public event Action<PlayerMoveCategory, SkillAttackType> AttackActivated;
         public event Action Blocked;
@@ -174,6 +177,8 @@ namespace MirrorTrial.Player
             animationDriver = GetComponent<PlayerAnimationDriver>();
             weapons = GetComponent<PlayerWeaponController>();
             bodyStateController = GetComponent<PlayerBodyStateController>();
+            stateMachine = GetComponent<PlayerStateMachine>();
+            damageReceiver = GetComponent<PlayerDamageReceiver>();
             EnsureCombo();
             EnsureMoveComboData();
 
@@ -201,29 +206,15 @@ namespace MirrorTrial.Player
             var activeCombo = ActiveCombo;
             if (HasGraphForWeapon(weapon))
             {
-                if (weapon == PlayerWeaponType.Sword && input.WasPressed(PlayerInputCommand.PrimaryAttack) && attackRoutine == null)
-                {
-                    if (input.MoveY < -0.5f)
-                        attackRoutine = StartCoroutine(SingleStepRoutine(swordCrouchAttack));
-                    else if (Mathf.Abs(input.MoveX) > 0.1f)
-                        attackRoutine = StartCoroutine(SingleStepRoutine(swordRunAttack));
-                    else
-                        UpdateGraphCombat(weapon);
-                }
-                else
-                    UpdateGraphCombat(weapon);
+                UpdateGraphCombat(weapon);
                 return;
             }
             if (activeCombo.Count == 0)
                 return;
             if (weapon == PlayerWeaponType.Sword && input.WasPressed(PlayerInputCommand.PrimaryAttack) && attackRoutine == null)
             {
-                if (input.MoveY < -0.5f)
-                    attackRoutine = StartCoroutine(SingleStepRoutine(swordCrouchAttack));
-                else if (Mathf.Abs(input.MoveX) > 0.1f)
-                    attackRoutine = StartCoroutine(SingleStepRoutine(swordRunAttack));
-                else
-                    attackRoutine = StartCoroutine(ComboRoutine());
+                CancelHurtInvincibilityForPrimaryAttack(PlayerInputCommand.PrimaryAttack);
+                attackRoutine = StartCoroutine(ComboRoutine());
                 return;
             }
             if (weapon == PlayerWeaponType.Unarmed && input.WasPressed(PlayerInputCommand.SecondaryAttack) && attackRoutine == null)
@@ -232,7 +223,16 @@ namespace MirrorTrial.Player
                 return;
             }
             if (input.WasPressed(activeCombo[0].input) && attackRoutine == null)
+            {
+                CancelHurtInvincibilityForPrimaryAttack(activeCombo[0].input);
                 attackRoutine = StartCoroutine(ComboRoutine());
+            }
+        }
+
+        void CancelHurtInvincibilityForPrimaryAttack(PlayerInputCommand attackInput)
+        {
+            if (attackInput == PlayerInputCommand.PrimaryAttack && damageReceiver)
+                damageReceiver.CancelHurtInvincibilityForAttack();
         }
 
         void BeginGuard()
@@ -282,7 +282,7 @@ namespace MirrorTrial.Player
 
         IEnumerator SingleStepRoutine(PlayerComboStep step)
         {
-            yield return StartCoroutine(ComboStepRoutine(step, step.input));
+            yield return ComboStepRoutine(step, step.input);
             DeactivateActiveHitbox();
             motor.MovementLocked = false;
             attackRoutine = null;
@@ -296,7 +296,7 @@ namespace MirrorTrial.Player
             {
                 queuedNextComboStep = false;
                 var nextInput = stepIndex < activeCombo.Count - 1 ? activeCombo[stepIndex + 1].input : activeCombo[stepIndex].input;
-                yield return StartCoroutine(ComboStepRoutine(activeCombo[stepIndex], nextInput));
+                yield return ComboStepRoutine(activeCombo[stepIndex], nextInput);
 
                 if (!queuedNextComboStep || stepIndex >= activeCombo.Count - 1)
                     break;
@@ -315,6 +315,7 @@ namespace MirrorTrial.Player
             var elapsed = 0f;
             var totalDuration = Mathf.Max(0f, step.startup) + Mathf.Max(0f, step.activeTime) + Mathf.Max(0f, step.recovery);
             var attackCuePlayed = false;
+            dodgeCancelAvailable = false;
 
             if (step.lockMovement)
                 motor.MovementLocked = true;
@@ -334,6 +335,7 @@ namespace MirrorTrial.Player
 
                 UpdateBodyState(step, elapsed);
                 ApplyHitboxFrame(step, combat, elapsed);
+                dodgeCancelAvailable = elapsed >= Mathf.Max(0f, step.startup) + Mathf.Max(0f, step.activeTime);
 
                 if (elapsed >= step.comboWindowStart && elapsed <= step.comboWindowEnd && input.WasPressed(nextInput))
                     queuedNextComboStep = true;
@@ -342,6 +344,7 @@ namespace MirrorTrial.Player
                 yield return null;
             }
 
+            dodgeCancelAvailable = false;
             DeactivateActiveHitbox();
             if (bodyStateController)
                 bodyStateController.ClearBodyState(this);
@@ -389,14 +392,14 @@ namespace MirrorTrial.Player
                 step.enableTargetReaction ? step.interruptPower : 0,
                 step.enableTargetReaction ? step.poiseDamage : 0f,
                 reaction, step.enableTargetReaction && step.breaksSuperArmor,
-                step.attackType, feedback));
+                step.attackType, step.hitFlashType, feedback));
             activeHitbox = attackHitbox;
             activeHitbox.SetActive(true);
         }
 
         void OnAttackHitConfirmed(DamagePayload payload)
         {
-            if (!motor || payload.source != gameObject || attackReaction == null || !attackReaction.enabled)
+            if (!IsAttacking || !motor || payload.source != gameObject || attackReaction == null || !attackReaction.enabled)
                 return;
             float speed;
             float duration;
@@ -505,9 +508,18 @@ namespace MirrorTrial.Player
                 attackHitbox.SetActive(false);
         }
 
+        public bool TryCancelForDodge()
+        {
+            if (!CanDodgeCancel)
+                return false;
+            CancelCurrentAction(PlayerActionCancelReason.Dodge);
+            return true;
+        }
+
         public void CancelCurrentAction(PlayerActionCancelReason reason)
         {
             actionVersion++;
+            dodgeCancelAvailable = false;
             runtimeCurrentDecisionId = string.Empty;
             runtimeDecisionProgress = 0f;
             CancelChargePresentation(reason == PlayerActionCancelReason.Hit
@@ -560,10 +572,6 @@ namespace MirrorTrial.Player
                 punchComboCreated = true;
             }
             activeComboSetIndex = Mathf.Clamp(activeComboSetIndex, 0, comboSets.Count - 1);
-            if (swordRunAttack == null) swordRunAttack = CreateSwordRunAttack();
-            if (swordCrouchAttack == null) swordCrouchAttack = CreateSwordCrouchAttack();
-            EnsureHitboxKeys(swordRunAttack);
-            EnsureHitboxKeys(swordCrouchAttack);
             for (var setIndex = 0; setIndex < comboSets.Count; setIndex++)
             {
                 var set = comboSets[setIndex];
@@ -615,46 +623,6 @@ namespace MirrorTrial.Player
                 step.hitboxKeys.Add(new PlayerAttackHitboxKey { frame = Mathf.Max(2, Mathf.RoundToInt((step.startup + step.activeTime) * Mathf.Max(1, step.animationFrameRate))), enabled = false });
             }
             step.hitboxKeys.Sort((a, b) => a.frame.CompareTo(b.frame));
-        }
-
-        static PlayerComboStep CreateSwordRunAttack()
-        {
-            return new PlayerComboStep
-            {
-                name = "\u5954\u8dd1\u65a9",
-                moveCategory = PlayerMoveCategory.Sword,
-                comboCategory = PlayerComboCategory.Special,
-                input = PlayerInputCommand.PrimaryAttack,
-                animationState = PlayerActionState.SwordRunSlash,
-                startup = 0.06f, activeTime = 0.1f, recovery = 0.19f,
-                damageMultiplier = 1.2f, knockbackMultiplier = 1.15f,
-                hitboxKeys = new List<PlayerAttackHitboxKey>
-                {
-                    new PlayerAttackHitboxKey { frame = 0, enabled = false },
-                    new PlayerAttackHitboxKey { frame = 2, enabled = true, offset = new Vector2(0.8f, 0.05f), size = new Vector2(1.25f, 0.85f), interpolation = AttackHitboxInterpolation.Linear },
-                    new PlayerAttackHitboxKey { frame = 5, enabled = false }
-                }
-            };
-        }
-
-        static PlayerComboStep CreateSwordCrouchAttack()
-        {
-            return new PlayerComboStep
-            {
-                name = "\u4e0b\u8e72\u65a9",
-                moveCategory = PlayerMoveCategory.Sword,
-                comboCategory = PlayerComboCategory.Special,
-                input = PlayerInputCommand.PrimaryAttack,
-                animationState = PlayerActionState.CrouchSlash,
-                startup = 0.07f, activeTime = 0.1f, recovery = 0.18f,
-                damageMultiplier = 1.1f, knockbackMultiplier = 1f,
-                hitboxKeys = new List<PlayerAttackHitboxKey>
-                {
-                    new PlayerAttackHitboxKey { frame = 0, enabled = false },
-                    new PlayerAttackHitboxKey { frame = 2, enabled = true, offset = new Vector2(0.72f, -0.2f), size = new Vector2(1.15f, 0.62f), interpolation = AttackHitboxInterpolation.Linear },
-                    new PlayerAttackHitboxKey { frame = 5, enabled = false }
-                }
-            };
         }
 
         static PlayerComboSet CreatePunchComboSet()

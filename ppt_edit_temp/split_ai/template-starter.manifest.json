@@ -1,0 +1,111 @@
+{
+  "sourcePptx": "G:\\mirror_test\\2026超新星P族答辩_张聪_实习经历版.pptx",
+  "mapPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-frame-map.json",
+  "output": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter.pptx",
+  "outputBytes": 7045825,
+  "sourceSlideCount": 7,
+  "slideCount": 9,
+  "previewDir": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-preview",
+  "layoutDir": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-layout",
+  "slides": [
+    {
+      "outputSlide": 1,
+      "sourceSlide": 1,
+      "narrativeRole": "opening identity",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-preview\\starter-slide-01.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-01.png",
+      "layoutPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-layout\\starter-slide-01.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-01.layout.json"
+    },
+    {
+      "outputSlide": 2,
+      "sourceSlide": 2,
+      "narrativeRole": "directory",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 0,
+      "previewPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-preview\\starter-slide-02.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-02.png",
+      "layoutPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-layout\\starter-slide-02.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-02.layout.json"
+    },
+    {
+      "outputSlide": 3,
+      "sourceSlide": 3,
+      "narrativeRole": "personal introduction",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 0,
+      "previewPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-preview\\starter-slide-03.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-03.png",
+      "layoutPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-layout\\starter-slide-03.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-03.layout.json"
+    },
+    {
+      "outputSlide": 4,
+      "sourceSlide": 4,
+      "narrativeRole": "game positioning and core loop",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 0,
+      "previewPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-preview\\starter-slide-04.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-04.png",
+      "layoutPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-layout\\starter-slide-04.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-04.layout.json"
+    },
+    {
+      "outputSlide": 5,
+      "sourceSlide": 5,
+      "narrativeRole": "combat editor overview",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 0,
+      "previewPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-preview\\starter-slide-05.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-05.png",
+      "layoutPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-layout\\starter-slide-05.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-05.layout.json"
+    },
+    {
+      "outputSlide": 6,
+      "sourceSlide": 6,
+      "narrativeRole": "AI-readable PRD",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 4,
+      "previewPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-preview\\starter-slide-06.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-06.png",
+      "layoutPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-layout\\starter-slide-06.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-06.layout.json"
+    },
+    {
+      "outputSlide": 7,
+      "sourceSlide": 6,
+      "narrativeRole": "project context handoff",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 4,
+      "previewPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-preview\\starter-slide-07.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-07.png",
+      "layoutPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-layout\\starter-slide-07.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-07.layout.json"
+    },
+    {
+      "outputSlide": 8,
+      "sourceSlide": 6,
+      "narrativeRole": "AI animation production skill",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 4,
+      "previewPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-preview\\starter-slide-08.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-08.png",
+      "layoutPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-layout\\starter-slide-08.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-08.layout.json"
+    },
+    {
+      "outputSlide": 9,
+      "sourceSlide": 7,
+      "narrativeRole": "closing bumper",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-preview\\starter-slide-09.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-09.png",
+      "layoutPath": "G:\\mirror_test\\ppt_edit_temp\\split_ai\\template-starter-layout\\starter-slide-09.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-09.layout.json"
+    }
+  ]
+}

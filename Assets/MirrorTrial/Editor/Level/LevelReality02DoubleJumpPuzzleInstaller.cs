@@ -122,12 +122,17 @@ namespace MirrorTrial.Editor.Level
             top.transform.localScale = Vector3.one * 0.72f;
             var foot = CreateSprite("梯子底部", holder.transform, "Puzzle_Ladder_Foot_v1.png", new Vector2(0f, -2.35f), 59);
             foot.transform.localScale = Vector3.one * 0.72f;
-            var trigger = holder.AddComponent<BoxCollider2D>();
+            var triggerObject = NewChild("LadderTrigger", holder.transform, new Vector2(0f, 0.1f));
+            var trigger = triggerObject.AddComponent<BoxCollider2D>();
             trigger.isTrigger = true;
-            trigger.size = new Vector2(1.0f, 5.25f);
-            var exit = NewChild("梯顶落脚点", holder.transform, new Vector2(0f, 3.25f));
-            var zone = holder.AddComponent<LadderClimbZone>();
+            trigger.offset = Vector2.zero;
+            trigger.size = new Vector2(0.9f, 5.2f);
+            var exit = NewChild("梯顶落脚点", holder.transform, new Vector2(0f, 2.54f));
+            var zone = triggerObject.AddComponent<LadderClimbZone>();
             SetObject(zone, "topExit", exit.transform);
+            SetFloat(zone, "topClimbOffset", 0.55f);
+            SetFloat(zone, "entryTolerance", 0.25f);
+            SetBool(zone, "createTopSupport", true);
         }
 
         static GameObject CreateSprite(string name, Transform parent, string spritePathOrName, Vector2 position, int order)
@@ -173,6 +178,20 @@ namespace MirrorTrial.Editor.Level
         {
             var serialized = new SerializedObject(target);
             serialized.FindProperty(property).intValue = value;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        static void SetBool(Object target, string property, bool value)
+        {
+            var serialized = new SerializedObject(target);
+            serialized.FindProperty(property).boolValue = value;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        static void SetFloat(Object target, string property, float value)
+        {
+            var serialized = new SerializedObject(target);
+            serialized.FindProperty(property).floatValue = value;
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
     }

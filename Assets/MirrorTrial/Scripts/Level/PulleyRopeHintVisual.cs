@@ -15,10 +15,13 @@ namespace MirrorTrial.Level
         [SerializeField] Transform promptRoot;
         [SerializeField] SpriteRenderer[] promptRenderers;
         [SerializeField] ParticleSystem ropeDust;
+        [Header("靠近区域")]
+        [SerializeField, Tooltip("在 Prefab 里编辑这个 BoxCollider2D，用来决定攻击提示的出现范围。")]
+        BoxCollider2D promptProximityArea;
 
         [Header("距离提示")]
         [SerializeField, Min(0.1f)] float noticeDistance = 4.5f;
-        [SerializeField, Min(0.1f)] float promptDistance = 2.8f;
+        [SerializeField, HideInInspector, Min(0.1f)] float promptDistance = 2.8f;
         [SerializeField, Min(0f)] float promptDelay = 1.2f;
         [SerializeField, Min(0.01f)] float promptFadeDuration = 0.2f;
 
@@ -44,11 +47,13 @@ namespace MirrorTrial.Level
         void Awake()
         {
             CacheVisuals();
+            DisablePromptAreaPhysics();
         }
 
         void OnEnable()
         {
             CacheVisuals();
+            DisablePromptAreaPhysics();
             promptTimer = 0f;
             promptAlpha = 0f;
             playerSearchTimer = 0f;
@@ -86,8 +91,8 @@ namespace MirrorTrial.Level
             var distance = player && cutPoint
                 ? Vector2.Distance(player.transform.position, cutPoint.position)
                 : float.PositiveInfinity;
-            var isNoticed = distance <= noticeDistance;
-            var isPromptRange = distance <= promptDistance;
+            var isPromptRange = player && IsInsidePromptArea(player.transform.position);
+            var isNoticed = isPromptRange || distance <= noticeDistance;
 
             if (isNoticed)
                 PlayDust();
@@ -143,6 +148,12 @@ namespace MirrorTrial.Level
 
             if (!controller)
                 controller = GetComponent<PulleyLiftController>();
+            if (!promptProximityArea)
+            {
+                var area = transform.Find("RopeHitTarget/PromptProximityArea");
+                if (area)
+                    promptProximityArea = area.GetComponent<BoxCollider2D>();
+            }
             if (glowRenderer)
             {
                 glowBaseColor = glowRenderer.color;
@@ -163,6 +174,28 @@ namespace MirrorTrial.Level
             }
 
             cachedVisuals = true;
+        }
+
+        bool IsInsidePromptArea(Vector3 worldPosition)
+        {
+            if (!promptProximityArea)
+            {
+                return cutPoint &&
+                    Vector2.Distance(worldPosition, cutPoint.position) <= promptDistance;
+            }
+
+            // Read the collider geometry directly so the area can stay out of the
+            // physics simulation and cannot block attacks or projectiles.
+            var localPoint = (Vector2)promptProximityArea.transform.InverseTransformPoint(worldPosition);
+            var delta = localPoint - promptProximityArea.offset;
+            var halfSize = promptProximityArea.size * 0.5f;
+            return Mathf.Abs(delta.x) <= halfSize.x && Mathf.Abs(delta.y) <= halfSize.y;
+        }
+
+        void DisablePromptAreaPhysics()
+        {
+            if (Application.isPlaying && promptProximityArea)
+                promptProximityArea.enabled = false;
         }
 
         void SetPromptAlpha(float alpha)
@@ -203,6 +236,8 @@ namespace MirrorTrial.Level
 
         void OnValidate()
         {
+            if (promptProximityArea)
+                promptProximityArea.isTrigger = true;
             noticeDistance = Mathf.Max(0.1f, noticeDistance);
             promptDistance = Mathf.Clamp(promptDistance, 0.1f, noticeDistance);
             promptDelay = Mathf.Max(0f, promptDelay);

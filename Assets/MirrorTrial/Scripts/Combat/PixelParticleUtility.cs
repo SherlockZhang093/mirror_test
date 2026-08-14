@@ -64,6 +64,11 @@ namespace MirrorTrial.Combat
             system.Emit(emit, 1);
         }
 
+        public static Material GetLightDotMaterial()
+        {
+            return GetDotParticleMaterial();
+        }
+
         static Material GetParticleMaterial()
         {
             if (particleMaterial) return particleMaterial;

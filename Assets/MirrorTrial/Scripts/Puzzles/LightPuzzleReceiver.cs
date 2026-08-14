@@ -4,6 +4,7 @@ using MirrorTrial.Feedback;
 using MirrorTrial.Level;
 using MirrorTrial.Player;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.Video;
 
 namespace MirrorTrial.Puzzles
@@ -15,7 +16,9 @@ namespace MirrorTrial.Puzzles
         [SerializeField] Transform leftReceivePoint;
         [SerializeField, Min(0.1f)] float chargeDuration = 3f;
         [SerializeField, Min(0.01f)] float receiveRadius = 0.3f;
-        [SerializeField, Range(0f, 1f)] float minimumRightwardDirection = 0.01f;
+        [FormerlySerializedAs("minimumRightwardDirection")]
+        [SerializeField, Range(0f, 1f)] float minimumHorizontalDirection = 0.01f;
+        [SerializeField] bool requireLeftwardDirection;
         [Header("Charge Presentation")]
         [SerializeField] PuzzleChargePresentation chargePresentation;
         [SerializeField] Animator activationAnimator;
@@ -28,14 +31,13 @@ namespace MirrorTrial.Puzzles
         [SerializeField, Range(0f, 1f)] float activationShakePower = 0.45f;
         [Header("Ability Reward")]
         [SerializeField] bool unlockDoubleJump = true;
+        [SerializeField] WindLightReceiver windReceiverToStop;
         [SerializeField] AbilityTransferEffect abilityTransferPrefab;
         [SerializeField] string unlockPromptSpeaker = "能力解锁";
         [SerializeField, TextArea(2, 4)] string unlockPromptText = "已获得二段跳能力\n在空中再次按跳跃键即可进行二段跳";
         [SerializeField] StoryTutorialSequence unlockPromptSequence;
-        [SerializeField] GameObject airflow;
-        [SerializeField] GameObject windPedestalWithFx;
-        [SerializeField] GameObject windPedestal;
         [SerializeField] GameObject lightBlockerVisual;
+        [SerializeField] Collider2D lightBlockerCollider;
         [Header("Light Blocker Opening")]
         [SerializeField, Min(0.01f)] float lightBlockerOpenDuration = 1.6f;
         [SerializeField] Vector3 lightBlockerOpenOffset = new Vector3(0f, -2.2f, 0f);
@@ -65,6 +67,9 @@ namespace MirrorTrial.Puzzles
             if (!lightBlockerVisual) return;
             lightBlockerClosedPosition = lightBlockerVisual.transform.localPosition;
             lightBlockerVisual.SetActive(true);
+            if (!lightBlockerCollider)
+                lightBlockerCollider = lightBlockerVisual.GetComponent<Collider2D>();
+            if (lightBlockerCollider) lightBlockerCollider.enabled = true;
             CreateLightBlockerMask();
         }
 
@@ -138,39 +143,29 @@ namespace MirrorTrial.Puzzles
         {
             var center = (Vector2)BeamPoint.position;
             receivePoint = center;
-            if (direction.x <= minimumRightwardDirection)
-            {
-                SetLit(false);
+            var invalidDirection = requireLeftwardDirection
+                ? direction.x >= -minimumHorizontalDirection
+                : direction.x <= minimumHorizontalDirection;
+            if (invalidDirection)
                 return false;
-            }
 
             var centerDistance = Vector2.Dot(center - origin, direction);
             if (centerDistance < 0f || centerDistance > maximumDistance + receiveRadius)
-            {
-                SetLit(false);
                 return false;
-            }
 
             var closest = origin + direction * centerDistance;
             var perpendicularDistance = Vector2.Distance(closest, center);
             if (perpendicularDistance > receiveRadius)
-            {
-                SetLit(false);
                 return false;
-            }
 
             var distanceToEdge = Mathf.Sqrt(
                 Mathf.Max(0f, receiveRadius * receiveRadius -
                                perpendicularDistance * perpendicularDistance));
             var entryDistance = Mathf.Max(0f, centerDistance - distanceToEdge);
             if (entryDistance > maximumDistance)
-            {
-                SetLit(false);
                 return false;
-            }
 
             receivePoint = origin + direction * entryDistance;
-            SetLit(true);
             return true;
         }
 
@@ -185,6 +180,7 @@ namespace MirrorTrial.Puzzles
         {
             if (activated || activationCommitted) return;
             receivingValidLight = lit;
+            if (chargePresentation) chargePresentation.SetReceivingLight(lit);
         }
 
         void CommitActivation()
@@ -192,7 +188,11 @@ namespace MirrorTrial.Puzzles
             if (activationCommitted) return;
             activationCommitted = true;
             receivingValidLight = false;
-            if (chargePresentation) chargePresentation.Complete();
+            if (chargePresentation)
+            {
+                chargePresentation.SetReceivingLight(false);
+                chargePresentation.Complete();
+            }
             routine = StartCoroutine(Activate());
         }
 
@@ -227,8 +227,6 @@ namespace MirrorTrial.Puzzles
             activated = true;
             routine = null;
             if (unlockDoubleJump) UnlockDoubleJump();
-            SwitchToUnlockedWindPedestal();
-            if (airflow) airflow.SetActive(false);
             if (lightBlockerVisual) yield return OpenLightBlocker();
         }
 
@@ -245,36 +243,12 @@ namespace MirrorTrial.Puzzles
                 yield return null;
         }
 
-        void SwitchToUnlockedWindPedestal()
-        {
-            if (!windPedestalWithFx)
-                windPedestalWithFx = FindAirflowChild("WindPedestal_WithWaterWindFX");
-            if (!windPedestal)
-                windPedestal = FindAirflowChild("WindPedestal");
-
-            if (windPedestalWithFx) windPedestalWithFx.SetActive(false);
-            if (windPedestal) windPedestal.SetActive(true);
-        }
-
-        GameObject FindAirflowChild(string childName)
-        {
-            if (!airflow) return null;
-
-            var searchRoot = airflow.transform.parent ? airflow.transform.parent : airflow.transform;
-            var children = searchRoot.GetComponentsInChildren<Transform>(true);
-            foreach (var child in children)
-            {
-                if (child.name == childName) return child.gameObject;
-            }
-
-            return null;
-        }
-
         IEnumerator OpenLightBlocker()
         {
             var blockerTransform = lightBlockerVisual.transform;
             var targetPosition = lightBlockerClosedPosition + lightBlockerOpenOffset;
             var elapsed = 0f;
+            if (lightBlockerCollider) lightBlockerCollider.enabled = false;
             if (chargePresentation) chargePresentation.PlayDoorOpening();
             if (lightBlockerOpenShakePower > 0f)
                 CameraShakeService.Shake(Vector2.down, lightBlockerOpenShakePower);
@@ -389,6 +363,9 @@ namespace MirrorTrial.Puzzles
             var tuning = FindObjectOfType<PlayerTuning>();
             if (tuning && tuning.abilities != null)
                 tuning.abilities.doubleJumpUnlocked = true;
+
+            if (windReceiverToStop)
+                windReceiverToStop.ShutDownAirflow();
 
             if (!unlockPromptSequence)
             {

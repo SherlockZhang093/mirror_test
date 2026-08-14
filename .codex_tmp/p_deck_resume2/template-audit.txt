@@ -1,0 +1,7 @@
+Source deck: 2026超新星P族答辩_张聪_简历版.pptx
+Slides: 7, 16:9, branded full-slide backgrounds.
+
+Only slide 3's inherited self-introduction body is rewritten.
+Slide 1 subtitle and slide 7 title are explicitly handled as unchanged structural placeholders.
+No new shapes, images, charts, tables, or overlays are introduced.
+All inherited typography, geometry, spacing, logos, and backgrounds are preserved.

@@ -7,6 +7,22 @@ using UnityEngine;
 
 namespace MirrorTrial.Boss
 {
+    [Serializable]
+    public sealed class MirrorBossGetUpProtectionSettings
+    {
+        [InspectorName("起身期间无敌")]
+        [Tooltip("Whether the boss ignores damage while the get-up animation is playing.")]
+        public bool invincibleDuringGetUp = true;
+
+        [InspectorName("起身后无敌时间")]
+        [Tooltip("Additional invincibility after the boss finishes getting up and resumes acting.")]
+        [Min(0f)] public float postGetUpInvincibleDuration = 1f;
+
+        [InspectorName("无敌闪烁间隔")]
+        [Tooltip("Seconds between visibility toggles while get-up invincibility is active.")]
+        [Min(0.02f)] public float blinkInterval = 0.08f;
+    }
+
     public enum MirrorBossTacticalAction
     {
         Shoot,
@@ -130,6 +146,7 @@ namespace MirrorTrial.Boss
 
         [Header("受击与击飞表现")]
         public EnemyLaunchSettings launchSettings = new EnemyLaunchSettings();
+        public MirrorBossGetUpProtectionSettings getUpProtection = new MirrorBossGetUpProtectionSettings();
 
         [Header("远程瞬移 Boss（关闭时保持原 Boss 行为）")]
         public bool enableRangedTeleportKit;

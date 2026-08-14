@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace MirrorTrial.Player
 {
-    public enum PlayerActionCancelReason { Hit, Knockdown, Death }
+    public enum PlayerActionCancelReason { Hit, Knockdown, Death, Dodge }
 
     public interface IInterruptiblePlayerAction
     {

@@ -21,10 +21,22 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0.000000
+      value: {fileID: 1030100101, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
+    - time: 0.025000
+      value: {fileID: 1030100102, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
+    - time: 0.050000
+      value: {fileID: 1030100103, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
+    - time: 0.075000
+      value: {fileID: 1030100104, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
+    - time: 0.100000
+      value: {fileID: 1030100105, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
+    - time: 0.125000
+      value: {fileID: 1030100106, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
+    - time: 0.200000
       value: {fileID: 1030100001, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
-    - time: 0.083333
+    - time: 0.216667
       value: {fileID: 1030100002, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
-    - time: 0.166667
+    - time: 0.233333
       value: {fileID: 1030100003, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
     - time: 0.250000
       value: {fileID: 1030100004, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
@@ -37,7 +49,7 @@ AnimationClip:
     classID: 212
     script: {fileID: 0}
     flags: 2
-  m_SampleRate: 12
+  m_SampleRate: 120
   m_WrapMode: 0
   m_Bounds:
     m_Center: {x: 0, y: 0, z: 0}
@@ -54,6 +66,12 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     pptrCurveMapping:
+    - {fileID: 1030100101, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
+    - {fileID: 1030100102, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
+    - {fileID: 1030100103, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
+    - {fileID: 1030100104, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
+    - {fileID: 1030100105, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
+    - {fileID: 1030100106, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
     - {fileID: 1030100001, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
     - {fileID: 1030100002, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}
     - {fileID: 1030100003, guid: d3bfde5fabda571c858e3202c46bc9c6, type: 3}

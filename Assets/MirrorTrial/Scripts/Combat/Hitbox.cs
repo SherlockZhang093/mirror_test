@@ -50,7 +50,8 @@ namespace MirrorTrial.Combat
                 return;
 
             var contactPoint = ResolveContactPoint(other);
-            hurtbox.ReceiveHit(payload);
+            if (!hurtbox.ReceiveHit(payload))
+                return;
             if (payload.source)
                 payload.source.SendMessage("OnAttackConnected", other.gameObject, SendMessageOptions.DontRequireReceiver);
             PlayEffect(contactPoint);

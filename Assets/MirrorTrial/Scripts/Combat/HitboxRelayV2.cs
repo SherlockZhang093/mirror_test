@@ -30,7 +30,7 @@ namespace MirrorTrial.Combat
             if (payload.source && other.transform.root.gameObject == payload.source) return;
             var hurtbox = other.GetComponent<Hurtbox>() ?? other.GetComponentInParent<Hurtbox>();
             if (!hurtbox) return;
-            hurtbox.ReceiveHit(payload);
+            if (!hurtbox.ReceiveHit(payload)) return;
             HitStopService.Request(payload.hitStop);
             CameraFeedbackService.RequestHit(payload);
         }

@@ -60,7 +60,7 @@ MonoBehaviour:
   fallSpin: 220
   fallingRumbleSound: {fileID: 8300000, guid: fdb51211b0bf480e997c28a36da3db23, type: 3}
   fallingRumbleVolume: 0.62
-  impactSound: {fileID: 8300000, guid: e4a680a850134e108619e73b6766cae1, type: 3}
+  impactSound: {fileID: 8300000, guid: 45465cd5addac0a48a1eb8d05cde57bd, type: 3}
   impactVolume: 0.9
   fallingShakePower: 0.08
   fallingShakeInterval: 0.12

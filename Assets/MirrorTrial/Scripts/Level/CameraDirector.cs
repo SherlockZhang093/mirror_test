@@ -223,21 +223,21 @@ namespace MirrorTrial.Level
                 camera.AddCinemachineComponent<CinemachineFramingTransposer>();
         }
 
-        static void ConfigurePlayerFraming(CinemachineFramingTransposer framing)
+        void ConfigurePlayerFraming(CinemachineFramingTransposer framing)
         {
             if (!framing) return;
-            framing.m_TrackedObjectOffset = new Vector3(0f, 1.25f, 0f);
-            framing.m_LookaheadTime = 0.12f;
-            framing.m_LookaheadSmoothing = 0.15f;
-            framing.m_XDamping = 0.22f;
-            framing.m_YDamping = 0.32f;
+            framing.m_TrackedObjectOffset = tuning.playerTrackedOffset;
+            framing.m_LookaheadTime = tuning.playerLookaheadTime;
+            framing.m_LookaheadSmoothing = tuning.playerLookaheadSmoothing;
+            framing.m_XDamping = tuning.playerXDamping;
+            framing.m_YDamping = tuning.playerYDamping;
             framing.m_ZDamping = 0f;
-            framing.m_ScreenX = 0.5f;
-            framing.m_ScreenY = 0.45f;
-            framing.m_DeadZoneWidth = 0.08f;
-            framing.m_DeadZoneHeight = 0.12f;
-            framing.m_SoftZoneWidth = 0.8f;
-            framing.m_SoftZoneHeight = 0.72f;
+            framing.m_ScreenX = tuning.playerScreenX;
+            framing.m_ScreenY = tuning.playerScreenY;
+            framing.m_DeadZoneWidth = tuning.playerDeadZoneWidth;
+            framing.m_DeadZoneHeight = tuning.playerDeadZoneHeight;
+            framing.m_SoftZoneWidth = tuning.playerSoftZoneWidth;
+            framing.m_SoftZoneHeight = tuning.playerSoftZoneHeight;
             framing.m_CameraDistance = 10f;
         }
 

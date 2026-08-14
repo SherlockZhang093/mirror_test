@@ -1,0 +1,13 @@
+{
+  "status": "pass",
+  "checkedAt": "2026-08-14T03:24:09.660Z",
+  "workspace": "G:\\mirror_test\\ppt_edit_temp\\combat_editor",
+  "finalPptx": "G:\\mirror_test\\ppt_edit_temp\\combat_editor\\candidate-v2.pptx",
+  "starterPptx": "G:\\mirror_test\\ppt_edit_temp\\combat_editor\\template-starter.pptx",
+  "mapPath": "G:\\mirror_test\\ppt_edit_temp\\combat_editor\\template-frame-map-v2.json",
+  "starterLayoutDir": "G:\\mirror_test\\ppt_edit_temp\\combat_editor\\template-starter-layout",
+  "finalLayoutDir": "G:\\mirror_test\\ppt_edit_temp\\combat_editor\\final-layout-v2\\final",
+  "editDir": "G:\\mirror_test\\ppt_edit_temp\\combat_editor",
+  "issueCount": 0,
+  "issues": []
+}

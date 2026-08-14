@@ -9,6 +9,7 @@ namespace MirrorTrial.Puzzles
         [SerializeField] Transform lightSource;
         [SerializeField] RotatablePuzzleMirror[] mirrors;
         [SerializeField] LightPuzzleReceiver receiver;
+        [SerializeField] WindLightReceiver windReceiver;
         [SerializeField] PuzzleLightBeamView beamPrefab;
         [SerializeField] Material beamMaterial;
         [SerializeField] Color beamColor = new Color(1f, 0.38f, 0.12f, 1f);
@@ -25,8 +26,9 @@ namespace MirrorTrial.Puzzles
         {
             BuildBeams();
             Subscribe(true);
-            RefreshPath();
         }
+
+        void Start() => RefreshPath();
 
         void OnDestroy() => Subscribe(false);
 
@@ -81,6 +83,7 @@ namespace MirrorTrial.Puzzles
                 ? initialDirection.normalized
                 : Vector2.down;
             var connected = false;
+            var windConnected = false;
 
             for (var segmentIndex = 0; segmentIndex <= maxReflections; segmentIndex++)
             {
@@ -90,10 +93,22 @@ namespace MirrorTrial.Puzzles
                     out var mirrorSurface, out var mirrorPoint, out var mirrorDistance);
                 var pathDistance = hasMirrorHit ? mirrorDistance : blockerDistance;
 
-                if (receiver && TryHitReceiver(from, direction, pathDistance, out var receiverPoint))
+                var receiverPoint = Vector2.zero;
+                var windPoint = Vector2.zero;
+                var hasFinalReceiverHit = receiver &&
+                    receiver.TryReceiveBeam(from, direction, pathDistance, out receiverPoint);
+                var hasWindReceiverHit = windReceiver &&
+                    windReceiver.TryReceiveBeam(from, direction, pathDistance, out windPoint);
+
+                if (hasFinalReceiverHit || hasWindReceiverHit)
                 {
-                    Draw(segmentIndex, from, receiverPoint);
-                    connected = true;
+                    var hitFinalReceiver = hasFinalReceiverHit &&
+                        (!hasWindReceiverHit ||
+                         Vector2.SqrMagnitude(receiverPoint - from) <=
+                         Vector2.SqrMagnitude(windPoint - from));
+                    Draw(segmentIndex, from, hitFinalReceiver ? receiverPoint : windPoint);
+                    connected = hitFinalReceiver;
+                    windConnected = !hitFinalReceiver;
                     break;
                 }
 
@@ -114,6 +129,7 @@ namespace MirrorTrial.Puzzles
             }
 
             if (receiver) receiver.SetLit(connected);
+            if (windReceiver) windReceiver.SetLit(windConnected);
         }
 
         RaycastHit2D FindFirstBlockingHit(Vector2 origin, Vector2 direction)
@@ -170,12 +186,6 @@ namespace MirrorTrial.Puzzles
         }
 
         static float Cross(Vector2 a, Vector2 b) => a.x * b.y - a.y * b.x;
-
-        bool TryHitReceiver(Vector2 origin, Vector2 direction, float maximumDistance,
-            out Vector2 receiverPoint)
-        {
-            return receiver.TryReceiveBeam(origin, direction, maximumDistance, out receiverPoint);
-        }
 
         void Draw(int index, Vector3 from, Vector3 to)
         {

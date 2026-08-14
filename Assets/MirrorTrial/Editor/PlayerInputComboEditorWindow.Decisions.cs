@@ -37,7 +37,8 @@ namespace MirrorTrial.Editor
         }
 
         void DrawDecisionEdges(Rect canvas, List<ComboNodeLayout> moveLayouts,
-            List<ComboDecisionLayout> decisionLayouts, SerializedProperty moves, SerializedProperty decisions)
+            List<ComboDecisionLayout> decisionLayouts, SerializedProperty moves,
+            SerializedProperty decisions, SerializedProperty stateDecision)
         {
             var moveIndexById = new Dictionary<string, int>();
             for (var i = 0; i < moves.arraySize; i++)
@@ -57,21 +58,31 @@ namespace MirrorTrial.Editor
                 }
 
                 DrawDecisionBranch(decisionRect, 0, "tapTargetInstanceId", "点按", TapDecisionColor,
-                    decision, moveIndexById, moveLayouts, canvas);
+                    decision, moveIndexById, moveLayouts, stateDecision, canvas);
                 DrawDecisionBranch(decisionRect, 1, "holdTargetInstanceId", "长按", HoldDecisionColor,
-                    decision, moveIndexById, moveLayouts, canvas);
+                    decision, moveIndexById, moveLayouts, stateDecision, canvas);
                 DrawDecisionBranch(decisionRect, 2, "noInputTargetInstanceId", "无输入", new Color(0.58f, 0.61f, 0.68f),
-                    decision, moveIndexById, moveLayouts, canvas);
+                    decision, moveIndexById, moveLayouts, stateDecision, canvas);
             }
             Handles.EndGUI();
         }
 
         void DrawDecisionBranch(Rect decisionRect, int branch, string targetField, string label, Color color,
-            SerializedProperty decision, Dictionary<string, int> moveIndexById, List<ComboNodeLayout> moveLayouts, Rect canvas)
+            SerializedProperty decision, Dictionary<string, int> moveIndexById,
+            List<ComboNodeLayout> moveLayouts, SerializedProperty stateDecision, Rect canvas)
         {
             var targetId = decision.FindPropertyRelative(targetField).stringValue;
-            if (string.IsNullOrEmpty(targetId) || !moveIndexById.TryGetValue(targetId, out var targetIndex)) return;
-            var targetRect = OffsetRect(moveLayouts[targetIndex].rect, canvas.position);
+            if (string.IsNullOrEmpty(targetId)) return;
+
+            Rect targetRect;
+            if (moveIndexById.TryGetValue(targetId, out var targetIndex))
+                targetRect = OffsetRect(moveLayouts[targetIndex].rect, canvas.position);
+            else if (stateDecision != null && stateDecision.FindPropertyRelative("enabled").boolValue &&
+                     stateDecision.FindPropertyRelative("id").stringValue == targetId)
+                targetRect = OffsetRect(GetStateDecisionRect(stateDecision), canvas.position);
+            else
+                return;
+
             var start = DecisionOutputCenter(decisionRect, branch);
             var end = new Vector3(targetRect.xMin, targetRect.center.y);
             var runtimeId = decision.FindPropertyRelative("id").stringValue + ":" + DecisionBranchKey(branch);
@@ -229,22 +240,33 @@ namespace MirrorTrial.Editor
             if (evt.type != EventType.MouseUp || evt.button != 0 || connectingFromDecisionIndex < 0) return;
             var graph = serializedCombat.FindProperty("comboGraphs").GetArrayElementAtIndex(selectedGraphIndex);
             var moves = graph.FindPropertyRelative("instances");
-            var target = -1;
+            var targetMove = -1;
             for (var i = 0; i < moves.arraySize; i++)
             {
                 var position = moves.GetArrayElementAtIndex(i).FindPropertyRelative("graphPosition").vector2Value;
                 var moveRect = OffsetRect(new Rect(position.x, position.y, 145f, 64f), canvas.position);
                 if (new Rect(moveRect.x - 12f, moveRect.center.y - 14f, 28f, 28f).Contains(evt.mousePosition))
                 {
-                    target = i;
+                    targetMove = i;
                     break;
                 }
             }
+
+            var stateDecision = graph.FindPropertyRelative("stateDecision");
+            var targetState = false;
+            if (targetMove < 0 && stateDecision != null && stateDecision.FindPropertyRelative("enabled").boolValue)
+            {
+                var stateRect = OffsetRect(GetStateDecisionRect(stateDecision), canvas.position);
+                targetState = new Rect(stateRect.x - 12f, stateRect.center.y - 14f, 28f, 28f)
+                    .Contains(evt.mousePosition);
+            }
+
             var source = connectingFromDecisionIndex;
             var branch = connectingDecisionBranch;
             connectingFromDecisionIndex = -1;
             connectingDecisionBranch = -1;
-            if (target >= 0) ConnectDecisionToMove(source, branch, target);
+            if (targetMove >= 0) ConnectDecisionToMove(source, branch, targetMove);
+            else if (targetState) ConnectDecisionToState(source, branch);
             evt.Use();
             Repaint();
         }
@@ -312,14 +334,14 @@ namespace MirrorTrial.Editor
 
                 EditorGUILayout.Space(4f);
                 GUILayout.Label("分支出口", EditorStyles.boldLabel);
-                DrawDecisionTargetRow(decision, moves, "tapTargetInstanceId", "tapRequiresHit", "点按", TapDecisionColor, "未到判定帧就松开");
-                DrawDecisionTargetRow(decision, moves, "holdTargetInstanceId", "holdRequiresHit", "长按", HoldDecisionColor, "判定帧仍保持按住");
-                DrawDecisionTargetRow(decision, moves, "noInputTargetInstanceId", "noInputRequiresHit", "无输入", new Color(0.58f, 0.61f, 0.68f), "没有按下时默认结束连招");
-                EditorGUILayout.LabelField("也可以直接从菱形右侧三个彩色端口拖线到招式节点。", EditorStyles.miniLabel);
+                DrawDecisionTargetRow(decision, graph, moves, "tapTargetInstanceId", "tapRequiresHit", "点按", TapDecisionColor, "未到判定帧就松开");
+                DrawDecisionTargetRow(decision, graph, moves, "holdTargetInstanceId", "holdRequiresHit", "长按", HoldDecisionColor, "判定帧仍保持按住");
+                DrawDecisionTargetRow(decision, graph, moves, "noInputTargetInstanceId", "noInputRequiresHit", "无输入", new Color(0.58f, 0.61f, 0.68f), "没有按下时默认结束连招");
+                EditorGUILayout.LabelField("也可以直接从菱形右侧三个彩色端口拖线到招式或状态判定节点。", EditorStyles.miniLabel);
             }
         }
 
-        void DrawDecisionTargetRow(SerializedProperty decision, SerializedProperty moves,
+        void DrawDecisionTargetRow(SerializedProperty decision, SerializedProperty graph, SerializedProperty moves,
             string targetField, string requiresHitField, string label, Color color, string hint)
         {
             var old = GUI.color;
@@ -328,7 +350,7 @@ namespace MirrorTrial.Editor
             {
                 GUILayout.Label(label, EditorStyles.boldLabel, GUILayout.Width(42f));
                 GUI.color = old;
-                DrawOptionalMovePopup(decision.FindPropertyRelative(targetField), moves, GUIContent.none.text, "结束连招");
+                DrawDecisionTargetPopup(decision.FindPropertyRelative(targetField), graph, moves);
                 EditorGUILayout.PropertyField(decision.FindPropertyRelative(requiresHitField), GUIContent.none, GUILayout.Width(18f));
                 GUILayout.Label("需命中", GUILayout.Width(45f));
             }
@@ -336,6 +358,26 @@ namespace MirrorTrial.Editor
             EditorGUILayout.LabelField(hint, EditorStyles.miniLabel);
         }
 
+        static void DrawDecisionTargetPopup(SerializedProperty id, SerializedProperty graph, SerializedProperty moves)
+        {
+            var ids = new List<string> { string.Empty };
+            var labels = new List<string> { "结束连招" };
+            var stateDecision = graph.FindPropertyRelative("stateDecision");
+            if (stateDecision != null && stateDecision.FindPropertyRelative("enabled").boolValue)
+            {
+                ids.Add(stateDecision.FindPropertyRelative("id").stringValue);
+                labels.Add("状态判定 / " + stateDecision.FindPropertyRelative("name").stringValue);
+            }
+            for (var i = 0; i < moves.arraySize; i++)
+            {
+                var move = moves.GetArrayElementAtIndex(i);
+                ids.Add(move.FindPropertyRelative("id").stringValue);
+                labels.Add("招式 / " + move.FindPropertyRelative("name").stringValue);
+            }
+            var selected = Mathf.Max(0, ids.IndexOf(id.stringValue));
+            selected = EditorGUILayout.Popup(selected, labels.ToArray());
+            id.stringValue = ids[selected];
+        }
         static void DrawOptionalMovePopup(SerializedProperty id, SerializedProperty moves, string label, string emptyLabel)
         {
             var labels = new string[moves.arraySize + 1];
@@ -382,6 +424,7 @@ namespace MirrorTrial.Editor
             Undo.RecordObject(combat, "删除输入判定节点");
             var id = graph.inputDecisions[index].id;
             graph.inputDecisions.RemoveAt(index);
+            ClearStateDecisionTarget(graph, id);
             if (graph.entryDecisionId == id) graph.entryDecisionId = string.Empty;
             selectedDecisionIndex = -1;
             RefreshAfterStructureChange();
@@ -427,6 +470,21 @@ namespace MirrorTrial.Editor
             RefreshAfterStructureChange();
         }
 
+        void ConnectDecisionToState(int decisionIndex, int branch)
+        {
+            CommitAndRefresh();
+            var graph = combat.ComboGraphs[selectedGraphIndex];
+            if (decisionIndex < 0 || decisionIndex >= graph.inputDecisions.Count ||
+                graph.stateDecision == null || !graph.stateDecision.enabled) return;
+            Undo.RecordObject(combat, "连接输入判定到状态判定");
+            var decision = graph.inputDecisions[decisionIndex];
+            var targetId = graph.stateDecision.id;
+            if (branch == 0) decision.tapTargetInstanceId = targetId;
+            else if (branch == 1) decision.holdTargetInstanceId = targetId;
+            else decision.noInputTargetInstanceId = targetId;
+            selectedDecisionIndex = decisionIndex;
+            RefreshAfterStructureChange();
+        }
         static string DecisionBranchKey(int branch)
         {
             return branch == 0 ? "tap" : branch == 1 ? "hold" : "none";

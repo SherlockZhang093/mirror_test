@@ -14,13 +14,14 @@ namespace MirrorTrial.Editor.UI
         const string PanelPath = Folder + "/EndLevelGrowthPanel.prefab";
         const string FontPath = "Assets/MirrorTrial/Resources/Fonts/ZCOOLKuaiLe-Regular.ttf";
 
-        static readonly Color Backdrop = new Color(0.008f, 0.014f, 0.030f, 0.94f);
-        static readonly Color Panel = new Color(0.018f, 0.035f, 0.065f, 0.98f);
-        static readonly Color Card = new Color(0.025f, 0.090f, 0.140f, 0.98f);
-        static readonly Color CardHover = new Color(0.050f, 0.190f, 0.240f, 1f);
-        static readonly Color Cyan = new Color(0.25f, 0.92f, 0.94f, 1f);
-        static readonly Color White = new Color(0.90f, 0.96f, 0.98f, 1f);
-        static readonly Color Muted = new Color(0.50f, 0.68f, 0.72f, 1f);
+        static readonly Color Backdrop = new Color(0.005f, 0.006f, 0.007f, 0.96f);
+        static readonly Color Panel = new Color(0.035f, 0.037f, 0.038f, 0.99f);
+        static readonly Color Card = new Color(0.085f, 0.088f, 0.087f, 1f);
+        static readonly Color CardHover = new Color(0.13f, 0.15f, 0.135f, 1f);
+        static readonly Color Accent = new Color(0.48f, 0.62f, 0.49f, 1f);
+        static readonly Color White = new Color(0.93f, 0.94f, 0.93f, 1f);
+        static readonly Color Muted = new Color(0.57f, 0.59f, 0.58f, 1f);
+        static readonly Color Divider = new Color(0.36f, 0.38f, 0.37f, 0.75f);
 
         [InitializeOnLoadMethod]
         static void EnsurePrefabsExist()
@@ -86,12 +87,12 @@ namespace MirrorTrial.Editor.UI
             button.transition = Selectable.Transition.ColorTint;
             var colors = button.colors;
             colors.normalColor = Color.white;
-            colors.highlightedColor = new Color(1.35f, 1.35f, 1.35f, 1f);
-            colors.pressedColor = new Color(0.65f, 0.90f, 0.92f, 1f);
+            colors.highlightedColor = new Color(1.12f, 1.12f, 1.12f, 1f);
+            colors.pressedColor = new Color(0.88f, 0.93f, 0.89f, 1f);
             colors.selectedColor = colors.highlightedColor;
-            colors.disabledColor = new Color(0.52f, 0.58f, 0.62f, 1f);
+            colors.disabledColor = new Color(0.60f, 0.60f, 0.60f, 1f);
             colors.colorMultiplier = 1f;
-            colors.fadeDuration = 0.10f;
+            colors.fadeDuration = 0.08f;
             button.colors = colors;
             button.navigation = new Navigation { mode = Navigation.Mode.None };
 
@@ -101,39 +102,42 @@ namespace MirrorTrial.Editor.UI
             layout.minWidth = 320f;
             layout.minHeight = 450f;
 
-            var topLine = CreateImage("TopAccent", root.transform, Cyan);
+            var topLine = CreateImage("MinimalTopAccent", root.transform, Accent);
             SetRect(topLine.rectTransform, new Vector2(0f, 1f), new Vector2(1f, 1f),
-                new Vector2(20f, -8f), new Vector2(-20f, -2f));
+                new Vector2(0f, -5f), new Vector2(0f, 0f));
 
-            var corner = CreateText("Corner", root.transform, "成长", font, 24, Muted, TextAnchor.MiddleLeft);
-            SetRect(corner.rectTransform, new Vector2(0f, 1f), new Vector2(1f, 1f),
-                new Vector2(34f, -74f), new Vector2(-34f, -24f));
+            var titleText = CreateText("Title", root.transform,
+                PlayerGrowthEffectApplier.FormatCardTitle(effect), font, 26, White, TextAnchor.MiddleLeft);
+            SetRect(titleText.rectTransform, new Vector2(0f, 1f), new Vector2(1f, 1f),
+                new Vector2(34f, -92f), new Vector2(-34f, -34f));
+
+            var amountText = CreateText("Amount", root.transform,
+                PlayerGrowthEffectApplier.FormatCardValue(amount), font, 92, White, TextAnchor.LowerLeft);
+            amountText.fontStyle = FontStyle.Bold;
+            SetRect(amountText.rectTransform, new Vector2(0f, 0.47f), new Vector2(1f, 0.78f),
+                new Vector2(34f, 0f), new Vector2(-34f, 0f));
 
             var effectText = CreateText("Effect", root.transform,
-                PlayerGrowthEffectApplier.FormatEffect(effect, amount), font, 48, White, TextAnchor.MiddleCenter);
-            effectText.fontStyle = FontStyle.Bold;
-            effectText.resizeTextForBestFit = true;
-            effectText.resizeTextMinSize = 30;
-            effectText.resizeTextMaxSize = 48;
-            SetRect(effectText.rectTransform, new Vector2(0f, 0.50f), new Vector2(1f, 0.82f),
-                new Vector2(32f, 0f), new Vector2(-32f, 0f));
+                PlayerGrowthEffectApplier.FormatCardAttribute(effect), font, 36, White, TextAnchor.UpperLeft);
+            SetRect(effectText.rectTransform, new Vector2(0f, 0.34f), new Vector2(1f, 0.49f),
+                new Vector2(34f, 0f), new Vector2(-34f, 0f));
 
-            var divider = CreateImage("Divider", root.transform, new Color(Cyan.r, Cyan.g, Cyan.b, 0.35f));
-            SetRect(divider.rectTransform, new Vector2(0.18f, 0.44f), new Vector2(0.82f, 0.44f),
-                new Vector2(0f, -1f), new Vector2(0f, 1f));
+            var divider = CreateImage("Divider", root.transform, Divider);
+            SetRect(divider.rectTransform, new Vector2(0f, 0.25f), new Vector2(1f, 0.25f),
+                new Vector2(34f, -1f), new Vector2(-34f, 1f));
 
-            var costLabel = CreateText("CostLabel", root.transform, "消耗", font, 23, Muted, TextAnchor.MiddleCenter);
-            SetRect(costLabel.rectTransform, new Vector2(0f, 0.27f), new Vector2(1f, 0.39f), Vector2.zero, Vector2.zero);
+            var costText = CreateText("Cost", root.transform, "消耗 " + cost, font, 27, Muted, TextAnchor.MiddleLeft);
+            SetRect(costText.rectTransform, new Vector2(0f, 0f), new Vector2(0.56f, 0.24f),
+                new Vector2(34f, 8f), Vector2.zero);
 
-            var costText = CreateText("Cost", root.transform, cost + " 生命精华", font, 36, Cyan, TextAnchor.MiddleCenter);
-            costText.fontStyle = FontStyle.Bold;
-            SetRect(costText.rectTransform, new Vector2(0f, 0.15f), new Vector2(1f, 0.29f), Vector2.zero, Vector2.zero);
-
-            var stateText = CreateText("State", root.transform, "点击选择", font, 22, Muted, TextAnchor.MiddleCenter);
-            SetRect(stateText.rectTransform, new Vector2(0f, 0.02f), new Vector2(1f, 0.13f), Vector2.zero, Vector2.zero);
+            var stateText = CreateText("State", root.transform, "", font, 20, Accent, TextAnchor.MiddleRight);
+            SetRect(stateText.rectTransform, new Vector2(0.42f, 0f), new Vector2(1f, 0.24f),
+                Vector2.zero, new Vector2(-34f, 8f));
 
             var serialized = new SerializedObject(root.GetComponent<GrowthCardView>());
             serialized.FindProperty("definition").objectReferenceValue = definition;
+            serialized.FindProperty("titleText").objectReferenceValue = titleText;
+            serialized.FindProperty("amountText").objectReferenceValue = amountText;
             serialized.FindProperty("effectText").objectReferenceValue = effectText;
             serialized.FindProperty("costText").objectReferenceValue = costText;
             serialized.FindProperty("stateText").objectReferenceValue = stateText;
@@ -187,6 +191,10 @@ namespace MirrorTrial.Editor.UI
                 var serialized = new SerializedObject(view);
                 if (!serialized.FindProperty("definition").objectReferenceValue)
                     return true;
+                if (!serialized.FindProperty("titleText").objectReferenceValue ||
+                    !serialized.FindProperty("amountText").objectReferenceValue ||
+                    !prefab.transform.Find("MinimalTopAccent"))
+                    return true;
             }
             return false;
         }
@@ -211,7 +219,7 @@ namespace MirrorTrial.Editor.UI
             SetRect(frame.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(-780f, -450f), new Vector2(780f, 450f));
 
-            var topAccent = CreateImage("TopAccent", frame.transform, Cyan);
+            var topAccent = CreateImage("TopAccent", frame.transform, Accent);
             SetRect(topAccent.rectTransform, new Vector2(0f, 1f), new Vector2(1f, 1f),
                 new Vector2(0f, -6f), new Vector2(0f, 0f));
 
@@ -220,7 +228,7 @@ namespace MirrorTrial.Editor.UI
             SetRect(title.rectTransform, new Vector2(0f, 1f), new Vector2(0.65f, 1f),
                 new Vector2(74f, -126f), new Vector2(0f, -42f));
 
-            var balanceText = CreateText("Balance", frame.transform, "生命精华  --", font, 36, Cyan, TextAnchor.MiddleRight);
+            var balanceText = CreateText("Balance", frame.transform, "生命精华  --", font, 32, Accent, TextAnchor.MiddleRight);
             SetRect(balanceText.rectTransform, new Vector2(0.58f, 1f), new Vector2(1f, 1f),
                 new Vector2(0f, -124f), new Vector2(-74f, -44f));
 
@@ -247,12 +255,12 @@ namespace MirrorTrial.Editor.UI
             SetRect(skipRect, new Vector2(1f, 0f), new Vector2(1f, 0f),
                 new Vector2(-374f, 34f), new Vector2(-74f, 106f));
             var skipImage = skipButtonObject.GetComponent<Image>();
-            skipImage.color = new Color(0.035f, 0.12f, 0.16f, 1f);
+            skipImage.color = Card;
             var skipButton = skipButtonObject.GetComponent<Button>();
             skipButton.targetGraphic = skipImage;
             var skipColors = skipButton.colors;
             skipColors.highlightedColor = CardHover;
-            skipColors.pressedColor = Cyan;
+            skipColors.pressedColor = Accent;
             skipButton.colors = skipColors;
             var skipText = CreateText("Text", skipButtonObject.transform, "保留精华并继续", font, 27, White, TextAnchor.MiddleCenter);
             Stretch(skipText.rectTransform);

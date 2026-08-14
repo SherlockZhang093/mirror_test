@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using MirrorTrial.Combat;
+using MirrorTrial.Enemies;
 using MirrorTrial.Feedback;
 using MirrorTrial.Player;
 using UnityEngine;
@@ -22,6 +23,7 @@ namespace MirrorTrial.Boss
 
         Rigidbody2D body;
         Animator animator;
+        EnemyDamageVisual damageVisual;
         int hitPoints;
         int phase = 1;
         float duelTimer;
@@ -48,6 +50,9 @@ namespace MirrorTrial.Boss
             body = GetComponent<Rigidbody2D>();
             animator = GetComponent<Animator>();
             if (!bodyRenderer) bodyRenderer = GetComponentInChildren<SpriteRenderer>(true);
+            damageVisual = GetComponent<EnemyDamageVisual>();
+            if (!damageVisual) damageVisual = gameObject.AddComponent<EnemyDamageVisual>();
+            damageVisual.Bind(bodyRenderer);
             if (!swordHitbox) swordHitbox = GetComponentInChildren<Hitbox>(true);
             if (!swordHitboxCollider && swordHitbox) swordHitboxCollider = swordHitbox.GetComponent<BoxCollider2D>();
             body.freezeRotation = true;
@@ -217,7 +222,10 @@ namespace MirrorTrial.Boss
             hitPoints = Mathf.Max(0, hitPoints - requestedDamage);
             var actualDamage = beforeDamage - hitPoints;
             if (actualDamage > 0)
+            {
                 DamageDealtEvents.RaisePlayerDamageDealt(new DamageDealtResult(payload.source, gameObject, requestedDamage, actualDamage));
+                if (damageVisual) damageVisual.PlayDamage(payload.hitFlashType, actualDamage);
+            }
             HealthChanged?.Invoke(this, hitPoints, MaxHitPoints);
             if (hitPoints <= 0) { Die(); return; }
 

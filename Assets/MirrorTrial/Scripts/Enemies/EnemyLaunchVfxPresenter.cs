@@ -39,7 +39,7 @@ namespace MirrorTrial.Enemies
                     break;
                 case EnemyLaunchController2D.LaunchPhase.Landing:
                     StopFollowedEffect();
-                    Spawn(profile.landingPrefab, GroundPoint());
+                    SpawnGroundAligned(profile.landingPrefab, GroundPoint());
                     break;
                 case EnemyLaunchController2D.LaunchPhase.Sliding:
                     StartFollowedEffect(profile.slidePrefab, GroundPoint());
@@ -56,6 +56,25 @@ namespace MirrorTrial.Enemies
         void Spawn(GameObject prefab, Vector3 position)
         {
             if (prefab) Instantiate(prefab, position, Quaternion.identity);
+        }
+
+        void SpawnGroundAligned(GameObject prefab, Vector3 groundPoint)
+        {
+            if (!prefab) return;
+
+            var instance = Instantiate(prefab, groundPoint, Quaternion.identity);
+            var renderers = instance.GetComponentsInChildren<SpriteRenderer>();
+            if (renderers.Length == 0) return;
+
+            var lowestY = float.MaxValue;
+            foreach (var spriteRenderer in renderers)
+            {
+                if (spriteRenderer.enabled)
+                    lowestY = Mathf.Min(lowestY, spriteRenderer.bounds.min.y);
+            }
+
+            if (lowestY < float.MaxValue)
+                instance.transform.position += Vector3.up * (groundPoint.y - lowestY);
         }
 
         void StartFollowedEffect(GameObject prefab, Vector3? position = null)

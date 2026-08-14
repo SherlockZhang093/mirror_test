@@ -11,6 +11,8 @@ namespace MirrorTrial.Growth
         [SerializeField] GrowthCardDefinition definition;
 
         [Header("界面引用")]
+        [SerializeField] Text titleText;
+        [SerializeField] Text amountText;
         [SerializeField] Text effectText;
         [SerializeField] Text costText;
         [SerializeField] Text stateText;
@@ -60,10 +62,16 @@ namespace MirrorTrial.Growth
 
         public void RefreshVisual()
         {
+            if (titleText)
+                titleText.text = PlayerGrowthEffectApplier.FormatCardTitle(EffectType);
+            if (amountText)
+                amountText.text = PlayerGrowthEffectApplier.FormatCardValue(IncreaseAmount);
             if (effectText)
-                effectText.text = EffectDescription;
+                effectText.text = titleText && amountText
+                    ? PlayerGrowthEffectApplier.FormatCardAttribute(EffectType)
+                    : EffectDescription;
             if (costText)
-                costText.text = EssenceCost + " 生命精华";
+                costText.text = "消耗 " + EssenceCost;
 
             var hasDefinition = definition;
             var hasWallet = wallet != null;
@@ -89,7 +97,7 @@ namespace MirrorTrial.Growth
             else if (!enough)
                 stateText.text = "精华不足";
             else
-                stateText.text = "点击选择";
+                stateText.text = "";
         }
 
         void OnSelected()
