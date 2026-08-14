@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>剑技/弓/连击 — 动画接入方案</title>
+<style>
+  :root {
+    --bg: #1a1a2e; --card-bg: #16213e; --text: #e0e0e0;
+    --accent: #e94560; --green: #4ecca3; --warn: #f0a500;
+    --border: #2a3a5c; --dim: #7a7a9e; --tag-bg: #2d2d5e;
+    --in: #1a4020; --new: #1a2040; --review: #402a1a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height:1.6; padding:2rem;
+  }
+  h1 { font-size:1.6rem; color:#fff; margin-bottom:.3rem; }
+  h2 {
+    font-size:1.2rem; margin:1.5rem 0 .6rem; color:#ccc;
+    border-bottom:1px solid var(--border); padding-bottom:.3rem;
+  }
+  .subtitle { color:var(--dim); font-size:.85rem; margin-bottom:1.2rem; }
+
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .card {
+    background:var(--card-bg); border:1px solid var(--border);
+    border-radius:8px; padding:1rem;
+  }
+  .card.full { grid-column:1/-1; }
+  .card-title {
+    font-weight:700; font-size:1rem; color:#fff;
+    margin-bottom:.6rem; display:flex; align-items:center; gap:.5rem;
+  }
+  table { width:100%; border-collapse:collapse; font-size:.82rem; }
+  th, td { padding:5px 8px; text-align:left; border-bottom:1px solid var(--border); }
+  th { color:var(--dim); font-weight:600; font-size:.72rem; text-transform:uppercase; }
+  td { color:var(--text); }
+  .tag {
+    display:inline-block; padding:1px 6px; border-radius:3px;
+    font-size:.68rem; margin-right:3px;
+  }
+  .tag-in { background:var(--in); color:var(--green); }
+  .tag-new { background:var(--new); color:#5b9bd5; }
+  .tag-review { background:var(--review); color:var(--warn); }
+  .tag-propose { background:var(--accent); color:#fff; }
+
+  .file-name { color:var(--dim); font-family:'Consolas',monospace; font-size:.75rem; }
+  .action-row { border-bottom:1px solid var(--border); }
+  .action-row td { padding:8px 10px; }
+  .action-name { font-weight:700; color:#fff; font-size:.88rem; }
+  .action-desc { color:var(--dim); font-size:.78rem; }
+
+  .mapping-table { margin-top:.5rem; }
+  .mapping-table td { vertical-align:top; }
+  .code-block {
+    background:#0d1117; padding:.8rem 1rem; border-radius:6px;
+    font-family:'Consolas',monospace; font-size:.78rem;
+    overflow-x:auto; margin:.8rem 0;
+  }
+  .kw { color:#ff7b72; } .str { color:#a5d6ff; } .cmt { color:#8b949e; }
+
+  .proposal-item {
+    display:flex; align-items:flex-start; gap:.6rem;
+    padding:.5rem 0; border-bottom:1px solid var(--border);
+  }
+  .proposal-item:last-child { border:none; }
+  .proposal-num {
+    background:var(--accent); color:#fff; min-width:22px; height:22px;
+    border-radius:4px; display:flex; align-items:center;
+    justify-content:center; font-size:.72rem; font-weight:700;
+  }
+  .proposal-new { background:var(--new); }
+  .proposal-review { background:var(--review); }
+
+  .combo-viz {
+    display:flex; flex-wrap:wrap; gap:4px; align-items:center;
+    margin:.6rem 0; font-size:.8rem;
+  }
+  .combo-node {
+    background:var(--tag-bg); padding:3px 8px; border-radius:4px;
+    color:var(--text);
+  }
+  .combo-arrow { color:var(--dim); }
+</style>
+</head>
+<body>
+
+<h1>剑技·弓·连击 — 动画接入方案</h1>
+<p class="subtitle">源资产: DeadRevolver PixelPrototypePlayerSprites | 当前已接入 10/96</p>
+
+<!-- ============ 剑技 ============ -->
+<h2>一、剑技动画 (14 个, 已用 2)</h2>
+
+<div class="card full">
+<table>
+  <thead><tr><th>动画文件</th><th>描述</th><th>状态</th><th>建议接入</th></tr></thead>
+  <tbody>
+    <tr><td>SwordAttack</td><td>基础剑攻击</td><td><span class="tag tag-in">已接入</span></td><td>→ PlayerActionState.Attack</td></tr>
+    <tr><td>AirSlash</td><td>空中斩击</td><td><span class="tag tag-in">已接入</span></td><td>→ PlayerActionState.Cast</td></tr>
+    <tr style="background:#1a2530;"><td><strong>SwordStandingSlash</strong></td><td>站立重斩 (纵向)</td><td><span class="tag tag-propose">建议新加</span></td><td>→ 新状态 <strong>HeavyAttack</strong> (重击)</td></tr>
+    <tr style="background:#1a2530;"><td><strong>SwordRunSlash</strong></td><td>跑动横扫</td><td><span class="tag tag-propose">建议新加</span></td><td>→ 新状态 <strong>RunAttack</strong> (跑攻)</td></tr>
+    <tr style="background:#1a2530;"><td><strong>SwordGuard</strong></td><td>格挡架势</td><td><span class="tag tag-propose">建议新加</span></td><td>→ 新状态 <strong>Guard</strong> (格挡)</td></tr>
+    <tr style="background:#1a2530;"><td><strong>SwordGuardImpact</strong></td><td>格挡受击反馈</td><td><span class="tag tag-propose">建议新加</span></td><td>→ 新状态 <strong>GuardHit</strong> (格挡成功)</td></tr>
+    <tr><td>SwordIdle</td><td>持剑待机</td><td><span class="tag tag-review">可选</span></td><td>替换 Idle (拔剑态)</td></tr>
+    <tr><td>SwordRun</td><td>持剑跑步</td><td><span class="tag tag-review">可选</span></td><td>替换 Run (拔剑态)</td></tr>
+    <tr><td>SwordJumpRise</td><td>持剑跳跃上升</td><td><span class="tag tag-review">可选</span></td><td>替换 JumpRise (拔剑态)</td></tr>
+    <tr><td>SwordJumpFall</td><td>持剑跳跃下落</td><td><span class="tag tag-review">可选</span></td><td>替换 JumpFall (拔剑态)</td></tr>
+    <tr><td>SwordWalk</td><td>持剑行走</td><td><span class="tag tag-review">可选</span></td><td>Future: 行走态</td></tr>
+    <tr><td>SwordRunAltGrip</td><td>反握跑步</td><td>暂不接入</td><td>-</td></tr>
+    <tr><td>SwordSprint</td><td>持剑冲刺</td><td>暂不接入</td><td>-</td></tr>
+    <tr><td>SwordSprintSlash</td><td>冲刺斩击</td><td>暂不接入</td><td>Future: Dash 结束后</td></tr>
+    <tr><td>SwordCrouch</td><td>持剑下蹲</td><td>暂不接入</td><td>-</td></tr>
+    <tr><td>SwordJumpMid</td><td>持剑跳跃中段</td><td>暂不接入</td><td>-</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ============ 弓 ============ -->
+<h2>二、弓动画 (5 个, 已用 0)</h2>
+
+<div class="card full">
+<table>
+  <thead><tr><th>动画文件</th><th>描述</th><th>建议接入</th></tr></thead>
+  <tbody>
+    <tr style="background:#1a2530;"><td><strong>BowAim</strong></td><td>拉弓瞄准 (Loop)</td><td>→ 新状态 <strong>BowAim</strong> (进入瞄准)</td></tr>
+    <tr style="background:#1a2530;"><td><strong>BowFire</strong></td><td>放箭射击</td><td>→ 新状态 <strong>BowFire</strong> (射箭)</td></tr>
+    <tr><td>BowDraw</td><td>掏弓动作</td><td>→ BowAim 的前置过渡</td></tr>
+    <tr><td>BowFull</td><td>满弓蓄力待发</td><td>→ 可选: 蓄力后自动切换</td></tr>
+    <tr><td>BowPreview</td><td>预览缩略图</td><td>不接入 (编辑器用)</td></tr>
+  </tbody>
+</table>
+
+<div style="margin-top:.6rem; font-size:.8rem; color:var(--dim);">
+  弓系统建议做两态：<strong>BowAim</strong> (按住瞄准键进入) → <strong>BowFire</strong> (松开/再次按射箭)。
+  BowDraw 可作为 Aim 的开场动画(非独立状态)，BowFull 可作为蓄力满后的视觉切换。
+</div>
+</div>
+
+<!-- ============ 连击 ============ -->
+<h2>三、连击动画 (10 个, 全部预览)</h2>
+
+<p class="subtitle" style="margin-top:.3rem;">以下是资产包中所有连击/拳脚动画，先看看再决定接哪些。</p>
+
+<div class="grid2">
+  <!-- 连击组 A/B/C/D -->
+  <div class="card">
+    <div class="card-title">连击组 ComboAttack</div>
+    <div class="combo-viz">
+      <span class="combo-node">ComboAttackA</span><span class="combo-arrow">→</span>
+      <span class="combo-node">ComboAttackB</span><span class="combo-arrow">→</span>
+      <span class="combo-node">ComboAttackC</span><span class="combo-arrow">→</span>
+      <span class="combo-node">ComboAttackD</span>
+    </div>
+    <div style="font-size:.78rem; color:var(--dim);">
+      标准的 4 段连击链，A→B→C→D 递增，适合作为普攻连段。
+      当前 Attack 用的是 <strong>SwordAttack</strong>，
+      可替换为 ComboAttackA/B/C/D 实现 4 连击。
+    </div>
+  </div>
+
+  <!-- 拳组 -->
+  <div class="card">
+    <div class="card-title">拳组 Punch</div>
+    <div class="combo-viz">
+      <span class="combo-node">PunchA</span><span class="combo-arrow">→</span>
+      <span class="combo-node">PunchB</span><span class="combo-arrow">→</span>
+      <span class="combo-node">PunchC</span>
+    </div>
+    <div style="font-size:.78rem; color:var(--dim);">
+      3 段拳击链，动作幅度比剑技小，节奏快。
+      适合作为轻攻击或快速打断技。
+    </div>
+  </div>
+
+  <!-- 踢组 -->
+  <div class="card">
+    <div class="card-title">踢组 Kick</div>
+    <div class="combo-viz">
+      <span class="combo-node">KickA</span><span class="combo-arrow">→</span>
+      <span class="combo-node">KickB</span><span class="combo-arrow">→</span>
+      <span class="combo-node">KickC</span>
+    </div>
+    <div style="font-size:.78rem; color:var(--dim);">
+      3 段踢击链，击退/范围效果通常比拳大。
+      适合作为重脚/破防技。
+    </div>
+  </div>
+
+  <!-- 蹲斩 -->
+  <div class="card">
+    <div class="card-title">特殊</div>
+    <div class="combo-viz">
+      <span class="combo-node">CrouchSlash</span>
+    </div>
+    <div style="font-size:.78rem; color:var(--dim);">
+      下蹲+斩击，可用于打下段/扫腿。
+    </div>
+  </div>
+</div>
+
+<!-- ============ 接入方案汇总 ============ -->
+<h2>四、建议一次接入的清单 (共 11 个新动画)</h2>
+
+<div class="card full">
+<table class="mapping-table">
+  <thead><tr><th>#</th><th>动画 Clip</th><th>新枚举值</th><th>触发方式</th><th>说明</th></tr></thead>
+  <tbody>
+    <!-- 剑技 -->
+    <tr><td>1</td><td>SwordStandingSlash</td><td class="action-name">HeavyAttack</td><td>长按攻击键 / 特殊键</td><td>重击，伤害高、前摇长</td></tr>
+    <tr><td>2</td><td>SwordRunSlash</td><td class="action-name">RunAttack</td><td>跑步中按攻击</td><td>跑动横扫，带位移</td></tr>
+    <tr><td>3</td><td>SwordGuard</td><td class="action-name">Guard</td><td>按住格挡键 (Loop)</td><td>格挡架势，减伤/弹反</td></tr>
+    <tr><td>4</td><td>SwordGuardImpact</td><td class="action-name">GuardHit</td><td>格挡成功时自动触发</td><td>格挡受击反馈</td></tr>
+    <!-- 弓 -->
+    <tr><td>5</td><td>BowDraw</td><td class="action-name">BowDraw</td><td>按下远程键</td><td>掏弓动作</td></tr>
+    <tr><td>6</td><td>BowAim</td><td class="action-name">BowAim</td><td>掏弓后进入 (Loop)</td><td>拉弓瞄准态</td></tr>
+    <tr><td>7</td><td>BowFire</td><td class="action-name">BowFire</td><td>瞄准中松开/再按</td><td>放箭</td></tr>
+    <!-- 连击 - 先预览 -->
+    <tr><td>8-11</td><td>ComboAttackA/B/C/D</td><td class="action-name" style="color:var(--warn);">待定</td><td>连续按攻击键</td><td>替换现有 SwordAttack 为连段</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ============ 代码预览 ============ -->
+<h2>五、PlayerActionState 枚举变更预览</h2>
+
+<div class="code-block">
+<span class="cmt">// 当前 (10 个值)</span><br/>
+<span class="kw">public enum</span> PlayerActionState {
+    None, Idle, Run, JumpRise, JumpFall, Land,
+    Attack, Cast, Dash, Hurt, Dead
+}
+<br/><br/>
+<span class="cmt">// 建议变更为 (17-21 个值)</span><br/>
+<span class="kw">public enum</span> PlayerActionState {
+    None, Idle, Run, JumpRise, JumpFall, Land,
+    Attack, Cast, Dash, Hurt, Dead,
+    <span class="str">// --- 剑技扩展 ---</span>
+    HeavyAttack, RunAttack, Guard, GuardHit,
+    <span class="str">// --- 弓系统 ---</span>
+    BowDraw, BowAim, BowFire,
+    <span class="str">// --- 连击 (待确认) ---</span>
+    <span style="color:var(--warn);">Attack2, Attack3, Attack4</span>  <span class="cmt">// ComboAttackB/C/D</span>
+}
+</div>
+
+<div style="margin-top:1rem; padding:.6rem 1rem; background:#1a2020; border-left:3px solid var(--green); border-radius:4px; font-size:.82rem;">
+  <strong>需要你确认的：</strong><br/>
+  1. 剑技扩展：HeavyAttack / RunAttack / Guard / GuardHit 四个新状态是否OK？<br/>
+  2. 弓系统：BowDraw → BowAim → BowFire 三段设计是否符合预期？<br/>
+  3. 连击：ComboAttackA/B/C/D 要不要替换掉当前的 SwordAttack？<br/>
+  4. 是否还要加 Punch/Kick (拳脚) 组？
+</div>
+
+</body>
+</html>

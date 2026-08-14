@@ -56,3 +56,13 @@ Desktop.ini
 /.agents/
 /.codex/
 /.workbuddy/
+
+ # IDE folders anywhere
+**/.idea/
+
+# Local logs
+*.log
+
+# Tool backups and temp files
+.codex-backups/
+tmp/

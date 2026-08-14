@@ -1,0 +1,3 @@
+Slide 1: Replaced sample candidate details with user-provided identity and internship information.
+Slide 3: Replaced template instruction copy with verified education, major, current role, and project group.
+Slide 7: Rewrote the inherited title placeholder with the original visible copy solely to handle the structural placeholder explicitly; no visible deviation intended.

@@ -1,0 +1,749 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/x8f69ofe",
+    "id": "x8f69ofe",
+    "slide": 6,
+    "layoutId": "/ppt/slideLayouts/slideLayout18.xml",
+    "layoutName": "空白",
+    "layoutType": "blank",
+    "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "Office",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "fontScheme": {
+      "name": "Office",
+      "majorFont": {
+        "latinTypeface": "等线 Light"
+      },
+      "minorFont": {
+        "latinTypeface": "等线"
+      }
+    },
+    "typefaces": [
+      "微软雅黑",
+      "等线",
+      "等线 Light",
+      "腾讯体 W7"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "/ppt/slideLayouts/slideLayout18.xml",
+      "name": "空白",
+      "type": "blank",
+      "parentLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "/ppt/slideMasters/slideMaster2.xml",
+      "type": "master",
+      "backgroundColor": "bg1",
+      "elements": [
+        {
+          "order": 1,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/1026",
+          "id": "1026",
+          "name": "Title Placeholder 1",
+          "bbox": [
+            88.67,
+            38.33,
+            1104,
+            139.17
+          ],
+          "geometry": "rect",
+          "text": "单击此处编辑母版标题样式",
+          "textPreview": "单击此处编辑母版标题样式",
+          "resolvedTextStyle": {
+            "anchor": 2,
+            "vertical": 1,
+            "verticalAlignment": "middle",
+            "wrap": "square",
+            "insets": {
+              "top": 4.8,
+              "right": 9.6,
+              "bottom": 4.8,
+              "left": 9.6
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "单击此处编辑母版标题样式",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "单击此处编辑母版标题样式"
+                }
+              ]
+            }
+          ],
+          "lineWidth": 0
+        },
+        {
+          "order": 2,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/1027",
+          "id": "1027",
+          "name": "Text Placeholder 2",
+          "bbox": [
+            88.67,
+            192,
+            1104,
+            456.83
+          ],
+          "geometry": "rect",
+          "text": "编辑母版文本样式\n第二级\n第三级\n第四级\n第五级",
+          "textPreview": "编辑母版文本样式 | 第二级 | 第三级 | 第四级 | 第五级",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "vertical": 1,
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "insets": {
+              "top": 4.8,
+              "right": 9.6,
+              "bottom": 4.8,
+              "left": 9.6
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "编辑母版文本样式",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "编辑母版文本样式"
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "text": "第二级",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "第二级"
+                }
+              ]
+            },
+            {
+              "index": 3,
+              "text": "第三级",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "第三级"
+                }
+              ]
+            },
+            {
+              "index": 4,
+              "text": "第四级",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "第四级"
+                }
+              ]
+            },
+            {
+              "index": 5,
+              "text": "第五级",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "第五级"
+                }
+              ]
+            }
+          ],
+          "lineWidth": 0
+        },
+        {
+          "order": 3,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/13",
+          "id": "13",
+          "name": "矩形 12",
+          "bbox": [
+            0,
+            688,
+            1280,
+            33
+          ],
+          "geometry": "rect",
+          "resolvedTextStyle": {
+            "anchor": 2,
+            "verticalAlignment": "middle"
+          },
+          "fillColor": "#269FD3",
+          "lineWidth": 0
+        },
+        {
+          "order": 4,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/14",
+          "id": "14",
+          "name": "矩形 17",
+          "bbox": [
+            973.33,
+            688,
+            306.67,
+            33.17
+          ],
+          "geometry": "rect",
+          "resolvedTextStyle": {
+            "anchor": 2,
+            "verticalAlignment": "middle"
+          },
+          "fillColor": "#777370",
+          "lineWidth": 0
+        },
+        {
+          "order": 5,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/15",
+          "id": "15",
+          "name": "直角三角形 15",
+          "bbox": [
+            946.44,
+            666.83,
+            65.33,
+            42.83
+          ],
+          "rotation": 318.62,
+          "geometry": "rtTriangle",
+          "resolvedTextStyle": {
+            "anchor": 2,
+            "verticalAlignment": "middle"
+          },
+          "fillColor": "#0C86B6",
+          "lineWidth": 0
+        }
+      ]
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/9k7m1w3i",
+      "id": "4",
+      "name": "图片 3",
+      "bbox": [
+        0,
+        0,
+        1280,
+        720
+      ],
+      "contentType": "image/jpeg",
+      "asset": {
+        "assetId": "/ppt/media/image2.jpeg",
+        "contentType": "image/jpeg",
+        "byteLength": 188238
+      },
+      "fillImage": {
+        "assetId": "/ppt/media/image2.jpeg",
+        "contentType": "image/jpeg",
+        "byteLength": 188238
+      }
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/yhg7epsj",
+      "id": "2",
+      "name": "文本框 1",
+      "bbox": [
+        74.81,
+        120.87,
+        1011.92,
+        507.31
+      ],
+      "geometry": "rect",
+      "text": "【看得懂】AI 可执行的 PRD\n工具卡 PRD：写清目标、边界、规则、职责与验收，让 AI 按设计实现\n【接得上】项目上下文管理\n索引、大纲、专项文档与交接记录全部沉淀在项目仓库\nWorkBuddy 与 Codex 可以随时读档接手\n【做得出】AI 动画生产 Skill\n固定骨架、根节点、比例与调色板，生成后完成对齐、验证、切片与 Unity 接入\n",
+      "textPreview": "【看得懂】AI 可执行的 PRD | 工具卡 PRD：写清目标、边界、规则、职责与验收，让 AI 按设计实现 | 【接得上】项目上下文管理 | 索引、大纲、专项文档与交接记录全部沉淀在项目仓库 | WorkBuddy 与 Codex 可以随时读档接手 | 【做得出】AI 动...",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "等线",
+        "color": "tx1",
+        "alignment": "left",
+        "wrap": "square",
+        "autoFit": "resizeShapeToFitText",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 14,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Ø【看得懂】AI 可执行的 PRD"
+          },
+          {
+            "index": 2,
+            "text": ""
+          },
+          {
+            "index": 3,
+            "text": "l工具卡 PRD：写清目标、边界、规则、职责与验收，让 AI 按设计实现"
+          },
+          {
+            "index": 4,
+            "text": ""
+          },
+          {
+            "index": 5,
+            "text": "Ø【接得上】项目上下文管理"
+          },
+          {
+            "index": 6,
+            "text": ""
+          },
+          {
+            "index": 7,
+            "text": "•索引、大纲、专项文档与交接记录全部沉淀在项目仓库"
+          },
+          {
+            "index": 8,
+            "text": ""
+          },
+          {
+            "index": 9,
+            "text": "•WorkBuddy 与 Codex 可以随时读档接手"
+          },
+          {
+            "index": 10,
+            "text": ""
+          },
+          {
+            "index": 11,
+            "text": "Ø【做得出】AI 动画生产 Skill"
+          },
+          {
+            "index": 12,
+            "text": ""
+          },
+          {
+            "index": 13,
+            "text": "•固定骨架、根节点、比例与调色板，生成后完成对齐、验证、切片与 Unity 接入"
+          },
+          {
+            "index": 14,
+            "text": ""
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "【看得懂】AI 可执行的 PRD",
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "【",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 2,
+              "text": "看得懂】AI",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 3,
+              "text": " ",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 4,
+              "text": "可执行的",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 5,
+              "text": " PRD",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 342900
+        },
+        {
+          "index": 2,
+          "text": "工具卡 PRD：写清目标、边界、规则、职责与验收，让 AI 按设计实现",
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "工具卡",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1"
+            },
+            {
+              "index": 2,
+              "text": " ",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 3,
+              "text": "PRD：写清目标、边界、规则、职责与验收，让",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 4,
+              "text": " AI ",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 5,
+              "text": "按设计实现",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 342900
+        },
+        {
+          "index": 3,
+          "text": "【接得上】项目上下文管理",
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "【",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 2,
+              "text": "接得上】项目上下文管理",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 342900
+        },
+        {
+          "index": 4,
+          "text": "索引、大纲、专项文档与交接记录全部沉淀在项目仓库",
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "索引、大纲、专项文档与交接记录全部沉淀在项目仓库",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 342900
+        },
+        {
+          "index": 5,
+          "text": "WorkBuddy 与 Codex 可以随时读档接手",
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "WorkBuddy",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 2,
+              "text": " 与 Codex ",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 3,
+              "text": "可以随时读档接手",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 342900
+        },
+        {
+          "index": 6,
+          "text": "【做得出】AI 动画生产 Skill",
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "【",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 2,
+              "text": "做得出】AI",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 3,
+              "text": " ",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 4,
+              "text": "动画生产",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 5,
+              "text": " Skill",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 342900
+        },
+        {
+          "index": 7,
+          "text": "固定骨架、根节点、比例与调色板，生成后完成对齐、验证、切片与 Unity 接入",
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "固定骨架、根节点、比例与调色板，生成后完成对齐、验证、切片与",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 2,
+              "text": " Unity ",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 3,
+              "text": "接入",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 342900
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/zi98nu94",
+      "id": "3",
+      "name": "文本框 2",
+      "bbox": [
+        74.81,
+        35.23,
+        895.84,
+        113.09
+      ],
+      "geometry": "rect",
+      "text": "3 . AI 在游戏项目中的应用\n",
+      "textPreview": "3 . AI 在游戏项目中的应用 |",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "等线",
+        "color": "tx1",
+        "alignment": "left",
+        "wrap": "square",
+        "autoFit": "resizeShapeToFitText",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "3 . AI 在游戏项目中的应用"
+          },
+          {
+            "index": 2,
+            "text": ""
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "3 . AI 在游戏项目中的应用",
+          "lineSpacingPercent": 100000,
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "3 . AI 在游戏项目中的应用",
+              "fontSize": 42.67,
+              "typeface": "腾讯体 W7",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/8jyl8rmd",
+      "id": "5",
+      "name": "图片 5",
+      "bbox": [
+        767.62,
+        256.29,
+        503.28,
+        216.22
+      ],
+      "contentType": "image/png",
+      "imageCrop": {
+        "left": 0,
+        "top": 0.05659,
+        "right": 0.06133,
+        "bottom": 0.07502
+      },
+      "asset": {
+        "assetId": "/ppt/media/image4.png",
+        "contentType": "image/png",
+        "byteLength": 52848
+      },
+      "fillImage": {
+        "assetId": "/ppt/media/image4.png",
+        "contentType": "image/png",
+        "byteLength": 52848
+      }
+    }
+  ],
+  "composeRuns": []
+}

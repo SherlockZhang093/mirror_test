@@ -1,0 +1,118 @@
+{
+  "version": 5,
+  "frames": 6,
+  "fps": 8,
+  "canvas": [
+    192,
+    128
+  ],
+  "parts": [
+    "far_wing",
+    "near_wing",
+    "body",
+    "upper_tail",
+    "lower_tail"
+  ],
+  "layer_order_back_to_front": [
+    "upper_tail",
+    "lower_tail",
+    "far_wing",
+    "body",
+    "near_wing"
+  ],
+  "regenerated_wing_key_poses_used": true,
+  "whole_wing_warp_used": false,
+  "near_wing_display_offset": [
+    4,
+    0
+  ],
+  "near_wing_display_root": [
+    120,
+    64
+  ],
+  "body_layer_source_modified": false,
+  "unoccluded_body_mismatch_pixels_across_all_frames": 0,
+  "tails_animated_in_this_preview": true,
+  "tail_root": [
+    101,
+    77
+  ],
+  "upper_tail_tip_offsets": [
+    [
+      0,
+      0
+    ],
+    [
+      -1,
+      1
+    ],
+    [
+      -1,
+      2
+    ],
+    [
+      0,
+      3
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      1,
+      1
+    ]
+  ],
+  "lower_tail_tip_offsets": [
+    [
+      0,
+      1
+    ],
+    [
+      -1,
+      2
+    ],
+    [
+      0,
+      3
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      0,
+      0
+    ]
+  ],
+  "upper_tail_root_distances": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "lower_tail_root_distances": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "consecutive_frame_difference_bytes": [
+    4004,
+    4314,
+    3335,
+    3155,
+    4285
+  ],
+  "gif_decoded_frames": 6,
+  "gif_alpha_ok": true,
+  "formal_unity_assets_modified": false
+}

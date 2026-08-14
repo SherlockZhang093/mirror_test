@@ -1,0 +1,17 @@
+PlayerHealthBarUI (RectTransform)
+├─ OuterFrame                  [Image: HB_OuterFrame_5Slot]
+├─ Lives                       [Empty RectTransform]
+│  ├─ Life Block 1
+│  │  ├─ Empty                 [Image: HB_Block_Empty]
+│  │  ├─ Fill                  [Image: HB_Block_Fill_Normal]
+│  │  ├─ Frame                 [Image: HB_Block_Frame]
+│  │  ├─ HitFlash              [Image: HB_Block_Fill_Hit, disabled by default]
+│  │  └─ HitSpark              [Image/Animator, optional]
+│  ├─ Life Block 2             [same]
+│  ├─ Life Block 3             [same]
+│  ├─ Life Block 4             [same]
+│  └─ Life Block 5             [same]
+└─ CenterOrnament              [Optional: HB_Center_Ornament]
+
+Recommended sibling order inside every Life Block:
+Empty → Fill → Frame → HitFlash → HitSpark

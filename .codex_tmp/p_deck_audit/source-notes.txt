@@ -1,0 +1,11 @@
+User-provided facts, 2026-08-13:
+- Name: 张聪
+- Project group: 火影忍者项目组
+- Role: 技术策划
+- Mentor: phynoluo（罗斯颖）
+- Leader: loy nliu spelling supplied as "loynliu（刘荃）"; preserve exact supplied account "loynliu".
+- Start date: 2026-06-09
+- School: 清华大学
+- Major: 互动媒体设计与技术
+
+No external sources or externally sourced claims are introduced in this revision.

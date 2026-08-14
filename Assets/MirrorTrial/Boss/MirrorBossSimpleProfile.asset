@@ -1,0 +1,553 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee856bf4551044045b5a41d67f093752, type: 3}
+  m_Name: MirrorBossSimpleProfile
+  m_EditorClassIdentifier: 
+  displayName: "\u6301\u5251\u7684\u5012\u5F71"
+  maxHitPoints: 300
+  moveSpeed: 2.8
+  acceleration: 18
+  attackRange: 1.5
+  introDuration: 0.8
+  cooldownMoveSpeedMultiplier: 0.55
+  phaseTwoAt: 0.7
+  phaseThreeAt: 0.35
+  phaseTransitionDuration: 1.2
+  phaseOneRecovery: {x: 3, y: 3.4}
+  phaseTwoRecovery: {x: 2.6, y: 3}
+  phaseThreeRecovery: {x: 2.2, y: 2.6}
+  phaseOneFeintChance: 0
+  phaseTwoFeintChance: 0.3
+  phaseThreeFeintChance: 0.45
+  feintHoldDuration: 0.18
+  feintResetDuration: 0.24
+  maxFeintsPerCombo: 1
+  windupEffectPrefab: {fileID: 420001, guid: f76caac7ee5b4693a77578770f020618, type: 3}
+  phaseOneWindupEffectPrefab: {fileID: 410001, guid: e5a992aef4054333a24bbc61feaedc38,
+    type: 3}
+  phaseTwoWindupEffectPrefab: {fileID: 420001, guid: f76caac7ee5b4693a77578770f020618,
+    type: 3}
+  phaseThreeWindupEffectPrefab: {fileID: 420001, guid: f76caac7ee5b4693a77578770f020618,
+    type: 3}
+  phaseOneWindupHoldDuration: 0.65
+  phaseTwoWindupHoldDuration: 0.5
+  phaseThreeWindupHoldDuration: 0.38
+  windupPresentation:
+    style: 0
+    coreStartColor: {r: 0.22, g: 0.58, b: 1, a: 0.55}
+    coreFullColor: {r: 0.82, g: 0.95, b: 1, a: 1}
+    bodyGlowColor: {r: 0.18, g: 0.62, b: 1, a: 0.42}
+    coreStartScale: 0.12
+    coreFullScale: 0.32
+    finalFlashStart: 0.9
+    pulseSpeed: 18
+    pulseAmount: 0.12
+    rotationSpeed: 0
+    particleIntensity: 1
+    particleRadius: 0.9
+    particleSpeed: 2.2
+    bodyGlowMaxAlpha: 0.32
+    bodyGlowScale: 1.035
+    readyChargeThreshold: 0.7
+    readyChargeCue: {fileID: 0}
+    swordOuterColor: {r: 0.2, g: 1, b: 0.45, a: 0.42}
+    swordCoreColor: {r: 0.82, g: 1, b: 0.86, a: 0.9}
+    swordAngle: 0
+    swordLength: 1.35
+    swordWidth: 0.12
+    swordJitterStart: 0.55
+    swordJitterAmount: 0.03125
+    leftFootOffset: {x: -0.3, y: 0.03}
+    rightFootOffset: {x: 0.3, y: 0.03}
+    dustIntensity: 1
+    punchFieldRadius: 1.35
+    punchCoreStartScale: 0.18
+    punchCoreReadyScale: 0.72
+    punchStreamIntensity: 1.25
+    punchAfterimageAlpha: 0.16
+    punchGroundPull: 1
+    chargingLoop: {fileID: 0}
+    fullChargeCue: {fileID: 0}
+    releaseCue: {fileID: 0}
+    feintCue: {fileID: 0}
+    interruptedCue: {fileID: 0}
+    audioVolume: 0.8
+  launchSettings:
+    getUpDuration: 0.6
+    groundProbeDistance: 0.08
+    hitCompressDuration: 0.045
+    takeoffDuration: 0.08
+    landingSlideSpeed: 2.2
+    landingSlideDuration: 0.12
+    knockdownDuration: 0.28
+    presentation: {fileID: 11400000, guid: 6533e9468fb67114cb5905876c630119, type: 2}
+  getUpProtection:
+    invincibleDuringGetUp: 1
+    postGetUpInvincibleDuration: 1
+    blinkInterval: 0.08
+  enableRangedTeleportKit: 0
+  bowDrawDuration: 0.8
+  bowShotInterval: 0.35
+  bowVolleyRecovery: 1.25
+  bowReloadRecovery: 1.8
+  volleysBeforeReload: 2
+  phaseOneArrowCount: 1
+  phaseTwoArrowCount: 2
+  phaseThreeArrowCount: 3
+  bowDamage: 1
+  bowArrowSpeed: 12
+  bowArrowRange: 18
+  bowKnockback: {x: 1.2, y: 0.25}
+  bowSpawnOffset: {x: 0.65, y: 0.9}
+  teleportCooldown: 6
+  teleportWindup: 0.38
+  teleportHiddenDuration: 0.14
+  teleportAppearRecovery: 0.3
+  teleportFlankDistance: 2.1
+  teleportArenaPadding: 1
+  closeEscapeDistance: 2.2
+  phaseOneTeleportAttackChance: 0.2
+  phaseTwoTeleportAttackChance: 0.32
+  phaseThreeTeleportAttackChance: 0.45
+  minionPrefab: {fileID: 0}
+  summonCooldown: 11
+  summonWindup: 1.25
+  summonRecovery: 0.45
+  summonDecisionChance: 0.3
+  phaseOneMaxMinions: 1
+  phaseTwoMaxMinions: 2
+  phaseThreeMaxMinions: 2
+  totalSummonLimit: 4
+  minionSpawnHorizontalOffset: 2.5
+  closeDefenseRecovery: 1
+  heavySlashChance: 0.25
+  heavySlashCooldown: 5
+  heavySlashRecovery: 1.1
+  heavySlash:
+    animationState: ComboAttackD
+    activeStart: 0.36
+    activeEnd: 0.6
+    playbackSpeed: 0.85
+    gapAfter: 0
+    damage: 1
+    hitboxOffset: {x: 0.95, y: 0}
+    hitboxSize: {x: 1.55, y: 1.15}
+    knockback: {x: 7, y: 3}
+    hitStop: 0.1
+    interruptPower: 3
+    poiseDamage: 4
+    playerHitReaction: 3
+    breaksSuperArmor: 1
+    advanceSpeed: 0
+    windupFrame: 2
+    windupHoldDuration: 0.8
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 0
+    feintChanceOverride: -1
+    animationFrameRate: 12
+    animationFrameCount: 9
+    mirrorHitboxByFacing: 1
+    hitboxKeysMigratedToClip: 0
+    hitboxKeys:
+    - frame: 0
+      enabled: 0
+      offset: {x: 0.95, y: 0}
+      size: {x: 1.55, y: 1.15}
+      interpolation: 0
+    - frame: 3
+      enabled: 1
+      offset: {x: 0.63446414, y: 0.5737007}
+      size: {x: 1.55, y: 0.96791613}
+      interpolation: 0
+  phaseOneCombo:
+  - animationState: ComboAttackA
+    activeStart: 0.3
+    activeEnd: 0.52
+    playbackSpeed: 1
+    gapAfter: 0.12
+    damage: 1
+    hitboxOffset: {x: 0.8, y: 0.05}
+    hitboxSize: {x: 1.3, y: 0.9}
+    knockback: {x: 1.2, y: 0.5}
+    hitStop: 0.06
+    interruptPower: 1
+    poiseDamage: 1
+    playerHitReaction: 1
+    breaksSuperArmor: 0
+    advanceSpeed: 1.2
+    windupFrame: 1
+    windupHoldDuration: 0.65
+    windupEffectOffset: {x: -0.12, y: 1.57}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
+    animationFrameRate: 12
+    animationFrameCount: 7
+    mirrorHitboxByFacing: 1
+    hitboxKeysMigratedToClip: 1
+    hitboxKeys:
+    - frame: 0
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+    - frame: 2
+      enabled: 0
+      offset: {x: -0.29534638, y: 1.0138552}
+      size: {x: 0.9486191, y: 1.0840178}
+      interpolation: 1
+    - frame: 3
+      enabled: 1
+      offset: {x: 0.6813109, y: 0.8395538}
+      size: {x: 1.0626221, y: 1.8358159}
+      interpolation: 0
+    - frame: 4
+      enabled: 0
+      offset: {x: 1.1564683, y: 0.678731}
+      size: {x: 2.0129368, y: 2.1574614}
+      interpolation: 0
+  - animationState: ComboAttackB
+    activeStart: 0.31
+    activeEnd: 0.54
+    playbackSpeed: 0.9
+    gapAfter: 0
+    damage: 1
+    hitboxOffset: {x: 0.8, y: 0.05}
+    hitboxSize: {x: 1.3, y: 0.9}
+    knockback: {x: 1.2, y: 0.5}
+    hitStop: 0.06
+    interruptPower: 1
+    poiseDamage: 1
+    playerHitReaction: 1
+    breaksSuperArmor: 0
+    advanceSpeed: 1.2
+    windupFrame: -1
+    windupHoldDuration: 0
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
+    animationFrameRate: 12
+    animationFrameCount: 6
+    mirrorHitboxByFacing: 1
+    hitboxKeysMigratedToClip: 1
+    hitboxKeys:
+    - frame: 0
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+    - frame: 2
+      enabled: 1
+      offset: {x: 0.90425277, y: 1.2487344}
+      size: {x: 1.1249261, y: 1.4216396}
+      interpolation: 1
+    - frame: 3
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+  phaseTwoCombo:
+  - animationState: ComboAttackA
+    activeStart: 0.3
+    activeEnd: 0.52
+    playbackSpeed: 1
+    gapAfter: 0.1
+    damage: 1
+    hitboxOffset: {x: 0.8, y: 0.05}
+    hitboxSize: {x: 1.3, y: 0.9}
+    knockback: {x: 1.2, y: 0.5}
+    hitStop: 0.06
+    interruptPower: 1
+    poiseDamage: 1
+    playerHitReaction: 1
+    breaksSuperArmor: 0
+    advanceSpeed: 1.2
+    windupFrame: 1
+    windupHoldDuration: 0.5
+    windupEffectOffset: {x: -0.51, y: 1.22}
+    windupEffectAngle: -42.22
+    allowFeint: 1
+    feintChanceOverride: -1
+    animationFrameRate: 12
+    animationFrameCount: 7
+    mirrorHitboxByFacing: 1
+    hitboxKeysMigratedToClip: 1
+    hitboxKeys:
+    - frame: 0
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+    - frame: 2
+      enabled: 1
+      offset: {x: 0.7439559, y: 1.2951587}
+      size: {x: 1.1879116, y: 1.1582918}
+      interpolation: 1
+    - frame: 3
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+  - animationState: ComboAttackB
+    activeStart: 0.31
+    activeEnd: 0.54
+    playbackSpeed: 0.9
+    gapAfter: 0.42
+    damage: 1
+    hitboxOffset: {x: 0.8, y: 0.05}
+    hitboxSize: {x: 1.3, y: 0.9}
+    knockback: {x: 1.2, y: 0.5}
+    hitStop: 0.06
+    interruptPower: 1
+    poiseDamage: 1
+    playerHitReaction: 1
+    breaksSuperArmor: 0
+    advanceSpeed: 1.2
+    windupFrame: -1
+    windupHoldDuration: 0
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
+    animationFrameRate: 12
+    animationFrameCount: 6
+    mirrorHitboxByFacing: 1
+    hitboxKeysMigratedToClip: 1
+    hitboxKeys:
+    - frame: 0
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+    - frame: 2
+      enabled: 1
+      offset: {x: 0.83352697, y: 1.2611957}
+      size: {x: 0.9965522, y: 1.1833966}
+      interpolation: 1
+    - frame: 3
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+  - animationState: ComboAttackD
+    activeStart: 0.36
+    activeEnd: 0.6
+    playbackSpeed: 0.82
+    gapAfter: 0
+    damage: 1
+    hitboxOffset: {x: 0.8, y: 0.05}
+    hitboxSize: {x: 1.3, y: 0.9}
+    knockback: {x: 1.2, y: 0.5}
+    hitStop: 0.06
+    interruptPower: 1
+    poiseDamage: 1
+    playerHitReaction: 1
+    breaksSuperArmor: 0
+    advanceSpeed: 1.2
+    windupFrame: -1
+    windupHoldDuration: 0
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
+    animationFrameRate: 12
+    animationFrameCount: 8
+    mirrorHitboxByFacing: 1
+    hitboxKeysMigratedToClip: 1
+    hitboxKeys:
+    - frame: 0
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+    - frame: 3
+      enabled: 1
+      offset: {x: 0.7706356, y: 0.5473957}
+      size: {x: 1.1177711, y: 1.0840787}
+      interpolation: 1
+    - frame: 4
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+  phaseThreeCombo:
+  - animationState: ComboAttackA
+    activeStart: 0.3
+    activeEnd: 0.52
+    playbackSpeed: 1.05
+    gapAfter: 0.08
+    damage: 1
+    hitboxOffset: {x: 0.8, y: 0.05}
+    hitboxSize: {x: 1.3, y: 0.9}
+    knockback: {x: 1.2, y: 0.5}
+    hitStop: 0.06
+    interruptPower: 1
+    poiseDamage: 1
+    playerHitReaction: 1
+    breaksSuperArmor: 0
+    advanceSpeed: 1.2
+    windupFrame: 1
+    windupHoldDuration: 0.38
+    windupEffectOffset: {x: -0.52, y: 1.2}
+    windupEffectAngle: -44.35
+    allowFeint: 1
+    feintChanceOverride: -1
+    animationFrameRate: 12
+    animationFrameCount: 7
+    mirrorHitboxByFacing: 1
+    hitboxKeysMigratedToClip: 1
+    hitboxKeys:
+    - frame: 0
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+    - frame: 3
+      enabled: 1
+      offset: {x: 0.68294525, y: 0.8305162}
+      size: {x: 1.0658908, y: 1.7079369}
+      interpolation: 0
+    - frame: 4
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+  - animationState: ComboAttackB
+    activeStart: 0.31
+    activeEnd: 0.54
+    playbackSpeed: 1
+    gapAfter: 0.08
+    damage: 1
+    hitboxOffset: {x: 0.8, y: 0.05}
+    hitboxSize: {x: 1.3, y: 0.9}
+    knockback: {x: 1.2, y: 0.5}
+    hitStop: 0.06
+    interruptPower: 1
+    poiseDamage: 1
+    playerHitReaction: 1
+    breaksSuperArmor: 0
+    advanceSpeed: 1.2
+    windupFrame: -1
+    windupHoldDuration: 0
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
+    animationFrameRate: 12
+    animationFrameCount: 6
+    mirrorHitboxByFacing: 1
+    hitboxKeysMigratedToClip: 1
+    hitboxKeys:
+    - frame: 0
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+    - frame: 1
+      enabled: 1
+      offset: {x: 0.90181625, y: 0.9135497}
+      size: {x: 1.2117221, y: 0.8233196}
+      interpolation: 0
+    - frame: 2
+      enabled: 1
+      offset: {x: 0.52168953, y: 1.271746}
+      size: {x: 1.7770402, y: 1.2180667}
+      interpolation: 0
+    - frame: 3
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+  - animationState: ComboAttackC
+    activeStart: 0.33
+    activeEnd: 0.56
+    playbackSpeed: 0.95
+    gapAfter: 0.35
+    damage: 1
+    hitboxOffset: {x: 0.8, y: 0.05}
+    hitboxSize: {x: 1.3, y: 0.9}
+    knockback: {x: 1.2, y: 0.5}
+    hitStop: 0.06
+    interruptPower: 1
+    poiseDamage: 1
+    playerHitReaction: 1
+    breaksSuperArmor: 0
+    advanceSpeed: 1.2
+    windupFrame: -1
+    windupHoldDuration: 0
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
+    animationFrameRate: 12
+    animationFrameCount: 6
+    mirrorHitboxByFacing: 1
+    hitboxKeysMigratedToClip: 1
+    hitboxKeys:
+    - frame: 0
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+    - frame: 2
+      enabled: 1
+      offset: {x: 0.9367323, y: 0.5535956}
+      size: {x: 1.1131439, y: 0.880815}
+      interpolation: 1
+    - frame: 3
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+  - animationState: ComboAttackD
+    activeStart: 0.36
+    activeEnd: 0.6
+    playbackSpeed: 0.88
+    gapAfter: 0
+    damage: 1
+    hitboxOffset: {x: 0.8, y: 0.05}
+    hitboxSize: {x: 1.3, y: 0.9}
+    knockback: {x: 1.2, y: 0.5}
+    hitStop: 0.06
+    interruptPower: 1
+    poiseDamage: 1
+    playerHitReaction: 1
+    breaksSuperArmor: 0
+    advanceSpeed: 1.2
+    windupFrame: -1
+    windupHoldDuration: 0
+    windupEffectOffset: {x: 0.7, y: 0.9}
+    windupEffectAngle: 0
+    allowFeint: 1
+    feintChanceOverride: -1
+    animationFrameRate: 12
+    animationFrameCount: 8
+    mirrorHitboxByFacing: 1
+    hitboxKeysMigratedToClip: 1
+    hitboxKeys:
+    - frame: 0
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0
+    - frame: 3
+      enabled: 1
+      offset: {x: 0.7399148, y: 0.6198489}
+      size: {x: 0.8991449, y: 1.1749463}
+      interpolation: 1
+    - frame: 4
+      enabled: 0
+      offset: {x: 0.8, y: 0.05}
+      size: {x: 1.3, y: 0.9}
+      interpolation: 0

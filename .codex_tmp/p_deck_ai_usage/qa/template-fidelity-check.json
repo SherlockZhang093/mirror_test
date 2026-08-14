@@ -1,0 +1,13 @@
+{
+  "status": "pass",
+  "checkedAt": "2026-08-14T02:57:35.918Z",
+  "workspace": "G:\\mirror_test\\.codex_tmp\\p_deck_ai_usage",
+  "finalPptx": "G:\\mirror_test\\.codex_tmp\\p_deck_ai_usage\\candidate.pptx",
+  "starterPptx": "G:\\mirror_test\\.codex_tmp\\p_deck_ai_usage\\template-starter.pptx",
+  "mapPath": "G:\\mirror_test\\.codex_tmp\\p_deck_ai_usage\\template-frame-map.json",
+  "starterLayoutDir": "G:\\mirror_test\\.codex_tmp\\p_deck_ai_usage\\template-starter-layout",
+  "finalLayoutDir": "G:\\mirror_test\\.codex_tmp\\p_deck_ai_usage\\final-layout\\final",
+  "editDir": "G:\\mirror_test\\.codex_tmp\\p_deck_ai_usage",
+  "issueCount": 0,
+  "issues": []
+}

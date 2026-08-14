@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>玩家受击音效筛选 · DFSJ 卡通音效库</title>
+<style>
+  :root{
+    --bg:#f6f8fb; --panel:#ffffff; --line:#e2e8f0; --ink:#1c2430; --sub:#5d6b7d;
+    --accent:#2f6df0; --gold:#b8860b; --ok:#1f9d63; --warn:#c2410c;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--ink);
+       margin:0;padding:28px 20px 60px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  main{max-width:1000px;margin:auto}
+  h1{margin:0 0 6px;font-size:26px;letter-spacing:.5px}
+  .lead{color:var(--sub);margin:0 0 22px;font-size:14px}
+  .lead b{color:var(--accent)}
+  section{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+          padding:20px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(20,30,50,.05)}
+  h2{margin:0 0 4px;font-size:17px}
+  .hint{color:var(--sub);font-size:13px;margin:0 0 14px}
+  .card{border-top:1px solid var(--line);padding:16px 0}
+  .card:first-of-type{border-top:0;padding-top:4px}
+  .top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .code{font-weight:700;font-size:15px}
+  .name{color:var(--sub);font-size:13px}
+  .badge{font-size:11px;padding:2px 9px;border-radius:99px;border:1px solid transparent;font-weight:700}
+  .b-main{background:#fff7e0;color:var(--gold);border-color:#f0d99a}
+  .b-alt{background:#e8f1ff;color:var(--accent);border-color:#c2d8fb}
+  .b-ctx{background:#eef2f6;color:var(--sub);border-color:#dbe2ea}
+  audio{width:100%;height:34px;margin:6px 0 8px}
+  .why{font-size:13px;color:var(--ink);margin:0 0 6px}
+  .why span{color:var(--warn)}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:center}
+  th{background:#eef2f7;color:var(--sub);font-weight:700}
+  td.l{text-align:left}
+  tr.hl td{background:#fffaeb;font-weight:700}
+  .metrics{font-size:12px;color:var(--sub);font-family:Consolas,monospace}
+  .kv{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--sub);margin-top:4px}
+  .kv i{font-style:normal;color:var(--ink);font-weight:700}
+  code{background:#eef2f7;padding:1px 6px;border-radius:4px;font-size:12.5px}
+  ul{margin:8px 0 0;padding-left:20px;font-size:13.5px}
+  li{margin:4px 0}
+</style>
+</head>
+<body><main>
+
+<h1>玩家受击音效筛选</h1>
+<p class="lead">来源：<code>【SFX】休闲卡通应用音效 手机游戏音效 【DFSJ】</code>（613 个 wav 全量扫描）。<br>
+库内没有现成的"玩家受击"命名，所以按受击音效的声学要求打分挑选：<b>起音 &lt;30ms、有效时长 0.1–0.4s、低频有重量、收尾干脆</b>。<br>
+最终推荐 <b>A_主推_钝击闷响</b>。下方每条都可直接试听，已裁掉前置静音并归一化到 −1dB。</p>
+
+<section>
+  <h2>推荐方案</h2>
+  <p class="hint">先听 A。若嫌"太木"，B 是同一音色的轻量版；若想要镜面主题的脆感，听 D。</p>
+
+  <div class="card">
+    <div class="top"><span class="code">A</span><span class="badge b-main">主推</span>
+      <span class="name">钝击闷响 · 源自 木斧砍树音_02</span></div>
+    <audio controls preload="metadata" src="Unity_Ready_48k/A_主推_钝击闷响.wav"></audio>
+    <p class="why">低频占比 <b>84%</b>，起音仅 <b>10ms</b>，20dB 衰减 120ms —— 打在身上"闷、沉、有重量"，不抢台面。<span>唯一需要注意：原始素材是砍木头，音色偏木质</span>，但去掉语境后听起来就是标准的钝器受击。</p>
+    <div class="kv"><span>有效时长 <i>325ms</i></span><span>起音 <i>10ms</i></span><span>频谱重心 <i>583Hz</i></span><span>峰均比 <i>16.2dB</i></span><span>评分 <i>10.70</i></span></div>
+  </div>
+
+  <div class="card">
+    <div class="top"><span class="code">B</span><span class="badge b-alt">轻受击备选</span>
+      <span class="name">擦伤感 · 源自 木斧砍树音_bad_hit_</span></div>
+    <audio controls preload="metadata" src="Unity_Ready_48k/B_轻受击_擦伤感.wav"></audio>
+    <p class="why">同系列的"打歪了"版本，中低频（250–800Hz 占 52%）为主、没有 A 那么重的低频砸击感。适合<b>掉血量小</b>的受击，或和 A 做随机轮播增加变化。</p>
+    <div class="kv"><span>有效时长 <i>475ms</i></span><span>起音 <i>0ms</i></span><span>频谱重心 <i>2285Hz</i></span><span>评分 <i>10.30</i></span></div>
+  </div>
+
+  <div class="card">
+    <div class="top"><span class="code">D</span><span class="badge b-alt">镜面主题备选</span>
+      <span class="name">脆响·碎裂感 · 源自 镐头砸碎岩石_03c</span></div>
+    <audio controls preload="metadata" src="Unity_Ready_48k/D_脆响_镜面碎裂感.wav"></audio>
+    <p class="why">全库<b>最短</b>的一条（有效仅 150ms），起音 0ms、极干脆，低频 41% + 高频刺 11%。契合"破映"的镜面碎裂主题，玩家受击时像身上崩了一小片镜。缺点是稍尖，建议在 Unity 里音量降到 0.7 左右。</p>
+    <div class="kv"><span>有效时长 <i>150ms</i></span><span>起音 <i>0ms</i></span><span>频谱重心 <i>2720Hz</i></span><span>峰均比 <i>19.6dB</i></span></div>
+  </div>
+</section>
+
+<section>
+  <h2>其他候选（按用途备着）</h2>
+  <p class="hint">这些不是最优解，但在特定场景可能更合适。</p>
+
+  <div class="card">
+    <div class="top"><span class="code">C</span><span class="badge b-ctx">重受击</span><span class="name">闷倒感 · 垃圾桶坠落闷响_01</span></div>
+    <audio controls preload="metadata" src="Unity_Ready_48k/C_重受击_闷倒感.wav"></audio>
+    <p class="why">80–250Hz 占 57%，非常闷。适合被击飞（Launch）落地或大伤害，单纯普通受击会显得过重。</p>
+  </div>
+
+  <div class="card">
+    <div class="top"><span class="code">E</span><span class="badge b-ctx">利器受击</span><span class="name">金属剑刃挥砍切割_02</span></div>
+    <audio controls preload="metadata" src="Unity_Ready_48k/E_金属_剑刃切割.wav"></audio>
+    <p class="why">带金属刮擦质感，更像"被刃器划到"。缺点是起音 95ms 偏慢，作受击反馈会有轻微迟滞感。可留给镜刃 Boss 的攻击命中。</p>
+  </div>
+
+  <div class="card">
+    <div class="top"><span class="code">F</span><span class="badge b-ctx">人声哼</span><span class="name">野兽怪物受伤_02</span></div>
+    <audio controls preload="metadata" src="Unity_Ready_48k/F_人声_怪物闷哼.wav"></audio>
+    <p class="why">库里唯一语义上真正的"受伤"声。但是野兽音色，且项目此前已明确<b>人形镜像方向、避开怪兽吼声</b>，所以不作主推。可以叠在 A 底下当第二层"闷哼"。</p>
+  </div>
+
+  <div class="card">
+    <div class="top"><span class="code">G</span><span class="badge b-ctx">低闷撞击</span><span class="name">街机互动破碎坠落撞击</span></div>
+    <audio controls preload="metadata" src="Unity_Ready_48k/G_低闷_撞击坠落.wav"></audio>
+    <p class="why">80–250Hz 高达 92%，几乎纯低频，非常"街机"。风格化强，如果整体走复古像素路线可以考虑。</p>
+  </div>
+
+  <div class="card">
+    <div class="top"><span class="code">H</span><span class="badge b-ctx">断折感</span><span class="name">木棍破碎_04a</span></div>
+    <audio controls preload="metadata" src="Unity_Ready_48k/H_木裂_断折感.wav"></audio>
+    <p class="why">中高频碎裂，"咔嚓"感明显。更适合可破坏物，不适合玩家本体受击。</p>
+  </div>
+
+  <div class="card">
+    <div class="top"><span class="code">I</span><span class="badge b-ctx">濒死/致命一击</span><span class="name">巨型铁砧重击_02</span></div>
+    <audio controls preload="metadata" src="Unity_Ready_48k/I_濒死_铁砧重击.wav"></audio>
+    <p class="why">890ms 长尾、带残响，远超受击音效应有的长度。<b>不能作普通受击</b>，但用于最后一格生命被打掉那一下、或死亡瞬间很有冲击力。</p>
+  </div>
+</section>
+
+<section>
+  <h2>客观数据对照</h2>
+  <p class="hint">受击音效理想区间：有效时长 100–400ms、起音 &lt;30ms、20dB 衰减 &lt;200ms、低频段（20–800Hz）占比 &gt;55%。</p>
+  <table>
+    <thead><tr>
+      <th>编号</th><th class="l">素材</th><th>有效时长</th><th>起音</th><th>−20dB</th><th>−40dB</th>
+      <th>重心Hz</th><th>低频合计</th><th>中频</th><th>峰均比</th><th>评分</th>
+    </tr></thead>
+    <tbody>
+      <tr class="hl"><td>A</td><td class="l">木斧砍树音_02</td><td>325ms</td><td>10ms</td><td>120ms</td><td>235ms</td><td>583</td><td>88%</td><td>5%</td><td>16.2dB</td><td>10.70</td></tr>
+      <tr><td>B</td><td class="l">木斧砍树音_bad_hit_</td><td>475ms</td><td>0ms</td><td>105ms</td><td>280ms</td><td>2285</td><td>58%</td><td>18%</td><td>19.3dB</td><td>10.30</td></tr>
+      <tr><td>C</td><td class="l">垃圾桶坠落闷响_01</td><td>370ms</td><td>30ms</td><td>160ms</td><td>290ms</td><td>317</td><td>90%</td><td>1%</td><td>14.3dB</td><td>9.70</td></tr>
+      <tr><td>D</td><td class="l">镐头砸碎岩石_03c</td><td>150ms</td><td>0ms</td><td>60ms</td><td>110ms</td><td>2720</td><td>69%</td><td>4%</td><td>19.6dB</td><td>11.60</td></tr>
+      <tr><td>E</td><td class="l">金属剑刃挥砍切割_02</td><td>270ms</td><td>95ms</td><td>70ms</td><td>165ms</td><td>2772</td><td>58%</td><td>6%</td><td>16.5dB</td><td>8.10</td></tr>
+      <tr><td>F</td><td class="l">野兽怪物受伤_02</td><td>410ms</td><td>45ms</td><td>230ms</td><td>335ms</td><td>705</td><td>86%</td><td>8%</td><td>15.2dB</td><td>7.50</td></tr>
+      <tr><td>G</td><td class="l">街机互动破碎坠落撞击</td><td>290ms</td><td>30ms</td><td>95ms</td><td>260ms</td><td>164</td><td>96%</td><td>2%</td><td>12.5dB</td><td>9.20</td></tr>
+      <tr><td>H</td><td class="l">木棍破碎_04a</td><td>455ms</td><td>5ms</td><td>190ms</td><td>375ms</td><td>3824</td><td>24%</td><td>28%</td><td>20.0dB</td><td>8.60</td></tr>
+      <tr><td>I</td><td class="l">巨型铁砧重击_02</td><td>890ms</td><td>30ms</td><td>425ms</td><td>815ms</td><td>925</td><td>75%</td><td>8%</td><td>17.2dB</td><td>2.00</td></tr>
+    </tbody>
+  </table>
+  <p class="hint" style="margin-top:12px">注：D 的原始评分最高（11.60），但音色偏脆、低频重量不如 A。玩家受击更需要"被打到的钝感"而非"碎裂感"，所以主推 A、把 D 列为镜面主题备选。另外库里名字最像的<b>机甲中弹爆破音</b>实测 1.1–1.2s 长尾、评分为负，完全不能用作受击。</p>
+</section>
+
+<section>
+  <h2>接入建议</h2>
+  <ul>
+    <li>放到 <code>Assets/MirrorTrial/Audio/SFX/Player/</code>，Import 设置：<code>Load Type = Decompress On Load</code>、<code>Compression = PCM</code> 或 <code>ADPCM</code>、关闭 <code>Force To Mono</code> 之外保持默认。这类短音效不要用 Vorbis 流式加载，会有触发延迟。</li>
+    <li>接入点是现有的 <code>PlayerDamageReceiver</code>。项目里受击已经串了相机震动（<code>CameraShakeService.Shake</code>）和 <code>ScreenFx.Play(PlayerHit)</code>，音效应该跟这两个同帧触发，三者对齐才有打击感。</li>
+    <li>受击有 0.75s 无敌帧，所以不用担心音效叠太密；但仍建议加一个 0.08s 的最小间隔保护。</li>
+    <li>想要更耐听：把 A 和 B 做成 2–3 条的随机轮播，音调随机 ±5%（<code>AudioSource.pitch = Random.Range(0.95f, 1.05f)</code>）。</li>
+    <li>低血量（≤30%，已有 LowHealth 信号）时可以把 A 换成 C，或把音量抬到 1.15 倍，强化"快死了"的压迫感。</li>
+    <li>最后一格生命被打掉那下用 I，配合已有的 Death 屏幕效果。</li>
+  </ul>
+</section>
+
+</main></body></html>

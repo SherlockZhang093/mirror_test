@@ -1,0 +1,17 @@
+Source deck: 2026超新星P族答辩_张聪_实习经历版.pptx
+Slides: 7, 16:9, 1280 x 720 render space.
+
+Reusable patterns:
+- Slide 1: branded cover with editable identity block.
+- Slide 3: self-introduction page already populated from the resume.
+- Slide 4: branded content page with editable title and body text boxes.
+- Slides 5-7: inherited template pages.
+
+Visual contract:
+- Preserve the full-slide raster backgrounds, inherited typography, alignment, insets, and geometry.
+- Rewrite only slide 4 title/body for the game introduction.
+- Explicitly preserve the cover and appendix placeholders so structural placeholders are handled.
+
+Insertion contract:
+- No new primitives, images, charts, tables, or overlays.
+- Keep the game description concise: type, core gameplay, growth path.

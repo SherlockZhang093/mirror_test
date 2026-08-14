@@ -1,0 +1,661 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/jyx0ra1s",
+    "id": "jyx0ra1s",
+    "slide": 4,
+    "layoutId": "/ppt/slideLayouts/slideLayout18.xml",
+    "layoutName": "空白",
+    "layoutType": "blank",
+    "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "Office",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "fontScheme": {
+      "name": "Office",
+      "majorFont": {
+        "latinTypeface": "等线 Light"
+      },
+      "minorFont": {
+        "latinTypeface": "等线"
+      }
+    },
+    "typefaces": [
+      "微软雅黑",
+      "等线",
+      "等线 Light",
+      "腾讯体 W7"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "/ppt/slideLayouts/slideLayout18.xml",
+      "name": "空白",
+      "type": "blank",
+      "parentLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "/ppt/slideMasters/slideMaster2.xml",
+      "type": "master",
+      "backgroundColor": "bg1",
+      "elements": [
+        {
+          "order": 1,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/1026",
+          "id": "1026",
+          "name": "Title Placeholder 1",
+          "bbox": [
+            88.67,
+            38.33,
+            1104,
+            139.17
+          ],
+          "geometry": "rect",
+          "text": "单击此处编辑母版标题样式",
+          "textPreview": "单击此处编辑母版标题样式",
+          "resolvedTextStyle": {
+            "anchor": 2,
+            "vertical": 1,
+            "verticalAlignment": "middle",
+            "wrap": "square",
+            "insets": {
+              "top": 4.8,
+              "right": 9.6,
+              "bottom": 4.8,
+              "left": 9.6
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "单击此处编辑母版标题样式",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "单击此处编辑母版标题样式"
+                }
+              ]
+            }
+          ],
+          "lineWidth": 0
+        },
+        {
+          "order": 2,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/1027",
+          "id": "1027",
+          "name": "Text Placeholder 2",
+          "bbox": [
+            88.67,
+            192,
+            1104,
+            456.83
+          ],
+          "geometry": "rect",
+          "text": "编辑母版文本样式\n第二级\n第三级\n第四级\n第五级",
+          "textPreview": "编辑母版文本样式 | 第二级 | 第三级 | 第四级 | 第五级",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "vertical": 1,
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "insets": {
+              "top": 4.8,
+              "right": 9.6,
+              "bottom": 4.8,
+              "left": 9.6
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "编辑母版文本样式",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "编辑母版文本样式"
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "text": "第二级",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "第二级"
+                }
+              ]
+            },
+            {
+              "index": 3,
+              "text": "第三级",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "第三级"
+                }
+              ]
+            },
+            {
+              "index": 4,
+              "text": "第四级",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "第四级"
+                }
+              ]
+            },
+            {
+              "index": 5,
+              "text": "第五级",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "第五级"
+                }
+              ]
+            }
+          ],
+          "lineWidth": 0
+        },
+        {
+          "order": 3,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/13",
+          "id": "13",
+          "name": "矩形 12",
+          "bbox": [
+            0,
+            688,
+            1280,
+            33
+          ],
+          "geometry": "rect",
+          "resolvedTextStyle": {
+            "anchor": 2,
+            "verticalAlignment": "middle"
+          },
+          "fillColor": "#269FD3",
+          "lineWidth": 0
+        },
+        {
+          "order": 4,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/14",
+          "id": "14",
+          "name": "矩形 17",
+          "bbox": [
+            973.33,
+            688,
+            306.67,
+            33.17
+          ],
+          "geometry": "rect",
+          "resolvedTextStyle": {
+            "anchor": 2,
+            "verticalAlignment": "middle"
+          },
+          "fillColor": "#777370",
+          "lineWidth": 0
+        },
+        {
+          "order": 5,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/15",
+          "id": "15",
+          "name": "直角三角形 15",
+          "bbox": [
+            946.44,
+            666.83,
+            65.33,
+            42.83
+          ],
+          "rotation": 318.62,
+          "geometry": "rtTriangle",
+          "resolvedTextStyle": {
+            "anchor": 2,
+            "verticalAlignment": "middle"
+          },
+          "fillColor": "#0C86B6",
+          "lineWidth": 0
+        }
+      ]
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/b2lc3q1s",
+      "id": "5",
+      "name": "图片 1",
+      "bbox": [
+        0,
+        0,
+        1280,
+        720
+      ],
+      "contentType": "image/jpeg",
+      "asset": {
+        "assetId": "/ppt/media/image2.jpeg",
+        "contentType": "image/jpeg",
+        "byteLength": 188238
+      },
+      "fillImage": {
+        "assetId": "/ppt/media/image2.jpeg",
+        "contentType": "image/jpeg",
+        "byteLength": 188238
+      }
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0ba143al",
+      "id": "3",
+      "name": "文本框 2",
+      "bbox": [
+        83.32,
+        27.94,
+        1091.77,
+        61.39
+      ],
+      "geometry": "rect",
+      "text": "2 . 命题研究展示（游戏提案/课题研究）",
+      "textPreview": "2 . 命题研究展示（游戏提案/课题研究）",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "等线",
+        "color": "tx1",
+        "alignment": "left",
+        "wrap": "square",
+        "autoFit": "resizeShapeToFitText",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "2 . 命题研究展示（游戏提案/课题研究）"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "2 . 命题研究展示（游戏提案/课题研究）",
+          "lineSpacingPercent": 100000,
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "2 . ",
+              "fontSize": 42.67,
+              "typeface": "腾讯体 W7",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 2,
+              "text": "命题研究展示（游戏提案",
+              "fontSize": 42.67,
+              "typeface": "腾讯体 W7",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 3,
+              "text": "/",
+              "fontSize": 42.67,
+              "typeface": "腾讯体 W7",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 4,
+              "text": "课题研究）",
+              "fontSize": 42.67,
+              "typeface": "腾讯体 W7",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/rm1k7yt4",
+      "id": "4",
+      "name": "矩形 3",
+      "bbox": [
+        94.26,
+        130.04,
+        1035.87,
+        405.52
+      ],
+      "geometry": "rect",
+      "text": "按照题目要求，完整呈现\n其中【游戏提案】（游戏提案思路逻辑呈现；若有demo，需要安排评委游戏体验环节）\n【小结与思考】对命题研究的总结，不仅限于\n阐述任务过程中遇到的挑战和难度，你如何克服的\n过程中你做过哪些重要的决策或抉择\n在命题研究中，你需要加强哪些方面的能力",
+      "textPreview": "按照题目要求，完整呈现 | 其中【游戏提案】（游戏提案思路逻辑呈现；若有demo，需要安排评委游戏体验环节） | 【小结与思考】对命题研究的总结，不仅限于 | 阐述任务过程中遇到的挑战和难度，你如何克服的 | 过程中你做过哪些重要的决策或抉择 | 在命题研究中，你需要加强哪...",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "等线",
+        "color": "tx1",
+        "alignment": "left",
+        "wrap": "square",
+        "autoFit": "resizeShapeToFitText",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 12,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Ø按照题目要求，完整呈现"
+          },
+          {
+            "index": 2,
+            "text": ""
+          },
+          {
+            "index": 3,
+            "text": "其中【游戏提案】（游戏提案思路逻辑呈现；若有demo"
+          },
+          {
+            "index": 4,
+            "text": "，需要安排评委游戏体验环节）"
+          },
+          {
+            "index": 5,
+            "text": ""
+          },
+          {
+            "index": 6,
+            "text": "Ø【小结与思考】对命题研究的总结，不仅限于"
+          },
+          {
+            "index": 7,
+            "text": ""
+          },
+          {
+            "index": 8,
+            "text": "•阐述任务过程中遇到的挑战和难度，你如何克服的"
+          },
+          {
+            "index": 9,
+            "text": ""
+          },
+          {
+            "index": 10,
+            "text": "•过程中你做过哪些重要的决策或抉择"
+          },
+          {
+            "index": 11,
+            "text": ""
+          },
+          {
+            "index": 12,
+            "text": "•在命题研究中，你需要加强哪些方面的能力"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "按照题目要求，完整呈现",
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "按照题目要求，完整呈现",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 342900
+        },
+        {
+          "index": 2,
+          "text": "其中【游戏提案】（游戏提案思路逻辑呈现；若有demo，需要安排评委游戏体验环节）",
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "其中",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 2,
+              "text": "【",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 3,
+              "text": "游戏提案",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 4,
+              "text": "】",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 5,
+              "text": "（游戏提案思路逻辑呈现；若有",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 6,
+              "text": "demo",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 7,
+              "text": "，需要安排评委游戏体验环节）",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 342900
+        },
+        {
+          "index": 3,
+          "text": "【小结与思考】对命题研究的总结，不仅限于",
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "【",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 2,
+              "text": "小结与思考",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 3,
+              "text": "】",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 4,
+              "text": "对命题研究的总结，不仅限于",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 342900
+        },
+        {
+          "index": 4,
+          "text": "阐述任务过程中遇到的挑战和难度，你如何克服的",
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "阐述任务过程中",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 2,
+              "text": "遇到的挑战和难度，你如何克服的",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 342900
+        },
+        {
+          "index": 5,
+          "text": "过程中你做过哪些重要的决策或抉择",
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "过程中你做过哪些重要的决策或抉择",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 342900
+        },
+        {
+          "index": 6,
+          "text": "在命题研究中，你需要加强哪些方面的能力",
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "在命题研究中，你需要加强哪些方面的能力",
+              "fontSize": 26.67,
+              "typeface": "微软雅黑",
+              "color": "bg1",
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 342900
+        }
+      ]
+    }
+  ],
+  "composeRuns": []
+}

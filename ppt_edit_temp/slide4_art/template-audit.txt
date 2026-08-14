@@ -1,0 +1,20 @@
+Source deck: G:/mirror_test/2026超新星P族答辩_张聪_实习经历版.pptx
+Slides: 7, 1280 x 720.
+Slide 1: cover / identity.
+Slide 2: agenda.
+Slide 3: self-introduction and internship experience.
+Slide 4: game positioning and core loop; full-slide background image with title and body text.
+Slide 5: combat editor overview.
+Slide 6: AI application in the game project.
+Slide 7: closing bumper.
+
+Typography and chrome:
+- Preserve the existing title and body font families, sizes, white color, and the bottom master bar.
+- Slide 4 is the only edited slide.
+- Replace the inherited full-slide background image, then shorten and reposition the inherited body textbox to the left negative-space zone.
+- Keep every other slide and every inherited master/layout element unchanged.
+
+Insertion contract:
+- Slide 4 image im/b2lc3q1s: replace with generated mirror-world concept art.
+- Slide 4 body sh/rm1k7yt4: rewrite and reposition inside the dark left 40%.
+- Slide 4 title sh/0ba143al: preserve.

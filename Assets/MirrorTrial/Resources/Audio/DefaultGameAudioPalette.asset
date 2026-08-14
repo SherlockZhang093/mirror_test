@@ -1,0 +1,90 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8adf16f0c6584d94984e148c44580fab, type: 3}
+  m_Name: DefaultGameAudioPalette
+  m_EditorClassIdentifier: 
+  uiSelect: {fileID: 8300000, guid: 726a33e5b54d0a54c9ddb6ac3f518f95, type: 3}
+  uiSelectVolume: 1
+  uiCancel: {fileID: 8300000, guid: 3275dca6bc70a9e4480c3a81bdb1c232, type: 3}
+  uiCancelVolume: 1
+  uiComplete: {fileID: 8300000, guid: a943adbc0429a104ca267a9e8493d423, type: 3}
+  uiCompleteVolume: 1
+  sandFootstep: {fileID: 8300000, guid: 1151f11f177e429cba7602a78d502a40, type: 3}
+  sandFootstepVolume: 1
+  stoneFootstep: {fileID: 8300000, guid: 5ee199b737a641a4c8b345d2bd0f3d4b, type: 3}
+  stoneFootstepVolume: 1
+  jump: {fileID: 8300000, guid: f5eaf2d667fc4e24a6604a13806d4144, type: 3}
+  jumpVolume: 1
+  land: {fileID: 8300000, guid: 4ea3253130a675a4599759108c30affb, type: 3}
+  landVolume: 1
+  dodge: {fileID: 8300000, guid: 775245b2eab3f984bb3d4b089085e288, type: 3}
+  dodgeVolume: 1
+  swordSwing: {fileID: 8300000, guid: e4ccf842b913488a818fcfcd6b721cfd, type: 3}
+  swordSwingVolume: 1
+  heavySwordSwing: {fileID: 8300000, guid: be97258dee695ad4bb2f4cd4782b1cc8, type: 3}
+  heavySwordSwingVolume: 1
+  swordHit: {fileID: 8300000, guid: 0316f6fe96b88bb4f820a3b8ecfc21e2, type: 3}
+  swordHitVolume: 1
+  guardClash: {fileID: 8300000, guid: ef7cc151b42bf7e4bb27802d707a5f8d, type: 3}
+  guardClashVolume: 1
+  unarmedSwing: {fileID: 8300000, guid: f6bd6bdea9e9a4a409e32525f4c3dd33, type: 3}
+  unarmedSwingVolume: 1
+  unarmedHit: {fileID: 8300000, guid: d05ba1ef53b7ddc4c8f638e91dc6ce1a, type: 3}
+  unarmedHitVolume: 1
+  bowDraw: {fileID: 8300000, guid: f1082c7ed2f2cc74e9fe37607bb30f70, type: 3}
+  bowDrawVolume: 1
+  bowFire: {fileID: 8300000, guid: 031d6f91cc52b3247b07babf5eb56cca, type: 3}
+  bowFireVolume: 1
+  arrowHit: {fileID: 8300000, guid: 5680c2e400f43374c8e268661b8c6ed1, type: 3}
+  arrowHitVolume: 1
+  playerHurt: {fileID: 8300000, guid: b1cf1ca391f25d84bb7476bafc946529, type: 3}
+  playerHurtVolume: 1
+  playerDeath: {fileID: 8300000, guid: d42d7986df0fd414da31db9dda6a8662, type: 3}
+  playerDeathVolume: 1
+  enemyAttack: {fileID: 8300000, guid: b32bca7daf602f8408c68302696dacd6, type: 3}
+  enemyAttackVolume: 0.135
+  enemyHurt: {fileID: 8300000, guid: 5bee8258221761b4e9ab37c28dfa5f34, type: 3}
+  enemyHurtVolume: 0.15
+  enemyDeath: {fileID: 8300000, guid: 23329cf7ff18aae44a1a397f73c941b2, type: 3}
+  enemyDeathVolume: 0.134
+  bossCharge: {fileID: 8300000, guid: e36d9839af4c3364a90994eef0770804, type: 3}
+  bossChargeVolume: 0.197
+  mirrorBladeRelease: {fileID: 8300000, guid: 8e9d7d3047e8f50439223006b36a4c15, type: 3}
+  mirrorBladeReleaseVolume: 1
+  teleport: {fileID: 8300000, guid: f54e74dde6a834a4097b804505177339, type: 3}
+  teleportVolume: 1
+  summon: {fileID: 8300000, guid: d09a046ac2a3efa49b890fb28f532097, type: 3}
+  summonVolume: 1
+  mirrorHit: {fileID: 8300000, guid: f1a127b769d46714bbfecb401dac76b5, type: 3}
+  mirrorHitVolume: 1
+  mirrorShatter: {fileID: 8300000, guid: c5c43f02e3c7b2948ba324802ff5147b, type: 3}
+  mirrorShatterVolume: 1
+  pulleyMove: {fileID: 8300000, guid: 04d1b4b87cfae02468a616ec0113c203, type: 3}
+  pulleyMoveVolume: 1
+  ropeBreak: {fileID: 8300000, guid: ca82c55942aa77b4f86309306564f784, type: 3}
+  ropeBreakVolume: 1
+  platformLand: {fileID: 8300000, guid: 45465cd5addac0a48a1eb8d05cde57bd, type: 3}
+  platformLandVolume: 1
+  grassHit: {fileID: 8300000, guid: 94332eccaa8c4256a4ea690e90ebd1df, type: 3}
+  grassHitVolume: 1
+  stoneHit: {fileID: 8300000, guid: 00bff0eab37148e39a6e36add8c3a887, type: 3}
+  stoneHitVolume: 1
+  resourcePickup: {fileID: 8300000, guid: 7c951a7a98f36ce4f9cc47e0dbcfaa95, type: 3}
+  resourcePickupVolume: 1
+  heal: {fileID: 8300000, guid: cd17ea722d66ff44981e0b13eec01780, type: 3}
+  healVolume: 1
+  ruinsAmbience: {fileID: 8300000, guid: f5b2c5b41f48d5047bec36cc353c398c, type: 3}
+  ruinsAmbienceVolume: 1
+  mirrorAmbience: {fileID: 8300000, guid: b145b2ed1c1543845854a2eb5129026c, type: 3}
+  mirrorAmbienceVolume: 0.567
+  jungleAmbience: {fileID: 8300000, guid: cd5c7c759d4976e449a7836495e317ef, type: 3}
+  jungleAmbienceVolume: 1

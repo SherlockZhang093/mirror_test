@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a2b7ca7f65e4b5498c7c7c9a0c91e41, type: 3}
+  m_Name: CameraTuning
+  m_EditorClassIdentifier: 
+  playerTrackedOffset: {x: 0, y: 1.25, z: 0}
+  playerLookaheadTime: 0.12
+  playerLookaheadSmoothing: 0.15
+  playerXDamping: 0.22
+  playerYDamping: 0.32
+  playerScreenX: 0.5
+  playerScreenY: 0.45
+  playerDeadZoneWidth: 0.08
+  playerDeadZoneHeight: 0.12
+  playerSoftZoneWidth: 0.8
+  playerSoftZoneHeight: 0.72
+  lightHitStrength: 0.07
+  heavyHitStrength: 0.3
+  impulseGain: 0.7
+  impulseDuration: 0.11
+  bossBlendIn: 0.55
+  bossHold: 1.15
+  bossBlendOut: 0.5
+  bossOrthographicSize: 3.25
+  bossTargetOffset: {x: 0, y: 1, z: 0}

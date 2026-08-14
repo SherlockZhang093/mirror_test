@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace MirrorTrial.Player
 {
@@ -15,7 +15,7 @@ namespace MirrorTrial.Player
     {
         [Header("Land buffer")]
         [Tooltip("落地后维持 Land 态的时间（秒），播放着地动画/缓冲。0 = 不用 Land 态")]
-        [SerializeField] float landStateDuration = 0.08f;
+        [SerializeField] float landStateDuration = 0.1667f;
 
         [Header("Debug")]
         [SerializeField] bool logStateChanges = true;
@@ -39,12 +39,26 @@ namespace MirrorTrial.Player
             CurrentState == PlayerActionState.Attack ||
             CurrentState == PlayerActionState.Cast ||
             CurrentState == PlayerActionState.Dash ||
+            CurrentState == PlayerActionState.Dodge ||
+            CurrentState == PlayerActionState.LedgeHang ||
+            CurrentState == PlayerActionState.LedgeClimb ||
+            CurrentState == PlayerActionState.MonkeyBarIdle ||
+            IsLadderState(CurrentState) ||
+            CurrentState == PlayerActionState.AirSlashUp ||
+            CurrentState == PlayerActionState.AirSlashDown ||
             CurrentState == PlayerActionState.Hurt ||
             CurrentState == PlayerActionState.Dead;
 
         /// <summary>动作态期间应锁定水平移动（Attack/Hurt/Dead 锁，Dash 由自身控制速度）</summary>
         public bool ShouldLockMovement =>
             CurrentState == PlayerActionState.Attack ||
+            CurrentState == PlayerActionState.Dodge ||
+            CurrentState == PlayerActionState.LedgeHang ||
+            CurrentState == PlayerActionState.LedgeClimb ||
+            CurrentState == PlayerActionState.MonkeyBarIdle ||
+            IsLadderState(CurrentState) ||
+            CurrentState == PlayerActionState.AirSlashUp ||
+            CurrentState == PlayerActionState.AirSlashDown ||
             CurrentState == PlayerActionState.Hurt ||
             CurrentState == PlayerActionState.Dead;
 
@@ -66,8 +80,8 @@ namespace MirrorTrial.Player
         void Tick()
         {
             // 1) 落地事件检测：空中 → 地面 的那一帧，进入 Land 缓冲
-            // 用 Motor 的稳定落地标志（经过吸附稳定化），而非基类每帧横跳的 IsGrounded
-            bool grounded = motor.StableGrounded;
+            // PlayerMotor owns the single authoritative grounded result.
+            bool grounded = motor.IsGrounded;
             if (grounded && !wasGroundedLastFrame)
                 landTimer = landStateDuration;
             else if (landTimer > 0f)
@@ -80,8 +94,6 @@ namespace MirrorTrial.Player
             {
                 PreviousState = CurrentState;
                 CurrentState = next;
-                if (logStateChanges)
-                    Debug.Log($"[SM] {PreviousState} → {CurrentState} | grounded={grounded} vel.y={motor.Velocity.y:F2} moveX={input.MoveX:F1}");
             }
         }
 
@@ -90,6 +102,9 @@ namespace MirrorTrial.Player
             // 最高优先级：外部请求的动作态（死亡/受击/攻击/施法/冲刺）
             if (requestedAction != PlayerActionState.None)
                 return requestedAction;
+
+            if (motor.IsDoubleJumpAnimating)
+                return PlayerActionState.DoubleJump;
 
             // 空中：上升 / 下落
             if (!grounded)
@@ -114,6 +129,17 @@ namespace MirrorTrial.Player
         {
             if (requestedAction == state)
                 requestedAction = PlayerActionState.None;
+        }
+
+        /// <summary>Used by forced interruptions after every action owner has cleaned up its local state.</summary>
+        public void CancelRequestedAction()
+        {
+            requestedAction = PlayerActionState.None;
+        }
+
+        static bool IsLadderState(PlayerActionState state)
+        {
+            return state >= PlayerActionState.LadderGrab && state <= PlayerActionState.LadderJumpPrepare;
         }
     }
 }

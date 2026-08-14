@@ -1,0 +1,11 @@
+Source deck: 2026超新星P族答辩_张聪_实习经历版.pptx
+Slides: 7, 16:9, 1280 x 720 render space.
+
+Visual contract:
+- Preserve inherited raster backgrounds, typography, geometry, bullets, and alignment.
+- Rewrite only slide 6 title/body.
+- Explicitly preserve inherited cover and closing structural text.
+
+Content contract:
+- Present AI usage in three concrete layers: executable PRD, WorkBuddy/Codex handoff, and production-ready animation generation.
+- Keep each layer outcome-oriented and concise.

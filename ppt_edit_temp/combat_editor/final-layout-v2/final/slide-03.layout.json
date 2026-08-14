@@ -1,0 +1,873 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/ofy9wn61",
+    "id": "ofy9wn61",
+    "slide": 3,
+    "layoutId": "/ppt/slideLayouts/slideLayout18.xml",
+    "layoutName": "空白",
+    "layoutType": "blank",
+    "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "Office",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "fontScheme": {
+      "name": "Office",
+      "majorFont": {
+        "latinTypeface": "等线 Light"
+      },
+      "minorFont": {
+        "latinTypeface": "等线"
+      }
+    },
+    "typefaces": [
+      "等线",
+      "等线 Light",
+      "腾讯体 W3",
+      "腾讯体 W7"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "/ppt/slideLayouts/slideLayout18.xml",
+      "name": "空白",
+      "type": "blank",
+      "parentLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "/ppt/slideMasters/slideMaster2.xml",
+      "type": "master",
+      "backgroundColor": "bg1",
+      "elements": [
+        {
+          "order": 1,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/1026",
+          "id": "1026",
+          "name": "Title Placeholder 1",
+          "bbox": [
+            88.67,
+            38.33,
+            1104,
+            139.17
+          ],
+          "geometry": "rect",
+          "text": "单击此处编辑母版标题样式",
+          "textPreview": "单击此处编辑母版标题样式",
+          "resolvedTextStyle": {
+            "anchor": 2,
+            "vertical": 1,
+            "verticalAlignment": "middle",
+            "wrap": "square",
+            "insets": {
+              "top": 4.8,
+              "right": 9.6,
+              "bottom": 4.8,
+              "left": 9.6
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "单击此处编辑母版标题样式",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "单击此处编辑母版标题样式"
+                }
+              ]
+            }
+          ],
+          "lineWidth": 0
+        },
+        {
+          "order": 2,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/1027",
+          "id": "1027",
+          "name": "Text Placeholder 2",
+          "bbox": [
+            88.67,
+            192,
+            1104,
+            456.83
+          ],
+          "geometry": "rect",
+          "text": "编辑母版文本样式\n第二级\n第三级\n第四级\n第五级",
+          "textPreview": "编辑母版文本样式 | 第二级 | 第三级 | 第四级 | 第五级",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "vertical": 1,
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "insets": {
+              "top": 4.8,
+              "right": 9.6,
+              "bottom": 4.8,
+              "left": 9.6
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "编辑母版文本样式",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "编辑母版文本样式"
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "text": "第二级",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "第二级"
+                }
+              ]
+            },
+            {
+              "index": 3,
+              "text": "第三级",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "第三级"
+                }
+              ]
+            },
+            {
+              "index": 4,
+              "text": "第四级",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "第四级"
+                }
+              ]
+            },
+            {
+              "index": 5,
+              "text": "第五级",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "第五级"
+                }
+              ]
+            }
+          ],
+          "lineWidth": 0
+        },
+        {
+          "order": 3,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/13",
+          "id": "13",
+          "name": "矩形 12",
+          "bbox": [
+            0,
+            688,
+            1280,
+            33
+          ],
+          "geometry": "rect",
+          "resolvedTextStyle": {
+            "anchor": 2,
+            "verticalAlignment": "middle"
+          },
+          "fillColor": "#269FD3",
+          "lineWidth": 0
+        },
+        {
+          "order": 4,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/14",
+          "id": "14",
+          "name": "矩形 17",
+          "bbox": [
+            973.33,
+            688,
+            306.67,
+            33.17
+          ],
+          "geometry": "rect",
+          "resolvedTextStyle": {
+            "anchor": 2,
+            "verticalAlignment": "middle"
+          },
+          "fillColor": "#777370",
+          "lineWidth": 0
+        },
+        {
+          "order": 5,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster2.xml/15",
+          "id": "15",
+          "name": "直角三角形 15",
+          "bbox": [
+            946.44,
+            666.83,
+            65.33,
+            42.83
+          ],
+          "rotation": 318.62,
+          "geometry": "rtTriangle",
+          "resolvedTextStyle": {
+            "anchor": 2,
+            "verticalAlignment": "middle"
+          },
+          "fillColor": "#0C86B6",
+          "lineWidth": 0
+        }
+      ]
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/qpon6hgj",
+      "id": "9",
+      "name": "图片 1",
+      "bbox": [
+        0,
+        0,
+        1280,
+        720
+      ],
+      "contentType": "image/jpeg",
+      "asset": {
+        "assetId": "/ppt/media/image2.jpeg",
+        "contentType": "image/jpeg",
+        "byteLength": 188238
+      },
+      "fillImage": {
+        "assetId": "/ppt/media/image2.jpeg",
+        "contentType": "image/jpeg",
+        "byteLength": 188238
+      }
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/d0jax03i",
+      "id": "3",
+      "name": "文本框 2",
+      "bbox": [
+        87.67,
+        360,
+        1018.29,
+        271.42
+      ],
+      "geometry": "rect",
+      "text": "莉莉丝｜Unity 技术策划（关卡）\n\n• 推动关卡 / NPC 编辑器与动物玩法工具链落地\n• 建设资源检索、配置 ID 与对话内容生产流程\n\n腾讯 天美J1｜Unity 客户端 → UE 技术策划（战斗）\n\n• 负责 3C 镜头、物理交互与 UI 开发\n• 搭建英雄 Ability Pipeline，推进技能配置自动化",
+      "textPreview": "莉莉丝｜Unity 技术策划（关卡） |  | • 推动关卡 / NPC 编辑器与动物玩法工具链落地 | • 建设资源检索、配置 ID 与对话内容生产流程 |  | 腾讯 天美J1｜Unity 客户端 → UE 技术策划（战斗） |  | • 负责 3C 镜头、物理交互与 ...",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "等线",
+        "color": "tx1",
+        "alignment": "left",
+        "wrap": "square",
+        "autoFit": "resizeShapeToFitText",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 9,
+        "lines": [
+          {
+            "index": 1,
+            "text": "莉莉丝｜Unity 技术策划（关卡）"
+          },
+          {
+            "index": 2,
+            "text": ""
+          },
+          {
+            "index": 3,
+            "text": "• 推动关卡 / NPC 编辑器与动物玩法工具链落地"
+          },
+          {
+            "index": 4,
+            "text": "• 建设资源检索、配置 ID 与对话内容生产流程"
+          },
+          {
+            "index": 5,
+            "text": ""
+          },
+          {
+            "index": 6,
+            "text": "腾讯 天美J1｜Unity 客户端 → UE 技术策划（战斗）"
+          },
+          {
+            "index": 7,
+            "text": ""
+          },
+          {
+            "index": 8,
+            "text": "• 负责 3C 镜头、物理交互与 UI 开发"
+          },
+          {
+            "index": 9,
+            "text": "• 搭建英雄 Ability Pipeline，推进技能配置自动化"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "莉莉丝｜Unity 技术策划（关卡）",
+          "lineSpacingPercent": 100000,
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "莉莉丝｜Unity",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 2,
+              "text": " ",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 3,
+              "text": "技术策划",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 4,
+              "text": "（关卡）",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        },
+        {
+          "index": 2,
+          "text": "\n• 推动关卡 / NPC 编辑器与动物玩法工具链落地\n• 建设资源检索、配置 ID 与对话内容生产流程\n\n腾讯 天美J1｜Unity 客户端 → UE 技术策划（战斗）",
+          "lineSpacingPercent": 100000,
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "\n• ",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 2,
+              "text": "推动关卡",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 3,
+              "text": " / NPC ",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 4,
+              "text": "编辑器与动物玩法工具链落地",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 5,
+              "text": "\n• ",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 6,
+              "text": "建设资源检索、配置",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 7,
+              "text": " ID ",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 8,
+              "text": "与对话内容生产流程",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 9,
+              "text": "\n\n",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 10,
+              "text": "腾讯",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 11,
+              "text": " ",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 12,
+              "text": "天美",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 13,
+              "text": "J1｜Unity ",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 14,
+              "text": "客户端",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 15,
+              "text": " → UE ",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 16,
+              "text": "技术策划",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 17,
+              "text": "（战斗）",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        },
+        {
+          "index": 3,
+          "text": "\n• 负责 3C 镜头、物理交互与 UI 开发\n• 搭建英雄 Ability Pipeline，推进技能配置自动化",
+          "lineSpacingPercent": 100000,
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "\n• ",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 2,
+              "text": "负责",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 3,
+              "text": " 3C ",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 4,
+              "text": "镜头、物理交互与",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 5,
+              "text": " UI ",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 6,
+              "text": "开发",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 7,
+              "text": "\n• ",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 8,
+              "text": "搭建英雄",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 9,
+              "text": " Ability ",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 10,
+              "text": "Pipeline，推进技能配置自动化",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/298ryl4v",
+      "id": "4",
+      "name": "文本框 3",
+      "bbox": [
+        87.67,
+        88.16,
+        831.67,
+        54.93
+      ],
+      "geometry": "rect",
+      "text": "学历背景：",
+      "textPreview": "学历背景：",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "等线",
+        "color": "tx1",
+        "alignment": "left",
+        "wrap": "square",
+        "autoFit": "resizeShapeToFitText",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "学历背景："
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "学历背景：",
+          "lineSpacingPercent": 100000,
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "学历背景：",
+              "fontSize": 37.33,
+              "typeface": "腾讯体 W7",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3ah8rqlg",
+      "id": "5",
+      "name": "文本框 4",
+      "bbox": [
+        87.67,
+        161,
+        644.48,
+        67.86
+      ],
+      "geometry": "rect",
+      "text": "清华大学｜互动媒体设计与技术硕士\n华中科技大学｜自动化学士",
+      "textPreview": "清华大学｜互动媒体设计与技术硕士 | 华中科技大学｜自动化学士",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "等线",
+        "color": "tx1",
+        "alignment": "left",
+        "wrap": "square",
+        "autoFit": "resizeShapeToFitText",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "清华大学｜互动媒体设计与技术硕士"
+          },
+          {
+            "index": 2,
+            "text": "华中科技大学｜自动化学士"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "清华大学｜互动媒体设计与技术硕士\n华中科技大学｜自动化学士",
+          "runs": [
+            {
+              "index": 1,
+              "text": "清华大学",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 2,
+              "text": "｜互动媒体设计与技术硕士\n",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            },
+            {
+              "index": 3,
+              "text": "华中科技大学",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            },
+            {
+              "index": 4,
+              "text": "｜自动化学士",
+              "fontSize": 24,
+              "typeface": "腾讯体 W3",
+              "color": "bg1",
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/m5cra54z",
+      "id": "8",
+      "name": "文本框 7",
+      "bbox": [
+        92.08,
+        278.38,
+        640.07,
+        54.93
+      ],
+      "geometry": "rect",
+      "text": "实习背景：",
+      "textPreview": "实习背景：",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "等线",
+        "color": "tx1",
+        "alignment": "left",
+        "wrap": "square",
+        "autoFit": "resizeShapeToFitText",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "实习背景："
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "实习背景：",
+          "lineSpacingPercent": 100000,
+          "resolvedTextStyle": {
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "实习背景：",
+              "fontSize": 37.33,
+              "typeface": "腾讯体 W7",
+              "color": "bg1",
+              "bold": true,
+              "textTransform": "none"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ]
+    }
+  ],
+  "composeRuns": []
+}

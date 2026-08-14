@@ -1,0 +1,165 @@
+{
+  "sequence": "FatalImbalance",
+  "cell": [
+    192,
+    128
+  ],
+  "frame_count": 6,
+  "root_anchor": [
+    96,
+    66
+  ],
+  "fixed_sequence_scale": true,
+  "core_mismatch_pixels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "head_neck_angles_degrees": [
+    0,
+    -3,
+    -6,
+    -10,
+    -14,
+    -18
+  ],
+  "head_neck_pivot": [
+    99,
+    66
+  ],
+  "action_regions": [
+    "articulated head-neck chain",
+    "wings",
+    "tail",
+    "cracks"
+  ],
+  "alpha_bboxes": [
+    [
+      4,
+      4,
+      128,
+      95
+    ],
+    [
+      4,
+      8,
+      128,
+      96
+    ],
+    [
+      4,
+      10,
+      128,
+      113
+    ],
+    [
+      4,
+      21,
+      128,
+      116
+    ],
+    [
+      4,
+      28,
+      128,
+      117
+    ],
+    [
+      4,
+      46,
+      127,
+      107
+    ]
+  ],
+  "transparent_corners": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ],
+  "saved_gif_validation": {
+    "frame_count": 6,
+    "transparent_corner_alpha": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "alpha_bboxes": [
+      [
+        4,
+        4,
+        128,
+        95
+      ],
+      [
+        4,
+        9,
+        128,
+        96
+      ],
+      [
+        4,
+        10,
+        128,
+        113
+      ],
+      [
+        4,
+        22,
+        128,
+        116
+      ],
+      [
+        4,
+        29,
+        128,
+        116
+      ],
+      [
+        4,
+        46,
+        127,
+        107
+      ]
+    ],
+    "all_frames_have_transparency": true
+  }
+}

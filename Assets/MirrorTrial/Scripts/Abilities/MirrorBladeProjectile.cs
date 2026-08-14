@@ -1,4 +1,4 @@
-﻿using MirrorTrial.Combat;
+using MirrorTrial.Combat;
 using MirrorTrial.Feedback;
 using UnityEngine;
 
@@ -62,10 +62,17 @@ namespace MirrorTrial.Abilities
             if (!hurtbox)
                 return;
 
-            hurtbox.ReceiveHit(payload);
-            HitStopService.Request(payload.hitStop);
+            var allowsHitFeedback = hurtbox.ReceiveHit(payload);
+            if (allowsHitFeedback)
+            {
+                if (payload.source)
+                    payload.source.SendMessage("OnMirrorBladeConnected", SendMessageOptions.DontRequireReceiver);
+                HitStopService.Request(payload.hitStop);
+                CameraFeedbackService.RequestHit(payload);
+            }
             Destroy(gameObject);
         }
     }
 }
+
 

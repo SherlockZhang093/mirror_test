@@ -1,0 +1,23 @@
+{
+  "frames": 4,
+  "fps": 10,
+  "canvas": [
+    192,
+    128
+  ],
+  "formal_unity_assets_modified": false,
+  "parts": [
+    "far_wing",
+    "near_wing",
+    "body",
+    "upper_tail",
+    "lower_tail"
+  ],
+  "pose_sequence": [
+    5,
+    4,
+    3,
+    2
+  ],
+  "body_core_fixed": true
+}

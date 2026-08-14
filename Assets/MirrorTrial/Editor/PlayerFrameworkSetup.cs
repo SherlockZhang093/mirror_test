@@ -1,4 +1,4 @@
-﻿using MirrorTrial.Abilities;
+using MirrorTrial.Abilities;
 using MirrorTrial.Combat;
 using MirrorTrial.Player;
 using Platformer.Mechanics;
@@ -13,11 +13,11 @@ namespace MirrorTrial.Editor
         const string AbilityPrefabFolder = "Assets/MirrorTrial/Prefabs/Abilities";
         const string PlayerPrefabPath = CharacterPrefabFolder + "/Player_MirrorTrial.prefab";
         const string MirrorBladePrefabPath = AbilityPrefabFolder + "/MirrorBladeProjectile.prefab";
-        const string AnimatorPath = "Assets/DeadRevolver/PixelPrototypePlayerSprites/Art/Animations/Animators/PlayerAnimator.controller";
+        const string AnimatorPath = "Assets/MirrorTrial/Animations/Player/Player_MirrorTrial.controller";
         const string IdleSpritePath = "Assets/DeadRevolver/PixelPrototypePlayerSprites/Art/Sprites/Idle/Idle01.png";
         const string MirrorBladeSpritePath = "Assets/DeadRevolver/PixelPrototypePlayerSprites/Art/Sprites/Combat/AirSlash/AirSlash01.png";
 
-        [MenuItem("Tools/Mirror Trial/Create Player Test Prefab")]
+        [MenuItem("Tools/镜像试炼/战斗/创建玩家测试预制体")]
         public static void CreatePlayerTestPrefab()
         {
             EnsureProjectFolders();
@@ -26,21 +26,28 @@ namespace MirrorTrial.Editor
 
             Selection.activeObject = playerPrefab;
             EditorGUIUtility.PingObject(playerPrefab);
-            Debug.Log("Created Mirror Trial player test prefab: " + PlayerPrefabPath);
+            Debug.Log("已创建镜像试炼玩家测试预制体：" + PlayerPrefabPath);
         }
 
-        [MenuItem("Tools/Mirror Trial/Fix Existing Player Prefab (add StateMachine)")]
+        [MenuItem("Tools/镜像试炼/战斗/修复现有玩家预制体（添加状态机）")]
         public static void FixExistingPlayerPrefab()
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
             if (!prefab)
             {
-                Debug.LogError("找不到 Player prefab：" + PlayerPrefabPath + "，请先 Create Player Test Prefab。");
+                Debug.LogError("找不到 Player prefab：" + PlayerPrefabPath + "，请先运行“创建玩家测试预制体”。");
                 return;
             }
 
             var root = PrefabUtility.LoadPrefabContents(PlayerPrefabPath);
             bool changed = false;
+
+            if (!root.GetComponent<PlayerDodgeController>())
+            {
+                root.AddComponent<PlayerDodgeController>();
+                changed = true;
+                Debug.Log("Player prefab: added PlayerDodgeController.");
+            }
 
             if (!root.GetComponent<PlayerStateMachine>())
             {
@@ -64,23 +71,29 @@ namespace MirrorTrial.Editor
             var player = new GameObject("Player_MirrorTrial");
             ApplyTagAndLayer(player);
 
-            var spriteRenderer = player.AddComponent<SpriteRenderer>();
+            var visual = new GameObject("Visual");
+            visual.transform.SetParent(player.transform, false);
+
+            var spriteRenderer = visual.AddComponent<SpriteRenderer>();
             spriteRenderer.sortingOrder = 5;
             spriteRenderer.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(IdleSpritePath);
 
-            var animator = player.AddComponent<Animator>();
+            var animator = visual.AddComponent<Animator>();
             animator.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(AnimatorPath);
+            animator.applyRootMotion = false;
 
             var body = player.AddComponent<Rigidbody2D>();
-            body.bodyType = RigidbodyType2D.Kinematic;
-            body.useFullKinematicContacts = false;
-            body.interpolation = RigidbodyInterpolation2D.None;
-            body.collisionDetectionMode = CollisionDetectionMode2D.Discrete;
+            body.bodyType = RigidbodyType2D.Dynamic;
+            body.gravityScale = 0f;
+            body.drag = 2f;
+            body.angularDrag = 1f;
+            body.interpolation = RigidbodyInterpolation2D.Interpolate;
+            body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
             body.freezeRotation = true;
 
             var collider = player.AddComponent<BoxCollider2D>();
-            collider.offset = new Vector2(0f, -0.10f);
-            collider.size = new Vector2(0.45f, 0.90f);
+            collider.offset = new Vector2(0f, 0.6389099f);
+            collider.size = new Vector2(0.45f, 1.3145105f);
 
             var health = player.AddComponent<Health>();
             health.maxHP = 100;
@@ -92,12 +105,17 @@ namespace MirrorTrial.Editor
             tuning.abilities.echoDashUnlocked = true;
 
             player.AddComponent<PlayerStateMachine>();
-            player.AddComponent<PlayerMotor>();
+            var motor = player.AddComponent<PlayerMotor>();
+            var motorSettings = new SerializedObject(motor);
+            motorSettings.FindProperty("groundMask").intValue = 1 << LayerMask.NameToLayer("Ground");
+            motorSettings.ApplyModifiedPropertiesWithoutUndo();
+
             player.AddComponent<PlayerAnimationDriver>();
             var combat = player.AddComponent<PlayerCombat>();
             var loadout = player.AddComponent<PlayerAbilityLoadout>();
             player.AddComponent<Hurtbox>();
             player.AddComponent<PlayerDamageReceiver>();
+            player.AddComponent<PlayerDodgeController>();
 
             var attackHitbox = CreateAttackHitbox(player.transform);
             AssignObject(combat, "attackHitbox", attackHitbox);

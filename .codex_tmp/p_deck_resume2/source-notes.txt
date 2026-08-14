@@ -1,0 +1,7 @@
+User correction, 2026-08-13: Do not include research paper content. Prioritize Lilith and earlier Tencent internship experience.
+
+Facts retained from the user-provided resume:
+- Lilith: Unity technical planning, tool-focused; animal gameplay toolchain; level/NPC editors; resource search; configuration ID management; dialogue production pipeline.
+- Tencent J1: Unity client work on 3C camera, physics interaction, UI and configuration tools; later UE combat technical planning on Ability Pipeline, skill-atom templates, and configuration automation.
+
+No web research or third-party assets were used.

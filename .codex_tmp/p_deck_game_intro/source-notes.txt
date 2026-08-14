@@ -1,0 +1,8 @@
+Slide 4 sources:
+- G:/mirror_test/Docs/Project/MirrorTrial_iWiki_Rewrite.md
+- G:/mirror_test/Docs/Project/MirrorTrial_ImplementationPlan.md
+- G:/mirror_test/Docs/Level/生命精华系统_完整实现说明.md
+
+Positioning judgment:
+- Describe the current game as a 2D side-scrolling action adventure with mirror-boss encounters and light Roguelite growth.
+- Avoid claiming a full Metroidvania or standard roguelike structure before interconnected exploration, ability gating, run reset, randomization, and build depth are demonstrated.

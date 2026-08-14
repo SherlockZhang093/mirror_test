@@ -1,0 +1,219 @@
+{
+  "sequence": "ImpactShatter",
+  "cell": [
+    192,
+    128
+  ],
+  "frame_count": 8,
+  "root_anchor": [
+    96,
+    118
+  ],
+  "fixed_sequence_scale": true,
+  "alpha_bboxes": [
+    [
+      47,
+      58,
+      158,
+      118
+    ],
+    [
+      58,
+      44,
+      158,
+      118
+    ],
+    [
+      34,
+      4,
+      158,
+      118
+    ],
+    [
+      34,
+      12,
+      159,
+      118
+    ],
+    [
+      34,
+      19,
+      152,
+      118
+    ],
+    [
+      50,
+      35,
+      155,
+      118
+    ],
+    [
+      54,
+      70,
+      141,
+      118
+    ],
+    [
+      49,
+      89,
+      123,
+      118
+    ]
+  ],
+  "alpha_stats": [
+    {
+      "visible": 2065,
+      "translucent": 134,
+      "green_like": 0
+    },
+    {
+      "visible": 2550,
+      "translucent": 234,
+      "green_like": 0
+    },
+    {
+      "visible": 3409,
+      "translucent": 267,
+      "green_like": 0
+    },
+    {
+      "visible": 2714,
+      "translucent": 332,
+      "green_like": 0
+    },
+    {
+      "visible": 2262,
+      "translucent": 298,
+      "green_like": 0
+    },
+    {
+      "visible": 1084,
+      "translucent": 187,
+      "green_like": 0
+    },
+    {
+      "visible": 389,
+      "translucent": 100,
+      "green_like": 0
+    },
+    {
+      "visible": 108,
+      "translucent": 40,
+      "green_like": 0
+    }
+  ],
+  "transparent_corners": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ],
+  "saved_gif_validation": {
+    "frame_count": 8,
+    "transparent_corner_alpha": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "alpha_bboxes": [
+      [
+        47,
+        58,
+        158,
+        118
+      ],
+      [
+        58,
+        44,
+        158,
+        118
+      ],
+      [
+        34,
+        4,
+        158,
+        118
+      ],
+      [
+        34,
+        12,
+        159,
+        118
+      ],
+      [
+        34,
+        19,
+        152,
+        118
+      ],
+      [
+        50,
+        35,
+        155,
+        118
+      ],
+      [
+        54,
+        70,
+        141,
+        118
+      ],
+      [
+        49,
+        89,
+        123,
+        118
+      ]
+    ],
+    "all_frames_have_transparency": true
+  }
+}

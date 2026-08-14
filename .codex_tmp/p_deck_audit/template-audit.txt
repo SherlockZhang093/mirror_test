@@ -1,0 +1,20 @@
+Source deck: 2026超新星P族答辩参考模板.pptx
+Slides: 7, 16:9, 1280 x 720 render space.
+
+Reusable patterns:
+- Slide 1: branded cover with one editable subtitle/personal-information placeholder.
+- Slide 2: directory page with editable text.
+- Slide 3: self-introduction page with editable title and body text box.
+- Slides 4-5: research and internship-result instruction pages with editable text boxes.
+- Slide 6: branded closing bumper.
+- Slide 7: light-background appendix page with an editable title placeholder.
+
+Visual contract:
+- Full-slide raster backgrounds carry the brand system.
+- Existing typography, font sizes, alignment, insets, and element geometry are preserved.
+- This pass changes only the inherited personal-information body on slide 1 and inherited self-introduction body on slide 3.
+- Slide 7's title placeholder is explicitly rewritten with its existing text so no structural placeholder is left unhandled.
+
+Insertion contract:
+- No new primitives, images, charts, tables, or overlays in this pass.
+- Research and internship-result instructions remain untouched until personal contribution evidence is supplied.

@@ -1,0 +1,198 @@
+{
+  "version": 3,
+  "frames": 10,
+  "fps": 8,
+  "reference_skeleton": "Assets/MirrorTrial/Art/Boss/AerialMount/Previews/AirIdleSkeleton_v1/MirrorBird_AirIdle_Skeleton_v1.json",
+  "trusted_core": "Assets/MirrorTrial/Art/Boss/AerialMount/Sheets/MirrorBird_MasterPose.png",
+  "wing_sources": [
+    "Assets/MirrorTrial/Art/Boss/AerialMount/Sheets/MirrorBird_MasterPose.png",
+    "Assets/MirrorTrial/Art/Boss/AerialMount/Previews/AirIdleContent_v3/MirrorBird_AirIdle_WingPoseReference_v3_alpha.png",
+    "Assets/MirrorTrial/Art/Boss/AerialMount/Previews/AirIdleContent_v3/MirrorBird_AirIdle_DownstrokeReference_v3_alpha.png"
+  ],
+  "imagegen_prompt_summary": "2x2 transition references plus a dedicated frame-5 horizontal downstroke reference; generated bodies discarded",
+  "reference_global_scale": 0.283,
+  "reference_plan": [
+    [
+      -1,
+      0
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      0,
+      3
+    ],
+    [
+      3,
+      7
+    ],
+    [
+      4,
+      5
+    ],
+    [
+      4,
+      5
+    ],
+    [
+      3,
+      7
+    ],
+    [
+      0,
+      3
+    ],
+    [
+      -1,
+      0
+    ]
+  ],
+  "wing_deformation": "inverse-distance skeleton warp, nearest-neighbour",
+  "generated_colors_projected_to_trusted_palette": true,
+  "core_mismatch_bytes": 0,
+  "consecutive_frame_difference_bytes": [
+    5972,
+    7153,
+    9145,
+    8103,
+    8797,
+    5798,
+    6463,
+    7747,
+    8398
+  ],
+  "wing_joint_distance_to_art_pixels": [
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 1.414
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 1.414
+    }
+  ],
+  "base_reference_joint_distance_to_art_pixels": [
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 1.414
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 0.0
+    },
+    {
+      "near_wing_shoulder": 0.0,
+      "near_wing_elbow": 0.0,
+      "near_wing_wrist": 0.0,
+      "near_wing_hand": 1.414
+    }
+  ],
+  "maximum_wing_joint_distance_to_art_pixels": 1.414,
+  "gif_decoded_frames": 10,
+  "gif_alpha_ok": true,
+  "formal_unity_assets_modified": false
+}

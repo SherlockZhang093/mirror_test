@@ -1,3 +1,4 @@
+using MirrorTrial.Level;
 using Platformer.Mechanics;
 using Platformer.UI;
 using UnityEngine;
@@ -36,6 +37,11 @@ namespace Platformer.UI
         /// Turn the main menu on or off.
         /// </summary>
         /// <param name="show"></param>
+        public void StartGame()
+        {
+            GameFlow.StartNewGame();
+        }
+
         public void ToggleMainMenu(bool show)
         {
             if (this.showMainCanvas != show)

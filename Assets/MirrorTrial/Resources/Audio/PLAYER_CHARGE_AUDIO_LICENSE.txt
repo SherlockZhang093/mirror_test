@@ -1,0 +1,14 @@
+Player charge audio
+
+Source: Electricity Game Sound Pack
+Author: faxcorp
+License: CC0 1.0 Universal (public domain dedication)
+Source page: https://opengameart.org/content/electricity-game-sound-pack
+
+Files used:
+- charge.wav -> Player_Charge_Loop.wav
+
+Player_Charge_Start.wav is an in-project copy of the generated
+Charge_CrystalTick.wav cue and is not sourced from this pack.
+Player_Charge_Full.wav is an in-project copy of the generated
+Charge_CompleteChime.wav cue and is not sourced from this pack.

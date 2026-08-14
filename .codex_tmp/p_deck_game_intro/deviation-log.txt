@@ -1,0 +1,3 @@
+No visual deviations. Slide 4 reuses the inherited title and body boxes without changing geometry or styling.
+
+Content deviation: the template instruction copy is replaced with a concise professional game overview requested by the user.

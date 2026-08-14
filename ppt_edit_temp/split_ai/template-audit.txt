@@ -1,0 +1,22 @@
+Source deck: G:/mirror_test/2026超新星P族答辩_张聪_实习经历版.pptx
+Slides: 7, 1280 x 720.
+
+Source inventory:
+- Slide 1: cover / identity.
+- Slide 2: agenda.
+- Slide 3: self-introduction and internships.
+- Slide 4: game positioning and core loop.
+- Slide 5: combat editor overview.
+- Slide 6: three AI application themes on one page.
+- Slide 7: closing bumper.
+
+Reusable pattern:
+- Source slide 6 supplies the AI-section master/layout, title, body textbox, full-slide background, and an optional right-side image.
+- Duplicate source slide 6 three times, one page per theme.
+- Keep the title across the top and move the inherited body textbox into a left column.
+- Delete the inherited small right-side image so the user has a large empty image zone.
+- Replace the accidentally shared mirror-art background with the AI section's original dark background.
+
+Typography/chrome:
+- Preserve the existing AI section title/body font families, colors, sizes, and the inherited bottom bar.
+- Keep all unrelated slides unchanged.

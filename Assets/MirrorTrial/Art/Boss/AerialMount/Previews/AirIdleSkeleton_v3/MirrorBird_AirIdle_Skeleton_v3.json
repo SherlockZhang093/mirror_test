@@ -1,0 +1,891 @@
+{
+  "version": 3,
+  "reference_skeleton": "Assets/MirrorTrial/Art/Boss/AerialMount/Previews/SkeletonMap_v3/MirrorBird_SkeletonMap_v3.json",
+  "frames": [
+    {
+      "sprite_root": [
+        96,
+        66
+      ],
+      "pelvis": [
+        112,
+        75
+      ],
+      "chest": [
+        128,
+        72
+      ],
+      "neck_base": [
+        139,
+        66
+      ],
+      "head": [
+        146,
+        62
+      ],
+      "beak": [
+        153,
+        66
+      ],
+      "near_wing_shoulder": [
+        116,
+        64
+      ],
+      "near_wing_elbow": [
+        107,
+        47
+      ],
+      "near_wing_wrist": [
+        95,
+        28
+      ],
+      "near_wing_hand": [
+        77,
+        15
+      ],
+      "far_wing_shoulder": [
+        114,
+        65
+      ],
+      "far_wing_elbow": [
+        105,
+        50
+      ],
+      "far_wing_wrist": [
+        92,
+        32
+      ],
+      "far_wing_hand": [
+        73,
+        22
+      ],
+      "tail_root": [
+        101,
+        77
+      ],
+      "tail_fork": [
+        91,
+        80
+      ],
+      "upper_tail_mid": [
+        63,
+        85
+      ],
+      "upper_tail_tip": [
+        28,
+        87
+      ],
+      "lower_tail_mid": [
+        67,
+        93
+      ],
+      "lower_tail_tip": [
+        40,
+        97
+      ],
+      "rider_seat": [
+        117,
+        65
+      ]
+    },
+    {
+      "sprite_root": [
+        96,
+        66
+      ],
+      "pelvis": [
+        112,
+        75
+      ],
+      "chest": [
+        128,
+        72
+      ],
+      "neck_base": [
+        139,
+        66
+      ],
+      "head": [
+        146,
+        62
+      ],
+      "beak": [
+        153,
+        66
+      ],
+      "near_wing_shoulder": [
+        116,
+        64
+      ],
+      "near_wing_elbow": [
+        109,
+        46
+      ],
+      "near_wing_wrist": [
+        99,
+        26
+      ],
+      "near_wing_hand": [
+        82,
+        12
+      ],
+      "far_wing_shoulder": [
+        114,
+        65
+      ],
+      "far_wing_elbow": [
+        109,
+        48
+      ],
+      "far_wing_wrist": [
+        101,
+        27
+      ],
+      "far_wing_hand": [
+        86,
+        12
+      ],
+      "tail_root": [
+        101,
+        77
+      ],
+      "tail_fork": [
+        91,
+        80
+      ],
+      "upper_tail_mid": [
+        63,
+        85
+      ],
+      "upper_tail_tip": [
+        28,
+        87
+      ],
+      "lower_tail_mid": [
+        67,
+        93
+      ],
+      "lower_tail_tip": [
+        40,
+        97
+      ],
+      "rider_seat": [
+        117,
+        65
+      ]
+    },
+    {
+      "sprite_root": [
+        96,
+        66
+      ],
+      "pelvis": [
+        112,
+        75
+      ],
+      "chest": [
+        128,
+        72
+      ],
+      "neck_base": [
+        139,
+        66
+      ],
+      "head": [
+        146,
+        62
+      ],
+      "beak": [
+        153,
+        66
+      ],
+      "near_wing_shoulder": [
+        116,
+        64
+      ],
+      "near_wing_elbow": [
+        112,
+        45
+      ],
+      "near_wing_wrist": [
+        104,
+        24
+      ],
+      "near_wing_hand": [
+        88,
+        8
+      ],
+      "far_wing_shoulder": [
+        114,
+        65
+      ],
+      "far_wing_elbow": [
+        112,
+        48
+      ],
+      "far_wing_wrist": [
+        106,
+        27
+      ],
+      "far_wing_hand": [
+        92,
+        11
+      ],
+      "tail_root": [
+        101,
+        77
+      ],
+      "tail_fork": [
+        91,
+        80
+      ],
+      "upper_tail_mid": [
+        63,
+        86
+      ],
+      "upper_tail_tip": [
+        28,
+        89
+      ],
+      "lower_tail_mid": [
+        67,
+        93
+      ],
+      "lower_tail_tip": [
+        40,
+        97
+      ],
+      "rider_seat": [
+        117,
+        65
+      ]
+    },
+    {
+      "sprite_root": [
+        96,
+        66
+      ],
+      "pelvis": [
+        112,
+        75
+      ],
+      "chest": [
+        128,
+        72
+      ],
+      "neck_base": [
+        139,
+        66
+      ],
+      "head": [
+        146,
+        62
+      ],
+      "beak": [
+        153,
+        66
+      ],
+      "near_wing_shoulder": [
+        116,
+        64
+      ],
+      "near_wing_elbow": [
+        105,
+        48
+      ],
+      "near_wing_wrist": [
+        89,
+        32
+      ],
+      "near_wing_hand": [
+        70,
+        21
+      ],
+      "far_wing_shoulder": [
+        114,
+        65
+      ],
+      "far_wing_elbow": [
+        105,
+        50
+      ],
+      "far_wing_wrist": [
+        91,
+        33
+      ],
+      "far_wing_hand": [
+        73,
+        21
+      ],
+      "tail_root": [
+        101,
+        77
+      ],
+      "tail_fork": [
+        91,
+        80
+      ],
+      "upper_tail_mid": [
+        63,
+        85
+      ],
+      "upper_tail_tip": [
+        28,
+        87
+      ],
+      "lower_tail_mid": [
+        67,
+        94
+      ],
+      "lower_tail_tip": [
+        40,
+        99
+      ],
+      "rider_seat": [
+        117,
+        65
+      ]
+    },
+    {
+      "sprite_root": [
+        96,
+        66
+      ],
+      "pelvis": [
+        112,
+        75
+      ],
+      "chest": [
+        128,
+        72
+      ],
+      "neck_base": [
+        139,
+        66
+      ],
+      "head": [
+        146,
+        62
+      ],
+      "beak": [
+        153,
+        66
+      ],
+      "near_wing_shoulder": [
+        116,
+        64
+      ],
+      "near_wing_elbow": [
+        99,
+        54
+      ],
+      "near_wing_wrist": [
+        77,
+        48
+      ],
+      "near_wing_hand": [
+        55,
+        46
+      ],
+      "far_wing_shoulder": [
+        114,
+        65
+      ],
+      "far_wing_elbow": [
+        100,
+        55
+      ],
+      "far_wing_wrist": [
+        79,
+        47
+      ],
+      "far_wing_hand": [
+        58,
+        43
+      ],
+      "tail_root": [
+        101,
+        77
+      ],
+      "tail_fork": [
+        91,
+        80
+      ],
+      "upper_tail_mid": [
+        63,
+        85
+      ],
+      "upper_tail_tip": [
+        28,
+        87
+      ],
+      "lower_tail_mid": [
+        67,
+        93
+      ],
+      "lower_tail_tip": [
+        40,
+        97
+      ],
+      "rider_seat": [
+        117,
+        65
+      ]
+    },
+    {
+      "sprite_root": [
+        96,
+        66
+      ],
+      "pelvis": [
+        112,
+        75
+      ],
+      "chest": [
+        128,
+        72
+      ],
+      "neck_base": [
+        139,
+        66
+      ],
+      "head": [
+        146,
+        62
+      ],
+      "beak": [
+        153,
+        66
+      ],
+      "near_wing_shoulder": [
+        116,
+        64
+      ],
+      "near_wing_elbow": [
+        99,
+        72
+      ],
+      "near_wing_wrist": [
+        78,
+        80
+      ],
+      "near_wing_hand": [
+        56,
+        84
+      ],
+      "far_wing_shoulder": [
+        114,
+        65
+      ],
+      "far_wing_elbow": [
+        98,
+        71
+      ],
+      "far_wing_wrist": [
+        77,
+        77
+      ],
+      "far_wing_hand": [
+        56,
+        79
+      ],
+      "tail_root": [
+        101,
+        77
+      ],
+      "tail_fork": [
+        91,
+        80
+      ],
+      "upper_tail_mid": [
+        63,
+        84
+      ],
+      "upper_tail_tip": [
+        28,
+        85
+      ],
+      "lower_tail_mid": [
+        67,
+        93
+      ],
+      "lower_tail_tip": [
+        40,
+        97
+      ],
+      "rider_seat": [
+        117,
+        65
+      ]
+    },
+    {
+      "sprite_root": [
+        96,
+        66
+      ],
+      "pelvis": [
+        112,
+        75
+      ],
+      "chest": [
+        128,
+        72
+      ],
+      "neck_base": [
+        139,
+        66
+      ],
+      "head": [
+        146,
+        62
+      ],
+      "beak": [
+        153,
+        66
+      ],
+      "near_wing_shoulder": [
+        116,
+        64
+      ],
+      "near_wing_elbow": [
+        97,
+        67
+      ],
+      "near_wing_wrist": [
+        75,
+        71
+      ],
+      "near_wing_hand": [
+        53,
+        73
+      ],
+      "far_wing_shoulder": [
+        114,
+        65
+      ],
+      "far_wing_elbow": [
+        97,
+        67
+      ],
+      "far_wing_wrist": [
+        75,
+        69
+      ],
+      "far_wing_hand": [
+        54,
+        69
+      ],
+      "tail_root": [
+        101,
+        77
+      ],
+      "tail_fork": [
+        91,
+        80
+      ],
+      "upper_tail_mid": [
+        63,
+        84
+      ],
+      "upper_tail_tip": [
+        28,
+        85
+      ],
+      "lower_tail_mid": [
+        67,
+        92
+      ],
+      "lower_tail_tip": [
+        40,
+        95
+      ],
+      "rider_seat": [
+        117,
+        65
+      ]
+    },
+    {
+      "sprite_root": [
+        96,
+        66
+      ],
+      "pelvis": [
+        112,
+        75
+      ],
+      "chest": [
+        128,
+        72
+      ],
+      "neck_base": [
+        139,
+        66
+      ],
+      "head": [
+        146,
+        62
+      ],
+      "beak": [
+        153,
+        66
+      ],
+      "near_wing_shoulder": [
+        116,
+        64
+      ],
+      "near_wing_elbow": [
+        97,
+        61
+      ],
+      "near_wing_wrist": [
+        75,
+        59
+      ],
+      "near_wing_hand": [
+        53,
+        59
+      ],
+      "far_wing_shoulder": [
+        114,
+        65
+      ],
+      "far_wing_elbow": [
+        97,
+        60
+      ],
+      "far_wing_wrist": [
+        75,
+        56
+      ],
+      "far_wing_hand": [
+        54,
+        54
+      ],
+      "tail_root": [
+        101,
+        77
+      ],
+      "tail_fork": [
+        91,
+        80
+      ],
+      "upper_tail_mid": [
+        63,
+        84
+      ],
+      "upper_tail_tip": [
+        28,
+        85
+      ],
+      "lower_tail_mid": [
+        66,
+        92
+      ],
+      "lower_tail_tip": [
+        39,
+        95
+      ],
+      "rider_seat": [
+        117,
+        65
+      ]
+    },
+    {
+      "sprite_root": [
+        96,
+        66
+      ],
+      "pelvis": [
+        112,
+        75
+      ],
+      "chest": [
+        128,
+        72
+      ],
+      "neck_base": [
+        139,
+        66
+      ],
+      "head": [
+        146,
+        62
+      ],
+      "beak": [
+        153,
+        66
+      ],
+      "near_wing_shoulder": [
+        116,
+        64
+      ],
+      "near_wing_elbow": [
+        100,
+        53
+      ],
+      "near_wing_wrist": [
+        80,
+        44
+      ],
+      "near_wing_hand": [
+        58,
+        39
+      ],
+      "far_wing_shoulder": [
+        114,
+        65
+      ],
+      "far_wing_elbow": [
+        101,
+        54
+      ],
+      "far_wing_wrist": [
+        82,
+        43
+      ],
+      "far_wing_hand": [
+        61,
+        37
+      ],
+      "tail_root": [
+        101,
+        77
+      ],
+      "tail_fork": [
+        91,
+        80
+      ],
+      "upper_tail_mid": [
+        63,
+        85
+      ],
+      "upper_tail_tip": [
+        28,
+        87
+      ],
+      "lower_tail_mid": [
+        67,
+        92
+      ],
+      "lower_tail_tip": [
+        40,
+        95
+      ],
+      "rider_seat": [
+        117,
+        65
+      ]
+    },
+    {
+      "sprite_root": [
+        96,
+        66
+      ],
+      "pelvis": [
+        112,
+        75
+      ],
+      "chest": [
+        128,
+        72
+      ],
+      "neck_base": [
+        139,
+        66
+      ],
+      "head": [
+        146,
+        62
+      ],
+      "beak": [
+        153,
+        66
+      ],
+      "near_wing_shoulder": [
+        116,
+        64
+      ],
+      "near_wing_elbow": [
+        104,
+        49
+      ],
+      "near_wing_wrist": [
+        87,
+        34
+      ],
+      "near_wing_hand": [
+        67,
+        24
+      ],
+      "far_wing_shoulder": [
+        114,
+        65
+      ],
+      "far_wing_elbow": [
+        104,
+        50
+      ],
+      "far_wing_wrist": [
+        89,
+        34
+      ],
+      "far_wing_hand": [
+        71,
+        23
+      ],
+      "tail_root": [
+        101,
+        77
+      ],
+      "tail_fork": [
+        91,
+        80
+      ],
+      "upper_tail_mid": [
+        63,
+        85
+      ],
+      "upper_tail_tip": [
+        28,
+        87
+      ],
+      "lower_tail_mid": [
+        67,
+        93
+      ],
+      "lower_tail_tip": [
+        40,
+        97
+      ],
+      "rider_seat": [
+        117,
+        65
+      ]
+    }
+  ],
+  "fps": 8,
+  "validation": {
+    "frame_count": 10,
+    "decoded_gif_frames": 10,
+    "first_frame_matches_approved_skeleton": true,
+    "invariant_joint_mismatch_frames": {
+      "pelvis": 0,
+      "chest": 0,
+      "near_wing_shoulder": 0,
+      "far_wing_shoulder": 0,
+      "tail_root": 0
+    },
+    "fixed_canvas_anchor_mismatch_frames": {
+      "sprite_root": 0
+    },
+    "fixed_attachment_anchor_mismatch_frames": {
+      "rider_seat": 0
+    },
+    "canvas_anchor_participates_in_bone_chains": false,
+    "attachment_anchor_participates_in_bone_chains": false,
+    "consecutive_duplicate_skeleton_frames_including_loop": 0,
+    "maximum_quantized_bone_length_error_pixels": 0.5405,
+    "all_joint_coordinates_are_integers": true,
+    "formal_unity_assets_modified": false
+  }
+}

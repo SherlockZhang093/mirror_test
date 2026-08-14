@@ -1,0 +1,3 @@
+Slide 5 intentionally reuses slide 6's content pattern, replacing the inherited background image with the user-provided Unity combat-editor screenshot and reducing the body to one capability line.
+
+The original blank slide 5 is omitted because it has no editable inherited content slots.

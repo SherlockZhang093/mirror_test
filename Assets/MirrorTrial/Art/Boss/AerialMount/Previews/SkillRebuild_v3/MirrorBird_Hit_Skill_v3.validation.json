@@ -1,0 +1,64 @@
+{
+  "frame_count": 4,
+  "target_cell": [
+    192,
+    128
+  ],
+  "target_anchor": [
+    96,
+    66
+  ],
+  "invariant_mismatch_pixels": [
+    0,
+    0,
+    0
+  ],
+  "consecutive_action_changed_pixels": [
+    4238,
+    3645,
+    4347
+  ],
+  "frames": [
+    {
+      "frame": 0,
+      "alpha_bbox": [
+        5,
+        8,
+        129,
+        96
+      ],
+      "touches_edge": false
+    },
+    {
+      "frame": 1,
+      "alpha_bbox": [
+        5,
+        33,
+        132,
+        92
+      ],
+      "touches_edge": false
+    },
+    {
+      "frame": 2,
+      "alpha_bbox": [
+        5,
+        50,
+        127,
+        102
+      ],
+      "touches_edge": false
+    },
+    {
+      "frame": 3,
+      "alpha_bbox": [
+        5,
+        7,
+        127,
+        95
+      ],
+      "touches_edge": false
+    }
+  ],
+  "passed": true
+}

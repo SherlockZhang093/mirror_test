@@ -1,0 +1,176 @@
+{
+  "version": 2,
+  "reference": "Assets/MirrorTrial/Art/Boss/AerialMount/Sheets/MirrorBird_MasterPose.png",
+  "cell": [
+    192,
+    128
+  ],
+  "ppu": 32,
+  "sprite_pivot_top_left": [
+    96,
+    66
+  ],
+  "coordinates": "top-left origin, integer pixels",
+  "joints": {
+    "sprite_root": [
+      96,
+      66
+    ],
+    "pelvis": [
+      112,
+      75
+    ],
+    "chest": [
+      128,
+      72
+    ],
+    "neck_base": [
+      139,
+      66
+    ],
+    "head": [
+      146,
+      62
+    ],
+    "beak": [
+      153,
+      66
+    ],
+    "near_wing_shoulder": [
+      116,
+      64
+    ],
+    "near_wing_elbow": [
+      107,
+      47
+    ],
+    "near_wing_wrist": [
+      95,
+      28
+    ],
+    "near_wing_hand": [
+      77,
+      15
+    ],
+    "far_wing_shoulder": [
+      114,
+      65
+    ],
+    "far_wing_elbow": [
+      105,
+      50
+    ],
+    "far_wing_wrist": [
+      92,
+      32
+    ],
+    "far_wing_hand": [
+      73,
+      22
+    ],
+    "tail_root": [
+      101,
+      77
+    ],
+    "tail_fork": [
+      91,
+      80
+    ],
+    "upper_tail_mid": [
+      63,
+      85
+    ],
+    "upper_tail_tip": [
+      28,
+      87
+    ],
+    "lower_tail_mid": [
+      67,
+      93
+    ],
+    "lower_tail_tip": [
+      40,
+      97
+    ],
+    "rider_seat": [
+      117,
+      65
+    ]
+  },
+  "chains": {
+    "core": [
+      "pelvis",
+      "chest",
+      "neck_base",
+      "head",
+      "beak"
+    ],
+    "near_wing": [
+      "near_wing_shoulder",
+      "near_wing_elbow",
+      "near_wing_wrist",
+      "near_wing_hand"
+    ],
+    "far_wing": [
+      "far_wing_shoulder",
+      "far_wing_elbow",
+      "far_wing_wrist",
+      "far_wing_hand"
+    ],
+    "tail_base": [
+      "pelvis",
+      "tail_root",
+      "tail_fork"
+    ],
+    "upper_tail": [
+      "tail_fork",
+      "upper_tail_mid",
+      "upper_tail_tip"
+    ],
+    "lower_tail": [
+      "tail_fork",
+      "lower_tail_mid",
+      "lower_tail_tip"
+    ],
+    "seat": [
+      "pelvis",
+      "rider_seat"
+    ]
+  },
+  "fixed_canvas_anchors": [
+    "sprite_root"
+  ],
+  "non_anatomical_anchors": [
+    "sprite_root"
+  ],
+  "invariant_core": [
+    "pelvis",
+    "chest",
+    "near_wing_shoulder",
+    "far_wing_shoulder",
+    "tail_root",
+    "rider_seat"
+  ],
+  "articulated_core": [
+    "neck_base",
+    "head"
+  ],
+  "action_chains": [
+    "near_wing",
+    "far_wing",
+    "upper_tail",
+    "lower_tail"
+  ],
+  "rules": {
+    "tail_motion_starts_after": "tail_fork",
+    "wing_motion_starts_at": [
+      "near_wing_shoulder",
+      "far_wing_shoulder"
+    ],
+    "rider_seat_parent": "pelvis",
+    "scale_per_frame": 1,
+    "subpixel_translation_allowed": false,
+    "runtime_sprite_rotation_allowed": false
+  },
+  "formal_unity_assets_modified": false
+}

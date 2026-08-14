@@ -1,3 +1,5 @@
+using MirrorTrial.Editor;
+using MirrorTrial.Level;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -10,15 +12,15 @@ namespace MirrorTrial.Editor
         const string ScenePath = "Assets/MirrorTrial/Scenes/MirrorTrial_TestGym.unity";
         const string PlayerPrefabPath = "Assets/MirrorTrial/Prefabs/Characters/Player_MirrorTrial.prefab";
 
-        [MenuItem("Tools/Mirror Trial/Create Test Scene")]
+        [MenuItem("Tools/镜像试炼/关卡/创建测试场景")]
         public static void CreateTestScene()
         {
             // Ensure player prefab exists
             var playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
             if (!playerPrefab)
             {
-                if (EditorUtility.DisplayDialog("Missing Player Prefab",
-                    "Player_MirrorTrial.prefab not found.\nRun 'Tools/Mirror Trial/Create Player Test Prefab' first?",
+                if (EditorUtility.DisplayDialog("缺少玩家预制体",
+                    "Player_MirrorTrial.prefab not found.\nRun 'Tools/镜像试炼/战斗/创建玩家测试预制体' first?",
                     "Run it now", "Cancel"))
                 {
                     PlayerFrameworkSetup.CreatePlayerTestPrefab();
@@ -42,33 +44,28 @@ namespace MirrorTrial.Editor
             if (existingLight)
                 Object.DestroyImmediate(existingLight);
 
-            // Setup camera
-            var mainCam = Camera.main;
-            if (mainCam)
-            {
-                mainCam.orthographic = true;
-                mainCam.orthographicSize = 7f;
-                mainCam.transform.position = new Vector3(0f, 2f, -10f);
-                mainCam.backgroundColor = new Color(0.12f, 0.12f, 0.18f);
-                mainCam.clearFlags = CameraClearFlags.SolidColor;
-            }
+            // Create geometry root for clean hierarchy and camera bounds
+            var geometryRoot = new GameObject("Geometry").transform;
 
             // Create ground
-            CreateGround("Ground_Main", new Vector3(0f, -2f, 0f), new Vector2(30f, 1f));
+            CreateGround(geometryRoot, "Ground_Main", new Vector3(0f, -2f, 0f), new Vector2(30f, 1f));
 
             // Create floating platforms for jump testing
-            CreateGround("Platform_Left", new Vector3(-5f, 1f, 0f), new Vector2(4f, 0.5f));
-            CreateGround("Platform_Right", new Vector3(5f, 2.5f, 0f), new Vector2(4f, 0.5f));
-            CreateGround("Platform_High", new Vector3(0f, 4.5f, 0f), new Vector2(3f, 0.5f));
+            CreateGround(geometryRoot, "Platform_Left", new Vector3(-5f, 1f, 0f), new Vector2(4f, 0.5f));
+            CreateGround(geometryRoot, "Platform_Right", new Vector3(5f, 2.5f, 0f), new Vector2(4f, 0.5f));
+            CreateGround(geometryRoot, "Platform_High", new Vector3(0f, 4.5f, 0f), new Vector2(3f, 0.5f));
 
             // Create walls for boundary
-            CreateGround("Wall_Left", new Vector3(-16f, 3f, 0f), new Vector2(1f, 12f));
-            CreateGround("Wall_Right", new Vector3(16f, 3f, 0f), new Vector2(1f, 12f));
+            CreateGround(geometryRoot, "Wall_Left", new Vector3(-16f, 3f, 0f), new Vector2(1f, 12f));
+            CreateGround(geometryRoot, "Wall_Right", new Vector3(16f, 3f, 0f), new Vector2(1f, 12f));
 
             // Spawn player (y=-0.95 places collider bottom exactly on ground top)
             var player = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab, scene);
             player.transform.position = new Vector3(0f, -0.95f, 0f);
             player.name = "Player_MirrorTrial";
+
+            var bounds = CameraSetupUtil.ComputeSceneBounds(geometryRoot);
+            CameraSetupUtil.ApplyDefault(Camera.main, player.transform, boundsMinX: bounds.minX, boundsMaxX: bounds.maxX);
 
             // Create a dummy target (punching bag) for combat testing
             CreateDummyTarget(new Vector3(4f, -1f, 0f));
@@ -81,18 +78,18 @@ namespace MirrorTrial.Editor
             EditorSceneManager.OpenScene(ScenePath);
 
             Selection.activeGameObject = player;
-            Debug.Log("[Mirror Trial] Test scene created and saved: " + ScenePath +
-                      "\n- Press Play to start debugging movement, jump, combat." +
+            Debug.Log("[镜像试炼] 测试场景已创建并保存：" + ScenePath +
+                      "\n- 点击 Play 开始调试移动、跳跃和战斗。" +
                       "\n- WASD/Arrows = move, Space = jump, J = attack, K = MirrorBlade, L = EchoDash");
         }
 
-        [MenuItem("Tools/Mirror Trial/Open Test Scene")]
+        [MenuItem("Tools/镜像试炼/关卡/打开测试场景")]
         public static void OpenTestScene()
         {
             if (!System.IO.File.Exists(ScenePath.Replace('/', '\\')))
             {
-                if (EditorUtility.DisplayDialog("Test Scene Not Found",
-                    "MirrorTrial_TestGym.unity doesn't exist yet. Create it?",
+                if (EditorUtility.DisplayDialog("找不到测试场景",
+                    "MirrorTrial_TestGym.unity 还不存在。要现在创建吗？",
                     "Create", "Cancel"))
                 {
                     CreateTestScene();
@@ -104,12 +101,13 @@ namespace MirrorTrial.Editor
                 EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
 
             EditorSceneManager.OpenScene(ScenePath);
-            Debug.Log("[Mirror Trial] Opened test scene. Press Play to debug.");
+            Debug.Log("[镜像试炼] 已打开测试场景。点击 Play 开始调试。");
         }
 
-        static GameObject CreateGround(string name, Vector3 position, Vector2 size)
+        static GameObject CreateGround(Transform parent, string name, Vector3 position, Vector2 size)
         {
             var ground = new GameObject(name);
+            ground.transform.SetParent(parent, false);
             ground.transform.position = position;
             ground.layer = LayerMask.NameToLayer("Default");
             ground.isStatic = true;

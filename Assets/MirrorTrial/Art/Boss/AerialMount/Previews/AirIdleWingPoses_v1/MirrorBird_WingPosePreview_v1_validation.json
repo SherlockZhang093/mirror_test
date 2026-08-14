@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "poses": 6,
+  "fps": 8,
+  "global_scale": 0.118,
+  "per_pose_scaling_used": false,
+  "near_root": [
+    116,
+    64
+  ],
+  "far_root": [
+    114,
+    65
+  ],
+  "near_root_distances": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "far_root_distances": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "opaque_pixel_areas": {
+    "near": [
+      708,
+      661,
+      496,
+      599,
+      544,
+      585
+    ],
+    "far": [
+      612,
+      520,
+      342,
+      373,
+      371,
+      492
+    ]
+  },
+  "gif_decoded_frames": 6,
+  "gif_alpha_ok": true,
+  "formal_unity_assets_modified": false
+}

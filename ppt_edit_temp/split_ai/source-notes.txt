@@ -1,0 +1,7 @@
+No web research or external assets were added.
+The three pages are based on the user's stated project workflow:
+1. AI-readable PRD using the tool-card system as the example.
+2. Repository-based project context shared between WorkBuddy and Codex.
+3. AI animation production skill that preserves skeleton, root alignment, scale, palette, slicing, validation, and Unity integration.
+
+Background asset restored from the previously verified AI-section slide in the same working deck lineage.

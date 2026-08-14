@@ -1,0 +1,6 @@
+Slide 4 only:
+- Replaced the original generic background with generated pixel-art concept art that visualizes the real-world / mirror-world confrontation.
+- Rewrote the inherited body textbox into three concise sections and moved it into the generated image's left negative-space zone.
+- Reason: add a meaningful visual while keeping the page readable and aligned with the user's concise presentation style.
+
+Slides 1-3 and 5-7: no intentional deviations.

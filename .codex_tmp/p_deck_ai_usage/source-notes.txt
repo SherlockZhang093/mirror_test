@@ -1,0 +1,6 @@
+Slide 6 sources:
+- G:/mirror_test/Docs/Project/MirrorTrial_AI_Outline.md
+- G:/mirror_test/Docs/Combat/CODEX_SKILL_EDITOR_HANDOFF.md
+- G:/mirror_test/Assets/MirrorTrial/Art/Boss/AerialMount/ASSET_NOTES.md
+
+The visible copy summarizes the user's three requested AI application layers and grounds them in existing project documentation and assets.

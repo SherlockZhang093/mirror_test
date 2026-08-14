@@ -1,0 +1,16 @@
+BossHealthBar (RectTransform, anchor = middle-bottom)
+├─ OuterFrame          [Image: BossBar_OuterFrame]
+├─ FillEmpty           [Image: BossBar_Fill_Empty]
+├─ Fill                [Image: BossBar_Fill_Normal]
+├─ FillHit             [Image: BossBar_Fill_Hit, disabled by default]
+├─ NameRoot
+│  ├─ NameTick_Left    [Image: BossBar_NameTick_Left]
+│  ├─ BossNameText     [TMP_Text]
+│  └─ NameTick_Right   [Image: BossBar_NameTick_Right]
+└─ HitSpark            [optional Image / Animator]
+
+Recommended order:
+OuterFrame at top border layer
+FillEmpty below Fill
+Fill uses Image Type = Filled
+FillHit overlays Fill for flash

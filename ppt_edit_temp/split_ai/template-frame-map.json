@@ -1,0 +1,63 @@
+{
+  "outputSlides": [
+    {
+      "outputSlide": 1,
+      "sourceSlide": 1,
+      "narrativeRole": "opening identity",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "sourceElementId": "sh/547294r6", "action": "rewrite" }
+      ]
+    },
+    { "outputSlide": 2, "sourceSlide": 2, "narrativeRole": "directory", "reuseMode": "duplicate-slide", "editTargets": [] },
+    { "outputSlide": 3, "sourceSlide": 3, "narrativeRole": "personal introduction", "reuseMode": "duplicate-slide", "editTargets": [] },
+    { "outputSlide": 4, "sourceSlide": 4, "narrativeRole": "game positioning and core loop", "reuseMode": "duplicate-slide", "editTargets": [] },
+    { "outputSlide": 5, "sourceSlide": 5, "narrativeRole": "combat editor overview", "reuseMode": "duplicate-slide", "editTargets": [] },
+    {
+      "outputSlide": 6,
+      "sourceSlide": 6,
+      "narrativeRole": "AI-readable PRD",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "sourceElementId": "im/9k7m1w3i", "action": "replace" },
+        { "sourceElementId": "sh/yhg7epsj", "action": "rewrite-and-reposition" },
+        { "sourceElementId": "sh/zi98nu94", "action": "rewrite" },
+        { "sourceElementId": "im/8jyl8rmd", "action": "delete" }
+      ]
+    },
+    {
+      "outputSlide": 7,
+      "sourceSlide": 6,
+      "narrativeRole": "project context handoff",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "sourceElementId": "im/9k7m1w3i", "action": "replace" },
+        { "sourceElementId": "sh/yhg7epsj", "action": "rewrite-and-reposition" },
+        { "sourceElementId": "sh/zi98nu94", "action": "rewrite" },
+        { "sourceElementId": "im/8jyl8rmd", "action": "delete" }
+      ]
+    },
+    {
+      "outputSlide": 8,
+      "sourceSlide": 6,
+      "narrativeRole": "AI animation production skill",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "sourceElementId": "im/9k7m1w3i", "action": "replace" },
+        { "sourceElementId": "sh/yhg7epsj", "action": "rewrite-and-reposition" },
+        { "sourceElementId": "sh/zi98nu94", "action": "rewrite" },
+        { "sourceElementId": "im/8jyl8rmd", "action": "delete" }
+      ]
+    },
+    {
+      "outputSlide": 9,
+      "sourceSlide": 7,
+      "narrativeRole": "closing bumper",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "sourceElementId": "sh/zedcfa9g", "action": "rewrite" }
+      ]
+    }
+  ],
+  "omittedSourceSlides": []
+}

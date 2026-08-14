@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MirrorTrial Player 动画清单</title>
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --card-bg: #16213e;
+    --text: #e0e0e0;
+    --accent: #e94560;
+    --green: #0f3460;
+    --green-active: #1a508b;
+    --border: #2a3a5c;
+    --dim: #7a7a9e;
+    --tag-bg: #2d2d5e;
+    --good: #4ecca3;
+    --warn: #f0a500;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+  }
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.3rem;
+    color: #fff;
+  }
+  h2 {
+    font-size: 1.3rem;
+    margin: 1.5rem 0 0.8rem;
+    color: #ccc;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.3rem;
+  }
+  h3 {
+    font-size: 1rem;
+    margin: 1rem 0 0.5rem;
+    color: #b0b0d0;
+  }
+  .subtitle {
+    color: var(--dim);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .card.full {
+    grid-column: 1 / -1;
+  }
+  .card-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #fff;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-active { background: var(--accent); color: #fff; }
+  .badge-legacy { background: #555; color: #aaa; }
+  .badge-source { background: var(--tag-bg); color: var(--dim); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th, td {
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    color: var(--dim);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+  }
+  td {
+    color: var(--text);
+  }
+  .enum-val { color: var(--good); font-family: 'Consolas', 'Courier New', monospace; }
+  .icon-col { width: 28px; text-align: center; }
+  .tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    background: var(--tag-bg);
+    color: var(--dim);
+    margin-right: 3px;
+  }
+  .tag.loop { background: #1a4020; color: var(--good); }
+  .tag.once { background: #402a1a; color: var(--warn); }
+  .section-desc {
+    color: var(--dim);
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+  }
+  .warn-note {
+    background: #2a1a0a;
+    border-left: 3px solid var(--warn);
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    margin: 0.8rem 0;
+  }
+  .count {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .transition-diagram {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    text-align: center;
+    overflow-x: auto;
+  }
+  .arrow-chain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    font-family: 'Consolas', monospace;
+    font-size: 0.82rem;
+  }
+  .node {
+    background: var(--green-active);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .node.special {
+    background: var(--accent);
+  }
+  .arrow { color: var(--dim); font-weight: bold; }
+  .unused-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 4px;
+  }
+  .unused-item {
+    background: var(--tag-bg);
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.78rem;
+    color: var(--dim);
+  }
+  .category-label {
+    color: var(--warn);
+    font-size: 0.72rem;
+    font-weight: 600;
+    grid-column: 1 / -1;
+    margin-top: 6px;
+    margin-bottom: -2px;
+  }
+</style>
+</head>
+<body>
+
+<h1>MirrorTrial Player 动画遍历报告</h1>
+<p class="subtitle">包含 3 层动画体系：当前运行中 | 老版本遗留 | 原始素材库预留</p>
+
+<!-- ==================== SECTION 1 ==================== -->
+<h2>一、当前项目实际使用的动画（Player_MirrorTrial.controller）</h2>
+<p class="section-desc">
+  由 <code>PlayerAnimationDriver</code> 驱动，通过 <code>PlayerActionState</code> 枚举映射。<br/>
+  状态机优先级的核心逻辑：动作态 > 空中态 > 地面态。
+</p>
+
+<div class="overview-grid">
+  <div class="card">
+    <div class="card-title"><span class="badge badge-active">运行中</span> 10 个 Animator 状态</div>
+    <table>
+      <thead><tr><th class="icon-col">#</th><th>Animator State</th><th>枚举</th><th>循环</th><th>Clip 源文件</th></tr></thead>
+      <tbody>
+        <tr><td class="icon-col">1</td><td><strong>Idle</strong></td><td class="enum-val">Idle</td><td><span class="tag loop">Loop</span></td><td>Idle.anim</td></tr>
+        <tr><td class="icon-col">2</td><td><strong>Run</strong></td><td class="enum-val">Run</td><td><span class="tag loop">Loop</span></td><td>Run.anim</td></tr>
+        <tr><td class="icon-col">3</td><td><strong>JumpRise</strong></td><td class="enum-val">JumpRise</td><td><span class="tag loop">Loop</span></td><td>JumpRise.anim</td></tr>
+        <tr><td class="icon-col">4</td><td><strong>JumpFall</strong></td><td class="enum-val">JumpFall</td><td><span class="tag loop">Loop</span></td><td>JumpFall.anim</td></tr>
+        <tr><td class="icon-col">5</td><td><strong>Land</strong></td><td class="enum-val">Land</td><td><span class="tag once">Once</span></td><td>Land.anim</td></tr>
+        <tr><td class="icon-col">6</td><td><strong>SwordAttack</strong></td><td class="enum-val">Attack</td><td><span class="tag once">Once</span></td><td>SwordAttack.anim</td></tr>
+        <tr><td class="icon-col">7</td><td><strong>AirSlash</strong></td><td class="enum-val">Cast</td><td><span class="tag once">Once</span></td><td>AirSlash.anim</td></tr>
+        <tr><td class="icon-col">8</td><td><strong>Dash</strong></td><td class="enum-val">Dash</td><td><span class="tag once">Once</span></td><td>Dash.anim</td></tr>
+        <tr><td class="icon-col">9</td><td><strong>HitDamage</strong></td><td class="enum-val">Hurt</td><td><span class="tag once">Once</span></td><td>HitDamage.anim</td></tr>
+        <tr><td class="icon-col">10</td><td><strong>Die</strong></td><td class="enum-val">Dead</td><td><span class="tag once">Once</span></td><td>Die.anim</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<h3>状态机流转图（PlayerStateMachine 优先级架构）</h3>
+<div class="transition-diagram">
+  <div class="arrow-chain" style="font-size:0.8rem; color:var(--dim); margin-bottom:10px;">
+    优先级: 动作态（最高） → 空中态 → 地面态（最低）
+  </div>
+  <div class="arrow-chain" style="margin-bottom:6px;">
+    <span style="font-size:0.75rem; color:var(--dim); margin-right:4px;">动作态:</span>
+    <span class="node special">Dead</span><span class="arrow">←</span>
+    <span class="node special">Hurt</span><span class="arrow">←</span>
+    <span class="node special">Attack</span><span class="arrow">←</span>
+    <span class="node special">Cast</span><span class="arrow">←</span>
+    <span class="node special">Dash</span>
+    <span style="font-size:0.7rem; color:var(--dim); margin-left:8px;">(RequestAction抢占)</span>
+  </div>
+  <div class="arrow-chain" style="margin-bottom:6px;">
+    <span style="font-size:0.75rem; color:var(--dim); margin-right:4px;">空中:</span>
+    <span class="node">JumpRise</span><span class="arrow">⇄</span><span class="node">JumpFall</span>
+    <span style="font-size:0.7rem; color:var(--dim); margin-left:8px;">(velocityY符号判定)</span>
+  </div>
+  <div class="arrow-chain">
+    <span style="font-size:0.75rem; color:var(--dim); margin-right:4px;">地面:</span>
+    <span class="node">Idle</span><span class="arrow">⇄</span><span class="node">Run</span>
+    <span style="font-size:0.7rem; color:var(--dim); margin-left:8px;">(input.MoveX判定)</span>
+  </div>
+  <div style="margin-top:8px; font-size:0.75rem; color:var(--dim);">
+    落地 → <span class="node">Land</span> (缓冲 0.167s) → 地面态
+  </div>
+</div>
+
+<h3>播放速度适配（AnimationDriver.GetPlaybackSpeed）</h3>
+<div class="card full" style="margin-top:0.5rem;">
+  <table>
+    <thead><tr><th>动画</th><th>Clip 原始时长</th><th>游戏逻辑时长来源</th><th>Speed =</th></tr></thead>
+    <tbody>
+      <tr><td>Attack</td><td>0.5s</td><td>tuning.combat (attackStartup + active + recovery)</td><td>clip / gameplay</td></tr>
+      <tr><td>Cast</td><td>0.2857s</td><td>tuning.abilities (mirrorBladeStartup + recovery)</td><td>clip / gameplay</td></tr>
+      <tr><td>Dash</td><td>0.75s</td><td>tuning.abilities.echoDashDuration</td><td>clip / gameplay</td></tr>
+      <tr><td>Hurt</td><td>0.2143s</td><td>tuning.hurt.hurtLockTime</td><td>clip / gameplay</td></tr>
+      <tr><td>Land</td><td>0.1667s</td><td>固定 0.1667s</td><td>1.0x</td></tr>
+      <tr><td>其余</td><td>-</td><td>无速度调整</td><td>1.0x</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== SECTION 2 ==================== -->
+<h2>二、原始 Platformer Demo 动画（Player.controller — 已废弃）</h2>
+<p class="section-desc">
+  旧版 <code>Assets/Character/Animations/Player.controller</code>，8 个动画 Clip，有完整的状态转换和参数驱动（velocityX/Y / grounded / hurt / dead / victory）。<br/>
+  当前项目已不再使用此控制器。
+</p>
+
+<div class="card">
+  <table>
+    <thead><tr><th>#</th><th>Animator State</th><th>Clip 文件</th><th>循环</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><strong>Player-Idle</strong></td><td>PlayerIdle.anim</td><td><span class="tag loop">Loop</span></td></tr>
+      <tr><td>2</td><td><strong>Player-Run</strong></td><td>PlayerRun.anim</td><td><span class="tag loop">Loop</span></td></tr>
+      <tr><td>3</td><td><strong>Player-Jump</strong></td><td>PlayerJump.anim</td><td><span class="tag loop">Loop</span></td></tr>
+      <tr><td>4</td><td><strong>Player-Land</strong></td><td>PlayerLand.anim</td><td><span class="tag once">Once</span></td></tr>
+      <tr><td>5</td><td><strong>Player-Hurt</strong></td><td>PlayerHurt.anim</td><td><span class="tag once">Once</span></td></tr>
+      <tr><td>6</td><td><strong>Player-Death</strong></td><td>PlayerDeath.anim</td><td><span class="tag once">Once</span></td></tr>
+      <tr><td>7</td><td><strong>Player-Spawn</strong></td><td>PlayerSpawn.anim</td><td><span class="tag once">Once</span></td></tr>
+      <tr><td>8</td><td><strong>Player-Victory</strong></td><td>PlayerVictory.anim</td><td><span class="tag once">Once</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== SECTION 3 ==================== -->
+<h2>三、DeadRevolver 资产包预留动画（未接入）</h2>
+<p class="section-desc">
+  来源路径: <code>Assets/DeadRevolver/PixelPrototypePlayerSprites/Art/Animations/</code><br/>
+  包含 <span class="count">96</span> 个 .anim 文件，覆盖大量未实现的功能状态。以下按类别分组列出，供后续扩展参考。
+</p>
+
+<div class="warn-note">
+  当前项目只使用了其中的 10 个（见第一部分），剩余 <span class="count">86</span> 个动画处于闲置状态。
+</div>
+
+<div class="unused-list" style="margin-top:0.8rem;">
+
+  <!-- 基础移动 -->
+  <span class="category-label">基础移动</span>
+  <span class="unused-item">Walk</span>
+  <span class="unused-item">Sprint</span>
+  <span class="unused-item">Crawl</span>
+  <span class="unused-item">Slide</span>
+  <span class="unused-item">Crouch</span>
+  <span class="unused-item">Roll</span>
+  <span class="unused-item">FrontFlip</span>
+
+  <!-- 剑技 -->
+  <span class="category-label">剑技扩展</span>
+  <span class="unused-item">SwordIdle</span>
+  <span class="unused-item">SwordWalk</span>
+  <span class="unused-item">SwordRun</span>
+  <span class="unused-item">SwordRunAltGrip</span>
+  <span class="unused-item">SwordSprint</span>
+  <span class="unused-item">SwordCrouch</span>
+  <span class="unused-item">SwordStandingSlash</span>
+  <span class="unused-item">SwordRunSlash</span>
+  <span class="unused-item">SwordSprintSlash</span>
+  <span class="unused-item">SwordGuard</span>
+  <span class="unused-item">SwordGuardImpact</span>
+  <span class="unused-item">SwordJumpRise</span>
+  <span class="unused-item">SwordJumpMid</span>
+  <span class="unused-item">SwordJumpFall</span>
+
+  <!-- 空技 -->
+  <span class="category-label">空中技能</span>
+  <span class="unused-item">AirSlashUp</span>
+  <span class="unused-item">AirSlashDown</span>
+  <span class="unused-item">GroundSlam</span>
+  <span class="unused-item">WallJump</span>
+
+  <!-- 冲刺 -->
+  <span class="category-label">冲刺系统</span>
+  <span class="unused-item">DashStart</span>
+  <span class="unused-item">DashLoop</span>
+  <span class="unused-item">DashEnd</span>
+
+  <!-- 枪械 -->
+  <span class="category-label">枪械系统</span>
+  <span class="unused-item">GunAim</span>
+  <span class="unused-item">GunFire</span>
+  <span class="unused-item">GunFire2H</span>
+  <span class="unused-item">GunReload</span>
+  <span class="unused-item">GunWalk</span>
+  <span class="unused-item">GunWalkFire</span>
+  <span class="unused-item">GunRun</span>
+  <span class="unused-item">GunRunFire</span>
+  <span class="unused-item">GunSprint</span>
+  <span class="unused-item">GunSprintFire</span>
+  <span class="unused-item">GunCrouch</span>
+  <span class="unused-item">GunCrouchFire</span>
+  <span class="unused-item">GunPreview</span>
+  <span class="unused-item">GunMuzzleFlashFX</span>
+  <span class="unused-item">GunBulletImpactFX</span>
+
+  <!-- 弓 -->
+  <span class="category-label">弓系统</span>
+  <span class="unused-item">BowAim</span>
+  <span class="unused-item">BowDraw</span>
+  <span class="unused-item">BowFull</span>
+  <span class="unused-item">BowFire</span>
+  <span class="unused-item">BowPreview</span>
+
+  <!-- 连击 -->
+  <span class="category-label">拳脚连击</span>
+  <span class="unused-item">PunchA</span>
+  <span class="unused-item">PunchB</span>
+  <span class="unused-item">PunchC</span>
+  <span class="unused-item">KickA</span>
+  <span class="unused-item">KickB</span>
+  <span class="unused-item">KickC</span>
+  <span class="unused-item">ComboAttackA</span>
+  <span class="unused-item">ComboAttackB</span>
+  <span class="unused-item">ComboAttackC</span>
+  <span class="unused-item">ComboAttackD</span>
+  <span class="unused-item">CrouchSlash</span>
+
+  <!-- 受击 -->
+  <span class="category-label">受击反馈</span>
+  <span class="unused-item">Knockback</span>
+  <span class="unused-item">Stunned</span>
+  <span class="unused-item">ShockLight</span>
+  <span class="unused-item">ShockHeavy</span>
+  <span class="unused-item">HitDamageUp</span>
+
+  <!-- 攀爬 -->
+  <span class="category-label">攀爬/墙壁</span>
+  <span class="unused-item">ClimbIdle</span>
+  <span class="unused-item">ClimbLeft</span>
+  <span class="unused-item">ClimbRight</span>
+  <span class="unused-item">ClimbUpLeft</span>
+  <span class="unused-item">ClimbUpRight</span>
+  <span class="unused-item">ClimbDownLeft</span>
+  <span class="unused-item">ClimbDownRight</span>
+  <span class="unused-item">ClimbGrab</span>
+  <span class="unused-item">ClimbJumpPrepare</span>
+  <span class="unused-item">WallSlide</span>
+  <span class="unused-item">WallClimb</span>
+  <span class="unused-item">WallClimbIdle</span>
+  <span class="unused-item">LedgeHang</span>
+  <span class="unused-item">LedgeClimb</span>
+  <span class="unused-item">LedgeGrab</span>
+
+  <!-- 梯子 -->
+  <span class="category-label">梯子</span>
+  <span class="unused-item">LadderClimb</span>
+  <span class="unused-item">LadderClimbFinish</span>
+  <span class="unused-item">LadderClimbHorizontal</span>
+
+  <!-- 猴架 -->
+  <span class="category-label">猴架</span>
+  <span class="unused-item">MonkeyBarIdle</span>
+  <span class="unused-item">MonkeyBarClimb</span>
+
+  <!-- 交互 -->
+  <span class="category-label">交互/物品</span>
+  <span class="unused-item">Push</span>
+  <span class="unused-item">PushIdle</span>
+  <span class="unused-item">Pull</span>
+  <span class="unused-item">InteractionPull</span>
+  <span class="unused-item">LookUp</span>
+
+  <!-- 钓鱼 -->
+  <span class="category-label">钓鱼</span>
+  <span class="unused-item">FishingIdle</span>
+  <span class="unused-item">FishingPrepare</span>
+  <span class="unused-item">FishingCast</span>
+  <span class="unused-item">FishingCatch</span>
+  <span class="unused-item">FishingReel</span>
+  <span class="unused-item">FishingCharge</span>
+  <span class="unused-item">FishingStruggle</span>
+
+  <!-- 投掷 -->
+  <span class="category-label">投掷</span>
+  <span class="unused-item">ThrowOverarm</span>
+  <span class="unused-item">ThrowUnderarm</span>
+
+  <!-- 过渡/闲置 -->
+  <span class="category-label">过渡/其他</span>
+  <span class="unused-item">IdleTransition</span>
+  <span class="unused-item">Jump</span>
+  <span class="unused-item">JumpMid</span>
+  <span class="unused-item">Spin</span>
+</div>
+
+<!-- ==================== SECTION 4 ==================== -->
+<h2>四、汇总</h2>
+<div class="overview-grid">
+  <div class="card">
+    <div class="card-title">动画体系</div>
+    <table>
+      <thead><tr><th>层级</th><th>数量</th><th>状态</th></tr></thead>
+      <tbody>
+        <tr><td>当前使用 (MirrorTrial)</td><td class="count">10</td><td><span class="badge badge-active">活跃</span></td></tr>
+        <tr><td>旧版 Demo (Platformer)</td><td>8</td><td><span class="badge badge-legacy">已废弃</span></td></tr>
+        <tr><td>DeadRevolver 资产包</td><td class="count">96</td><td><span class="badge badge-source">素材库</span></td></tr>
+        <tr style="border-top: 2px solid var(--border);"><td><strong>总计 Clip 文件</strong></td><td class="count">96</td><td>-</td></tr>
+        <tr><td>已接入</td><td class="count">10</td><td>-</td></tr>
+        <tr><td>可扩展（未接入）</td><td class="count">86</td><td>-</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-title">PlayerActionState 枚举 vs Animator State 映射</div>
+    <table>
+      <thead><tr><th>枚举值</th><th>Animator State</th><th>驱动方式</th></tr></thead>
+      <tbody>
+        <tr><td class="enum-val">Idle</td><td>Idle</td><td>状态机自动</td></tr>
+        <tr><td class="enum-val">Run</td><td>Run</td><td>状态机自动</td></tr>
+        <tr><td class="enum-val">JumpRise</td><td>JumpRise</td><td>状态机自动</td></tr>
+        <tr><td class="enum-val">JumpFall</td><td>JumpFall</td><td>状态机自动</td></tr>
+        <tr><td class="enum-val">Land</td><td>Land</td><td>状态机自动</td></tr>
+        <tr><td class="enum-val">Attack</td><td>SwordAttack</td><td>RequestAction</td></tr>
+        <tr><td class="enum-val">Cast</td><td>AirSlash</td><td>RequestAction</td></tr>
+        <tr><td class="enum-val">Dash</td><td>Dash</td><td>RequestAction</td></tr>
+        <tr><td class="enum-val">Hurt</td><td>HitDamage</td><td>RequestAction</td></tr>
+        <tr><td class="enum-val">Dead</td><td>Die</td><td>RequestAction</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>
